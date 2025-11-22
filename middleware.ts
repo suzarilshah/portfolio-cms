@@ -30,6 +30,7 @@ export function middleware(request: NextRequest) {
     addCORSHeaders(response, {
       origins: [
         'http://localhost:3000',
+        'http://localhost:3001',
         'https://www.suzarilshah.uk',
         'https://suzarilshah.uk'
       ],
