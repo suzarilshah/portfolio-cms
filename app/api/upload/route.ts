@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Client, Storage, ID, Permission, Role } from 'node-appwrite';
 import { InputFile } from 'node-appwrite/file';
+import { createSecureAPIHandler } from '@/lib/security/middleware';
+import { SecurityValidator } from '@/lib/security/validation';
+import { uploadRateLimiter, createRateLimitResponse, getClientIdentifier } from '@/lib/security/rate-limiter';
 
 // Ensure Node.js runtime (Appwrite SDK + Buffer not available on Edge)
 export const runtime = 'nodejs';
@@ -23,7 +26,7 @@ const ALLOWED_DOC_EXTS = new Set(['pdf', 'doc', 'docx']);
 const ALLOWED_IMAGE_EXTS = new Set(['png', 'jpg', 'jpeg', 'svg', 'webp', 'ico']);
 const MAX_SIZE_BYTES = 15 * 1024 * 1024; // 15MB
 
-export async function POST(request: NextRequest) {
+export const POST = createSecureAPIHandler(async (request: NextRequest) => {
     try {
         // Validate env config
         const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
@@ -45,6 +48,15 @@ export async function POST(request: NextRequest) {
 
         if (!file) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+        }
+
+        // Enhanced file validation
+        const validation = SecurityValidator.validateFileUpload(file);
+        if (!validation.isValid) {
+            return NextResponse.json(
+              { error: 'File validation failed', details: validation.errors },
+              { status: 400 }
+            );
         }
 
         // Basic validations (type/size)
@@ -70,9 +82,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Sanitize filename
+        const sanitizedName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        
         // Convert to buffer for node-appwrite
         const buffer = Buffer.from(await file.arrayBuffer());
-        const inputFile = InputFile.fromBuffer(buffer, file.name);
+        const inputFile = InputFile.fromBuffer(buffer, sanitizedName);
 
         // Initialize client lazily (after env validation)
         const client = new Client()
@@ -97,7 +112,7 @@ export async function POST(request: NextRequest) {
         const endpointTrimmed = endpoint.replace(/\/$/, '');
         const fileUrl = `${endpointTrimmed}/storage/buckets/${targetBucket}/files/${result.$id}/view?project=${project}`;
         
-        return NextResponse.json({ url: fileUrl });
+        return NextResponse.json({ url: fileUrl, fileId: result.$id });
     } catch (error: any) {
         console.error('Upload error:', error);
         // Helpful Appwrite-specific messaging
@@ -122,4 +137,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ error: message }, { status: 500 });
     }
-}
+}, { 
+  rateLimit: { windowMs: 60000, maxRequests: 20 },
+  validateContentType: false // FormData uploads use multipart/form-data
+});

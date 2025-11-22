@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Trash2, Plus, GripVertical, Award, CheckCircle2, ExternalLink, Loader2, LayoutList, Grid3X3 } from 'lucide-react';
-import { motion, Reorder, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Script from 'next/script';
 
 interface Badge {
@@ -208,89 +208,87 @@ export default function BadgeManager() {
       {loading ? (
           <div className="text-center py-12 text-slate-400">Loading credentials...</div>
       ) : (
-        <Reorder.Group
-          axis="y"
-          values={badges}
-          onReorder={handleReorder}
-          className={`grid ${listView ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} gap-6`}
-        >
-          <AnimatePresence mode='popLayout'>
-              {badges.map((badge) => (
-                <Reorder.Item 
-                  key={badge.id} 
-                  value={badge}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className={`group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 cursor-grab active:cursor-grabbing ${listView ? 'flex flex-row' : ''}`}
+        <motion.div layout className="space-y-4">
+          <AnimatePresence>
+          {badges.map((badge, index) => (
+            <motion.div
+              key={badge.id}
+              layout
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              onDragEnd={() => {}}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className={`group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 cursor-grab active:cursor-grabbing ${listView ? 'flex flex-row' : ''}`}
+            >
+              <div className={`p-4 ${listView ? 'w-56 border-r' : ''} border-b border-slate-100 bg-slate-50/50 flex ${listView ? 'flex-col items-start gap-3' : 'justify-between items-center'} shrink-0`}>
+                <div className="flex items-center gap-2 text-slate-500">
+                  <GripVertical size={18} />
+                  <span className="text-xs font-mono uppercase tracking-wider">Drag</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-slate-900 line-clamp-2">{badge.title || 'Untitled Badge'}</span>
+                  {badge.issuer && <span className="text-xs text-slate-500">{badge.issuer}</span>}
+                </div>
+                <button 
+                  onClick={() => deleteBadge(badge.id)}
+                  className="ml-auto text-slate-400 hover:text-red-500 transition-colors p-1 rounded hover:bg-red-50"
+                  aria-label={`Delete ${badge.title || badge.badge_id}`}
                 >
-                    <div className={`p-4 ${listView ? 'w-56 border-r' : ''} border-b border-slate-100 bg-slate-50/50 flex ${listView ? 'flex-col items-start gap-3' : 'justify-between items-center'} shrink-0`}>
-                        <div className="flex items-center gap-2 text-slate-500">
-                            <GripVertical size={18} />
-                            <span className="text-xs font-mono uppercase tracking-wider">Drag</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-slate-900 line-clamp-2">{badge.title || 'Untitled Badge'}</span>
-                          {badge.issuer && <span className="text-xs text-slate-500">{badge.issuer}</span>}
-                        </div>
-                        <button 
-                            onClick={() => deleteBadge(badge.id)}
-                            className="ml-auto text-slate-400 hover:text-red-500 transition-colors p-1 rounded hover:bg-red-50"
-                            aria-label={`Delete ${badge.title || badge.badge_id}`}
-                        >
-                            <Trash2 size={18} />
-                        </button>
-                    </div>
+                  <Trash2 size={18} />
+                </button>
+              </div>
 
                     <div className={`p-6 flex ${listView ? 'flex-row items-center gap-6' : 'flex-col'} justify-center bg-white relative min-h-[200px] grow`}>
-                        {/* Verification Badge */}
-                        <div className="absolute top-4 right-4 z-10">
-                            <div className="bg-green-50 text-green-600 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-green-100">
-                                <CheckCircle2 size={12} /> Verified
-                            </div>
-                        </div>
+                {/* Verification Badge */}
+                <div className="absolute top-4 right-4 z-10">
+                  <div className="bg-green-50 text-green-600 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-green-100">
+                    <CheckCircle2 size={12} /> Verified
+                  </div>
+                </div>
 
-                        {/* Credly Embed or Static Image */}
+                {/* Credly Embed or Static Image */}
                         {badge.image_url && !imageError[badge.id] ? (
-                            <div className="flex flex-col items-center text-center">
-                                <img 
-                                    src={badge.image_url} 
-                                    alt={badge.title || 'Badge'} 
-                                    className="w-32 h-32 object-contain mb-4"
-                                    onError={() => setImageError(prev => ({ ...prev, [badge.id]: true }))}
-                                />
-                                {badge.title && (
-                                    <h4 className="font-bold text-slate-900 text-sm mb-1 line-clamp-2 px-2">
-                                        {badge.title}
-                                    </h4>
-                                )}
-                                {badge.issuer && (
-                                    <p className="text-xs text-slate-500">
-                                        {badge.issuer}
-                                    </p>
-                                )}
-                            </div>
-                        ) : (
-                            <div 
-                                data-iframe-width="150" 
-                                data-iframe-height="270" 
-                                data-share-badge-id={badge.badge_id} 
-                                data-share-badge-host="https://www.credly.com"
-                                className="transform transition-transform group-hover:scale-105 duration-500"
-                                key={`embed-${badge.id}-${badge.badge_id}-${badge.image_url || 'noimg'}`}
-                            ></div>
-                        )}
-                    </div>
-                    
-                    {!listView && (
-                      <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
-                        <span className="text-xs font-medium text-slate-600">{badge.title || badge.badge_id}</span>
-                      </div>
+                  <div className="flex flex-col items-center text-center">
+                    <img 
+                      src={badge.image_url} 
+                      alt={badge.title || 'Badge'} 
+                      className="w-32 h-32 object-contain mb-4"
+                      onError={() => setImageError(prev => ({ ...prev, [badge.id]: true }))}
+                    />
+                    {badge.title && (
+                      <h4 className="font-bold text-slate-900 text-sm mb-1 line-clamp-2 px-2">
+                        {badge.title}
+                      </h4>
                     )}
-                </Reorder.Item>
-              ))}
+                    {badge.issuer && (
+                      <p className="text-xs text-slate-500">
+                        {badge.issuer}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div 
+                    data-iframe-width="150" 
+                    data-iframe-height="270" 
+                    data-share-badge-id={badge.badge_id} 
+                    data-share-badge-host="https://www.credly.com"
+                    className="transform transition-transform group-hover:scale-105 duration-500"
+                    key={`embed-${badge.id}-${badge.badge_id}-${badge.image_url || 'noimg'}`}
+                  ></div>
+                )}
+              </div>
+              
+              {!listView && (
+                <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                  <span className="text-xs font-medium text-slate-600">{badge.title || badge.badge_id}</span>
+                </div>
+              )}
+            </motion.div>
+          ))}
           </AnimatePresence>
-        </Reorder.Group>
+        </motion.div>
       )}
       
       {badges.length === 0 && !loading && (
