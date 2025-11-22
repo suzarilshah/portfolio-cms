@@ -1,0 +1,416 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Save, Loader2, Plus, Trash2, Edit2, ExternalLink, Code, Cloud, Zap, Server, Globe, History, RotateCcw } from 'lucide-react';
+
+interface Project {
+    id?: number;
+    title: string;
+    tagline: string;
+    challenge: string;
+    solution: string;
+    impact: { metric: string; value: string }[];
+    technologies: string[];
+    category: string;
+    icon_name: string;
+    year: string;
+    link: string;
+    updated_at?: string;
+}
+
+const DEFAULT_PROJECT: Project = {
+    title: '',
+    tagline: '',
+    challenge: '',
+    solution: '',
+    impact: [{ metric: '', value: '' }],
+    technologies: [],
+    category: '',
+    icon_name: 'Code',
+    year: '',
+    link: ''
+};
+
+const ICONS = ['Code', 'Cloud', 'Zap', 'Server', 'Globe'];
+
+import SectionEditor from '../components/SectionEditor';
+
+// ... existing interfaces ...
+
+export default function ProjectsAdminPage() {
+    const [activeTab, setActiveTab] = useState<'projects' | 'settings'>('projects');
+    
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [formData, setFormData] = useState<Project>(DEFAULT_PROJECT);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
+    // History State
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [historyRecords, setHistoryRecords] = useState<any[]>([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
+    const [selectedProjectForHistory, setSelectedProjectForHistory] = useState<number | null>(null);
+
+    useEffect(() => {
+        fetchProjects();
+    }, []);
+
+    const fetchProjects = async () => {
+        try {
+            const res = await fetch('/api/cms/projects');
+            const data = await res.json();
+            setProjects(data || []);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchHistory = async (projectId: number) => {
+        setHistoryLoading(true);
+        try {
+            const res = await fetch(`/api/cms/projects/history?projectId=${projectId}`);
+            const data = await res.json();
+            setHistoryRecords(data || []);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setHistoryLoading(false);
+        }
+    };
+
+    const handleHistoryClick = (projectId: number) => {
+        setSelectedProjectForHistory(projectId);
+        setHistoryOpen(true);
+        fetchHistory(projectId);
+    };
+
+    const handleRestore = async (historyId: number) => {
+        if (!confirm('Restore this version? Current changes will be overwritten.')) return;
+        try {
+            const res = await fetch('/api/cms/projects/history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ history_id: historyId })
+            });
+            if (res.ok) {
+                const restored = await res.json();
+                alert('Version restored successfully!');
+                setHistoryOpen(false);
+                fetchProjects();
+                // If we were editing this project, update the form
+                if (editingId === restored.id) {
+                    setFormData(restored);
+                }
+            }
+        } catch (e) {
+            alert('Failed to restore version');
+        }
+    };
+
+    const handleEdit = (project: Project) => {
+        setEditingId(project.id!);
+        setFormData(project);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCancel = () => {
+        setEditingId(null);
+        setFormData(DEFAULT_PROJECT);
+    };
+
+    const handleDelete = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this project?')) return;
+        await fetch(`/api/cms/projects?id=${id}`, { method: 'DELETE' });
+        fetchProjects();
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSaving(true);
+        try {
+            const method = editingId ? 'PUT' : 'POST';
+            const payload = editingId ? { ...formData, id: editingId } : formData;
+            
+            await fetch('/api/cms/projects', {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            handleCancel();
+            fetchProjects();
+        } catch (e) {
+            alert('Failed to save project');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const updateImpact = (index: number, field: 'metric' | 'value', val: string) => {
+        const newImpact = [...formData.impact];
+        newImpact[index][field] = val;
+        setFormData({ ...formData, impact: newImpact });
+    };
+
+    const addImpact = () => {
+        setFormData({ ...formData, impact: [...formData.impact, { metric: '', value: '' }] });
+    };
+
+    const removeImpact = (index: number) => {
+        const newImpact = formData.impact.filter((_, i) => i !== index);
+        setFormData({ ...formData, impact: newImpact });
+    };
+
+    if (loading && activeTab === 'projects') return <div>Loading...</div>;
+
+    return (
+        <div className="space-y-8">
+            {/* Tab Switcher */}
+            <div className="flex gap-1 bg-slate-100 p-1 rounded-lg w-fit mb-8">
+                <button 
+                    onClick={() => setActiveTab('projects')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'projects' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    Manage Projects
+                </button>
+                <button 
+                    onClick={() => setActiveTab('settings')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'settings' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    Section Settings
+                </button>
+            </div>
+
+            {activeTab === 'settings' ? (
+                <SectionEditor<{ title: string; description: string }>
+                    sectionKey="projects"
+                    title="Projects Section Config"
+                    description="Manage the section header, title, and introductory text."
+                    defaultContent={{
+                        title: "Projects & Case Studies",
+                        description: "Real-world cloud architecture, DevOps transformations, and IoT solutions driving measurable business impact"
+                    }}
+                    renderForm={(content, onChange) => (
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-slate-900">Section Title</label>
+                                <input 
+                                    type="text" 
+                                    value={content.title} 
+                                    onChange={(e) => onChange({ ...content, title: e.target.value })}
+                                    className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-slate-900">Description</label>
+                                <textarea 
+                                    value={content.description} 
+                                    onChange={(e) => onChange({ ...content, description: e.target.value })}
+                                    className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white h-32"
+                                />
+                            </div>
+                        </div>
+                    )}
+                />
+            ) : (
+                <div className="space-y-12 relative">
+                    {/* History Modal */}
+                    {historyOpen && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex justify-end">
+                            <div className="w-full max-w-md bg-white h-full shadow-2xl p-6 overflow-y-auto animate-slide-in-right">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-xl font-bold text-slate-900">Version History</h3>
+                                    <button onClick={() => setHistoryOpen(false)} className="text-slate-500 hover:text-slate-700">Close</button>
+                                </div>
+                                
+                                {historyLoading ? (
+                                    <div className="text-center py-8 text-slate-500">Loading history...</div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {historyRecords.map((record) => (
+                                            <div key={record.id} className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="text-sm text-slate-500">
+                                                        {new Date(record.created_at).toLocaleString()}
+                                                    </div>
+                                                    <button 
+                                                        onClick={() => handleRestore(record.id)}
+                                                        className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100 flex items-center gap-1"
+                                                    >
+                                                        <RotateCcw size={12} /> Restore
+                                                    </button>
+                                                </div>
+                                                <div className="text-sm font-medium text-slate-900 truncate">
+                                                    {record.snapshot.title}
+                                                </div>
+                                                <div className="text-xs text-slate-400 mt-1">
+                                                    {record.snapshot.technologies?.length || 0} technologies • {record.snapshot.impact?.length || 0} metrics
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {historyRecords.length === 0 && (
+                                            <div className="text-center text-slate-400 py-8">No history found.</div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-900">Projects Showcase</h2>
+                            <p className="text-slate-500">Manage featured case studies and projects.</p>
+                        </div>
+                        {!editingId && (
+                            <button 
+                                onClick={() => { setEditingId(null); setFormData(DEFAULT_PROJECT); }}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                            >
+                                <Plus size={18} /> Add Project
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Editor Form */}
+                    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                        <h3 className="text-lg font-semibold mb-6">{editingId ? 'Edit Project' : 'New Project'}</h3>
+                        <form onSubmit={handleSave} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Project Title</label>
+                                    <input type="text" className="w-full border p-2 rounded-lg" required 
+                                        value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Tagline</label>
+                                    <input type="text" className="w-full border p-2 rounded-lg" 
+                                        value={formData.tagline} onChange={e => setFormData({...formData, tagline: e.target.value})} />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Category</label>
+                                    <input type="text" className="w-full border p-2 rounded-lg" placeholder="e.g. Cloud Architecture"
+                                        value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Year</label>
+                                    <input type="text" className="w-full border p-2 rounded-lg" placeholder="e.g. 2024-2025"
+                                        value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Challenge</label>
+                                    <textarea className="w-full border p-2 rounded-lg h-32" required
+                                        value={formData.challenge} onChange={e => setFormData({...formData, challenge: e.target.value})} />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Solution</label>
+                                    <textarea className="w-full border p-2 rounded-lg h-32" required
+                                        value={formData.solution} onChange={e => setFormData({...formData, solution: e.target.value})} />
+                                </div>
+                            </div>
+
+                            {/* Tech Stack */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Technologies (comma separated)</label>
+                                <input type="text" className="w-full border p-2 rounded-lg" 
+                                    value={formData.technologies.join(', ')} 
+                                    onChange={e => setFormData({...formData, technologies: e.target.value.split(',').map(s => s.trim())})} 
+                                    placeholder="React, Node.js, Azure, ..."
+                                />
+                            </div>
+
+                            {/* Impact Metrics */}
+                            <div className="space-y-4">
+                                <label className="text-sm font-medium">Impact Metrics</label>
+                                {formData.impact.map((imp, idx) => (
+                                    <div key={idx} className="flex gap-4 items-center">
+                                        <input type="text" placeholder="Metric (e.g. Uptime)" className="flex-1 border p-2 rounded-lg"
+                                            value={imp.metric} onChange={e => updateImpact(idx, 'metric', e.target.value)} />
+                                        <input type="text" placeholder="Value (e.g. 99.9%)" className="flex-1 border p-2 rounded-lg"
+                                            value={imp.value} onChange={e => updateImpact(idx, 'value', e.target.value)} />
+                                        <button type="button" onClick={() => removeImpact(idx)} className="text-red-500 hover:bg-red-50 p-2 rounded">
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button type="button" onClick={addImpact} className="text-sm text-blue-600 hover:underline">+ Add Metric</button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Project Link</label>
+                                    <div className="flex items-center gap-2">
+                                        <ExternalLink size={16} className="text-slate-400" />
+                                        <input type="text" className="w-full border p-2 rounded-lg" placeholder="https://..."
+                                            value={formData.link} onChange={e => setFormData({...formData, link: e.target.value})} />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Icon</label>
+                                    <div className="flex gap-2">
+                                        {ICONS.map(icon => (
+                                            <button
+                                                key={icon}
+                                                type="button"
+                                                onClick={() => setFormData({...formData, icon_name: icon})}
+                                                className={`p-2 border rounded-lg ${formData.icon_name === icon ? 'bg-blue-50 border-blue-500 text-blue-600' : 'hover:bg-slate-50'}`}
+                                            >
+                                                {icon}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                {editingId && (
+                                    <button type="button" onClick={handleCancel} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                                        Cancel
+                                    </button>
+                                )}
+                                <button type="submit" disabled={saving} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                                    {saving && <Loader2 size={16} className="animate-spin" />}
+                                    {editingId ? 'Update Project' : 'Create Project'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Projects List */}
+                    <div className="grid gap-4">
+                        {projects.map(project => (
+                            <div key={project.id} className="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between group hover:shadow-md transition-all">
+                                <div>
+                                    <h4 className="font-bold text-slate-900">{project.title}</h4>
+                                    <p className="text-sm text-slate-500">{project.category} • {project.year}</p>
+                                </div>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => handleHistoryClick(project.id!)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg" title="History">
+                                        <History size={18} />
+                                    </button>
+                                    <button onClick={() => handleEdit(project)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">
+                                        <Edit2 size={18} />
+                                    </button>
+                                    <button onClick={() => handleDelete(project.id!)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        {projects.length === 0 && (
+                            <div className="text-center py-12 text-slate-400 bg-slate-50 rounded-xl border border-dashed">
+                                No projects found. Create one above!
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

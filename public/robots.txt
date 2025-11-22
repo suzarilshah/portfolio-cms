@@ -1,0 +1,12 @@
+# Allow all crawlers to access all content except admin areas
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /handler/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://www.suzarilshah.uk/sitemap.xml
+
+# Crawl rate
+Crawl-delay: 1
