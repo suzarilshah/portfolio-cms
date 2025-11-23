@@ -212,6 +212,64 @@ export class SecurityValidator {
           return sanitizedJob;
         });
       }
+
+      // Handle items array (for awards section)
+      if (content.items && Array.isArray(content.items)) {
+        sanitized.items = content.items.slice(0, 20).map((item: any) => {
+          const sanitizedItem: any = {};
+          if (item.title) {
+            sanitizedItem.title = this.sanitizeHtml((item.title as string).trim().substring(0, 200));
+          }
+          if (item.issuer) {
+            sanitizedItem.issuer = this.sanitizeHtml((item.issuer as string).trim().substring(0, 200));
+          }
+          if (item.year) {
+            sanitizedItem.year = this.sanitizeHtml((item.year as string).trim().substring(0, 20));
+          }
+          if (item.description) {
+            sanitizedItem.description = this.sanitizeHtml((item.description as string).trim().substring(0, 1000));
+          }
+          // Education fields
+          if (item.degree) {
+            sanitizedItem.degree = this.sanitizeHtml((item.degree as string).trim().substring(0, 200));
+          }
+          if (item.institution) {
+            sanitizedItem.institution = this.sanitizeHtml((item.institution as string).trim().substring(0, 200));
+          }
+          if (item.period) {
+            sanitizedItem.period = this.sanitizeHtml((item.period as string).trim().substring(0, 100));
+          }
+          if (item.specialization) {
+            sanitizedItem.specialization = this.sanitizeHtml((item.specialization as string).trim().substring(0, 200));
+          }
+          if (item.details) {
+            sanitizedItem.details = this.sanitizeHtml((item.details as string).trim().substring(0, 1000));
+          }
+          // Common fields
+          if (item.icon) {
+            sanitizedItem.icon = this.sanitizeHtml((item.icon as string).trim().substring(0, 50));
+          }
+          if (item.link) {
+             try {
+                const url = new URL(item.link);
+                if (['http:', 'https:'].includes(url.protocol)) {
+                    sanitizedItem.link = url.toString();
+                }
+             } catch {
+                // invalid link, ignore or strip
+             }
+          }
+          return sanitizedItem;
+        });
+      }
+
+      // Handle skills array (for about section)
+      if (content.skills && Array.isArray(content.skills)) {
+        sanitized.skills = content.skills
+          .filter((item: any) => typeof item === 'string' && item.length <= 50)
+          .map((item: string) => this.sanitizeHtml(item.trim()))
+          .slice(0, 50); // Max 50 skills
+      }
     } else {
       errors.push('Content must be a valid object');
     }
