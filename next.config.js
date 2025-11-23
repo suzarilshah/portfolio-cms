@@ -6,6 +6,7 @@ const nextConfig = {
   // Security configurations
   poweredByHeader: false,
   reactStrictMode: true,
+  swcMinify: true,
   transpilePackages: ['@stackframe/stack'],
   // Security headers
   async headers() {
