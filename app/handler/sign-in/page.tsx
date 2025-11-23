@@ -1,8 +1,21 @@
 'use client';
 
-import { SignIn } from '@stackframe/stack';
+import { SignIn, useUser } from '@stackframe/stack';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
 
-export default function CustomSignInPage() {
+function SignInContent() {
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect_url') || '/';
+  const user = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push(redirectUrl);
+    }
+  }, [user, redirectUrl, router]);
+
   return (
     <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center px-4">
       {/* Architectural background */}
@@ -48,7 +61,7 @@ export default function CustomSignInPage() {
                 Use your Stack Auth credentials to continue.
               </p>
             </div>
-            <SignIn />
+            <SignIn fullPage={false} />
             <p className="mt-4 text-[11px] text-slate-400 text-center md:text-left">
               Sessions are secured with HTTP-only cookies. If you suspect
               unauthorized access, rotate your keys in Stack Auth.
@@ -57,5 +70,17 @@ export default function CustomSignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CustomSignInPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-slate-500">Loading...</div>
+      </div>
+    }>
+      <SignInContent />
+    </Suspense>
   );
 }

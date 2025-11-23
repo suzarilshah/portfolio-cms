@@ -152,20 +152,15 @@ export default function CommunitySection({ content }: { content?: any }) {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const res = await fetch('https://sessionize.com/api/speaker/sessions/qe8n7ez6dg/1x1x3fb393x');
-        const text = await res.text();
-        // Extract session data from the document.write content
-        // Pattern: <a href="LINK" class="sz-item__title" target="_blank">TITLE</a>
-        const regex = /<a href="([^"]+)"[^>]*class="sz-item__title"[^>]*>([^<]+)<\/a>/g;
-        const foundSessions: SessionizeSession[] = [];
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-          foundSessions.push({
-            link: match[1],
-            title: match[2].replace(/&amp;/g, '&')
-          });
+        const res = await fetch('/api/community/sessions');
+
+        if (!res.ok) {
+          console.error('Failed to fetch sessions: bad status', res.status);
+          return;
         }
-        setSessions(foundSessions);
+
+        const data: { sessions?: SessionizeSession[] } = await res.json();
+        setSessions(data.sessions ?? []);
       } catch (e) {
         console.error('Failed to fetch sessions', e);
       } finally {

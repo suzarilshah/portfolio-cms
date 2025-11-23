@@ -137,8 +137,8 @@ export default async function RootLayout({
   const gaId = settings?.ga_measurement_id || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   return (
-    <html lang="en" className="scroll-smooth" data-accent={accent}>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased relative min-h-screen`}>
+    <html lang="en" className="scroll-smooth" data-accent={accent} suppressHydrationWarning>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased relative min-h-screen`} suppressHydrationWarning>
         {/* SEO Structured Data & Analytics (client-safe in body) */}
         <StructuredData type="all" />
         <GoogleAnalytics measurementId={gaId} />

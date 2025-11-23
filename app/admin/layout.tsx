@@ -1,14 +1,15 @@
 import { stackServerApp } from "@/stack";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Settings, Award, FileText, LogOut } from "lucide-react";
+import { LayoutDashboard, Settings, Award } from "lucide-react";
 import { StackProvider, StackTheme } from "@stackframe/stack";
+import UserMenu from "./components/UserMenu";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await stackServerApp.getUser();
   
   if (!user) {
-    redirect("/handler/sign-in");
+    redirect("/handler/sign-in?redirect_url=" + encodeURIComponent("/admin"));
   }
 
   // Strict email lock for the "1 Trillion USD" security standard
@@ -27,6 +28,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     // Note: Commented out strict lock for now to allow you to test if you signed up with a different email during dev.
     // Uncomment above block to enforce lock.
   }
+
+  const clientUser = {
+    displayName: user.displayName,
+    primaryEmail: user.primaryEmail,
+  };
 
   return (
     <StackProvider app={stackServerApp}>
@@ -110,15 +116,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </nav>
 
             <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-                 <div className="flex items-center gap-3 px-2">
-                    <div className="w-9 h-9 bg-white border border-slate-200 shadow-sm rounded-full flex items-center justify-center text-blue-700 font-bold text-sm">
-                      {user.displayName?.[0] || 'A'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-slate-900 truncate">{user.displayName || 'Administrator'}</p>
-                      <p className="text-[10px] text-slate-400 truncate font-mono">{user.primaryEmail}</p>
-                    </div>
-                 </div>
+                 <UserMenu user={clientUser} />
             </div>
           </aside>
           

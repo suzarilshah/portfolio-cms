@@ -21,7 +21,7 @@ export class SecurityHeadersBuilder {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.stack.inc https://*.stack-auth.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://sgp.cloud.appwrite.io https://ep-orange-fire-a85s6psf-pooler.eastus2.azure.neon.tech https://*.stack.inc https://*.stack-auth.com",
+      "connect-src 'self' https://sgp.cloud.appwrite.io https://ep-orange-fire-a85s6psf-pooler.eastus2.azure.neon.tech https://*.stack.inc https://*.stack-auth.com https://sessionize.com https://*.sessionize.com",
       "frame-src 'self' https://*.stack.inc https://*.stack-auth.com https://www.credly.com",
       "object-src 'none'",
       "base-uri 'self'",

@@ -208,25 +208,28 @@ export default function BadgeManager() {
       {loading ? (
           <div className="text-center py-12 text-slate-400">Loading credentials...</div>
       ) : (
-        <motion.div layout className="space-y-4">
+        <motion.div layout className={listView ? "space-y-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
           <AnimatePresence>
           {badges.map((badge, index) => (
             <motion.div
               key={badge.id}
               layout
-              drag="y"
+              // Dragging only works well in list view for now due to Reorder.Group complexities
+              drag={listView ? "y" : false}
               dragConstraints={{ top: 0, bottom: 0 }}
               onDragEnd={() => {}}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className={`group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 cursor-grab active:cursor-grabbing ${listView ? 'flex flex-row' : ''}`}
+              className={`group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 ${listView ? 'flex flex-row cursor-grab active:cursor-grabbing' : ''}`}
             >
               <div className={`p-4 ${listView ? 'w-56 border-r' : ''} border-b border-slate-100 bg-slate-50/50 flex ${listView ? 'flex-col items-start gap-3' : 'justify-between items-center'} shrink-0`}>
-                <div className="flex items-center gap-2 text-slate-500">
-                  <GripVertical size={18} />
-                  <span className="text-xs font-mono uppercase tracking-wider">Drag</span>
-                </div>
+                {listView && (
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <GripVertical size={18} />
+                    <span className="text-xs font-mono uppercase tracking-wider">Drag</span>
+                  </div>
+                )}
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-slate-900 line-clamp-2">{badge.title || 'Untitled Badge'}</span>
                   {badge.issuer && <span className="text-xs text-slate-500">{badge.issuer}</span>}
