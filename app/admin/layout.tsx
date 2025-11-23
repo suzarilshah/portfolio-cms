@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LayoutDashboard, Settings, Award } from "lucide-react";
 import { StackProvider, StackTheme } from "@stackframe/stack";
 import UserMenu from "./components/UserMenu";
+import { Suspense } from "react";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await stackServerApp.getUser();
@@ -114,7 +115,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </nav>
 
             <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-                 <UserMenu user={clientUser} />
+                 <Suspense fallback={
+                   <div className="flex items-center gap-2 text-sm text-slate-500">
+                     <div className="w-4 h-4 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+                     Loading user...
+                   </div>
+                 }>
+                   <UserMenu user={clientUser} />
+                 </Suspense>
             </div>
           </aside>
           
