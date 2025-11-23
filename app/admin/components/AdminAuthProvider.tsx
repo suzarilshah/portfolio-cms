@@ -8,7 +8,7 @@ interface AdminAuthContextType {
 
 const AdminAuthContext = createContext<AdminAuthContextType>({ user: null });
 
-export function AdminAuthProvider({ 
+export default function AdminAuthProvider({ 
   children, 
   user 
 }: { 
