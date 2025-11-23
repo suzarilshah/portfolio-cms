@@ -6,9 +6,9 @@ import SkillsMatrix from '@/components/SkillsMatrix';
 import ProjectsShowcase from '@/components/ProjectsShowcase';
 import ExperienceSection from './components/ExperienceSection';
 import EducationSection from './components/EducationSection';
-import AwardsSection from '@/components/AwardsSection';
+import AwardsSection from './components/AwardsSection';
 import PublicationsSection from './components/PublicationsSection';
-import CommunitySection from '@/components/CommunitySection';
+import CommunitySection from './components/CommunitySection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 
