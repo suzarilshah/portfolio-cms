@@ -27,8 +27,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   const clientUser = {
-    email: user.email,
-    name: 'Muhammad Suzaril Shah',
+    displayName: 'Muhammad Suzaril Shah',
+    primaryEmail: user.email,
   };
 
   return (
