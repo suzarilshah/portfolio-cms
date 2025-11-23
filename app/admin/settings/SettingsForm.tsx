@@ -377,11 +377,12 @@ export default function SettingsForm() {
                 <label className="block text-sm font-medium text-slate-700">Background Pattern</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {[
-                        { value: 'dots', label: 'Subtle Dots', preview: 'radial-gradient(#cbd5e1 1px, transparent 1px)' },
-                        { value: 'grid', label: 'Modern Grid', preview: 'linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px)' },
-                        { value: 'graph', label: 'Graph Paper', preview: 'linear-gradient(transparent 95%, #e2e8f0 95%), linear-gradient(90deg, transparent 95%, #e2e8f0 95%)' },
-                        { value: 'polka', label: 'Polka Dots', preview: 'radial-gradient(#94a3b8 2px, transparent 2px)' },
-                        { value: 'diagonal', label: 'Diagonal Lines', preview: 'repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 10px, #f8fafc 10px, #f8fafc 20px)' },
+                        { value: 'topography', label: 'Topography', preview: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` },
+                        { value: 'circuit', label: 'Circuit Board', preview: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.2'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` },
+                        { value: 'hexagons', label: 'Hexagons', preview: `url("data:image/svg+xml,%3Csvg width='24' height='40' viewBox='0 0 24 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40c5.523 0 10-4.477 10-10V10c0-5.523-4.477-10-10-10s-10 4.477-10 10v20c0 5.523 4.477 10 10 10z' fill='%239C92AC' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E")` },
+                        { value: 'cubes', label: '3D Cubes', preview: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.2' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")` },
+                        { value: 'texture', label: 'Noise Texture', preview: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.2'/%3E%3C/svg%3E")` },
+                        { value: 'dots', label: 'Minimal Dots', preview: 'radial-gradient(#94a3b8 2px, transparent 2px)' },
                         { value: 'none', label: 'Clean White', preview: 'none' },
                     ].map((pattern) => (
                         <button
@@ -391,13 +392,10 @@ export default function SettingsForm() {
                             className={`relative h-24 rounded-lg border overflow-hidden transition-all group ${settings.background_pattern === pattern.value ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200 hover:border-slate-300'}`}
                         >
                             <div 
-                                className="absolute inset-0 opacity-50" 
+                                className="absolute inset-0" 
                                 style={{ 
                                     backgroundImage: pattern.preview !== 'none' ? pattern.preview : 'none',
-                                    backgroundSize: pattern.value === 'dots' ? '20px 20px' : 
-                                                   pattern.value === 'grid' ? '20px 20px' :
-                                                   pattern.value === 'graph' ? '10px 10px' :
-                                                   pattern.value === 'polka' ? '30px 30px' : 'auto',
+                                    backgroundSize: pattern.value === 'dots' ? '24px 24px' : 'auto',
                                     backgroundColor: '#f8fafc'
                                 }} 
                             />
