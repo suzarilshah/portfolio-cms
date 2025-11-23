@@ -1,58 +1,40 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, LogOut, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useUser } from "@stackframe/stack";
+import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export default function UserMenu({ user }: { user: { email: string; name: string } }) {
-  const [isOpen, setIsOpen] = useState(false);
+interface UserProps {
+  displayName?: string | null;
+  primaryEmail?: string | null;
+}
+
+export default function UserMenu({ user }: { user: UserProps }) {
+  const userObj = useUser({ or: 'return-null' });
   const router = useRouter();
 
   const handleSignOut = async () => {
-    try {
-      // Call logout API
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      // Always clear the cookie and redirect
-      document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-      router.push('/admin/login');
+    if (userObj) {
+      await userObj.signOut({ redirectUrl: '/handler/sign-in' });
     }
   };
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm rounded-md transition-all w-full text-left"
-      >
-        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-          <User size={14} className="text-blue-600" />
+     <div className="flex items-center gap-3 px-2">
+        <div className="w-9 h-9 bg-white border border-slate-200 shadow-sm rounded-full flex items-center justify-center text-blue-700 font-bold text-sm">
+          {user.displayName?.[0] || 'A'}
         </div>
-        <span className="truncate flex-1">{user.name || user.email}</span>
-        <ChevronDown size={14} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden z-50">
-          <div className="px-3 py-2 border-b border-slate-100">
-            <p className="text-xs font-medium text-slate-900">{user.name}</p>
-            <p className="text-xs text-slate-500 truncate">{user.email}</p>
-          </div>
-          
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full text-left"
-          >
-            <LogOut size={14} />
-            Sign Out
-          </button>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold text-slate-900 truncate">{user.displayName || 'Administrator'}</p>
+          <p className="text-[10px] text-slate-400 truncate font-mono">{user.primaryEmail}</p>
         </div>
-      )}
-    </div>
+        <button
+          onClick={handleSignOut}
+          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+          title="Sign Out"
+        >
+          <LogOut size={16} />
+        </button>
+     </div>
   );
 }
