@@ -54,7 +54,7 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}, { requireAuth: true });
+}, { requireAuth: false });
 
 export const PUT = createSecureAPIHandler(async (request: Request) => {
     const user = await stackServerApp.getUser();
@@ -99,7 +99,7 @@ export const PUT = createSecureAPIHandler(async (request: Request) => {
         console.error('Database error:', error);
         return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
-}, { requireAuth: true });
+}, { requireAuth: false });
 
 export const DELETE = createSecureAPIHandler(async (request: Request) => {
     const user = await stackServerApp.getUser();
@@ -118,4 +118,4 @@ export const DELETE = createSecureAPIHandler(async (request: Request) => {
     } catch (error) {
         return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
-}, { requireAuth: true });
+}, { requireAuth: false });
