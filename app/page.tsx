@@ -15,6 +15,30 @@ import Footer from './components/Footer';
 export const dynamic = 'force-dynamic';
 
 async function getData() {
+  // Default fallback data in case database fails
+  const defaultSettings = {
+    logo_text: 'SUZARIL',
+    logo_highlight: 'SHAH',
+    logo_url: null,
+    profile_photo_url: null,
+    favicon_url: null,
+    accent_color: 'primary',
+    resume_url: null,
+  };
+
+  const defaultOrder = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'awards', 'publications', 'community', 'contact'];
+  
+  // Check if database URL is available
+  if (!process.env.DATABASE_URL) {
+    console.warn('DATABASE_URL not configured, using fallback data');
+    return { 
+      sectionData: {}, 
+      renderOrder: defaultOrder, 
+      badges: [], 
+      settings: defaultSettings 
+    };
+  }
+
   try {
     // Fetch sorted and visible sections
     const sectionsRes = await pool.query('SELECT * FROM content_sections ORDER BY sort_order ASC');
@@ -32,21 +56,18 @@ async function getData() {
         .filter((row: any) => row.is_visible !== false) // Default to true if null
         .map((row: any) => row.section_key);
         
-    // Default order fallback if DB is empty or missing keys
-    const defaultOrder = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'awards', 'publications', 'community', 'contact'];
-    
     // If no visible sections found (e.g. first run), use default order
     const renderOrder = visibleSections.length > 0 ? visibleSections : defaultOrder;
 
     const s = settingsRes.rows[0] || {};
     const settings = {
-      logo_text: s.logo_text || '',
-      logo_highlight: s.logo_highlight || '',
-      logo_url: s.logo_url || null,
-      profile_photo_url: s.profile_photo_url || null,
-      favicon_url: s.favicon_url || null,
-      accent_color: s.accent_color || 'primary',
-      resume_url: s.resume_url || null,
+      logo_text: s.logo_text || defaultSettings.logo_text,
+      logo_highlight: s.logo_highlight || defaultSettings.logo_highlight,
+      logo_url: s.logo_url || defaultSettings.logo_url,
+      profile_photo_url: s.profile_photo_url || defaultSettings.profile_photo_url,
+      favicon_url: s.favicon_url || defaultSettings.favicon_url,
+      accent_color: s.accent_color || defaultSettings.accent_color,
+      resume_url: s.resume_url || defaultSettings.resume_url,
     };
 
     return { 
@@ -56,8 +77,13 @@ async function getData() {
       settings
     };
   } catch (e) {
-    console.error(e);
-    return { sectionData: {}, renderOrder: [], badges: [], settings: {} };
+    console.error('Database connection failed, using fallback data:', e);
+    return { 
+      sectionData: {}, 
+      renderOrder: defaultOrder, 
+      badges: [], 
+      settings: defaultSettings 
+    };
   }
 }
 
