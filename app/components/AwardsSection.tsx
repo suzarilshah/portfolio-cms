@@ -108,7 +108,7 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
         {/* AWARDS SECTION */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-32">
           {/* Header */}
-          <div className="lg:col-span-4 sticky top-32">
+          <div className="lg:col-span-4 relative lg:sticky lg:top-32">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}

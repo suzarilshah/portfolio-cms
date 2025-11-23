@@ -15,7 +15,8 @@ export default function SettingsForm() {
     seo_title: '',
     seo_description: '',
     seo_keywords: '',
-    seo_og_image: ''
+    seo_og_image: '',
+    background_pattern: 'dots'
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -343,16 +344,21 @@ export default function SettingsForm() {
             <Palette size={18} className="text-emerald-600" />
             <h3 className="font-semibold text-slate-900">Design System</h3>
         </div>
-        <div className="p-6">
-            <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Primary Accent Color</label>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="p-6 space-y-8">
+            <div className="space-y-3">
+                <label className="block text-sm font-medium text-slate-700">Primary Accent Color</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                     {[
                         { value: 'primary', label: 'Executive Blue', color: 'bg-blue-600' },
                         { value: 'indigo', label: 'Deep Indigo', color: 'bg-indigo-600' },
                         { value: 'violet', label: 'Creative Violet', color: 'bg-violet-600' },
                         { value: 'emerald', label: 'Tech Emerald', color: 'bg-emerald-600' },
                         { value: 'slate', label: 'Minimal Slate', color: 'bg-slate-600' },
+                        { value: 'orange', label: 'Energetic Orange', color: 'bg-orange-500' },
+                        { value: 'cyan', label: 'Modern Cyan', color: 'bg-cyan-500' },
+                        { value: 'rose', label: 'Passionate Rose', color: 'bg-rose-500' },
+                        { value: 'teal', label: 'Calm Teal', color: 'bg-teal-500' },
+                        { value: 'amber', label: 'Warm Amber', color: 'bg-amber-500' },
                     ].map((option) => (
                         <button
                             key={option.value}
@@ -361,7 +367,48 @@ export default function SettingsForm() {
                             className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${settings.accent_color === option.value ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}
                         >
                             <div className={`w-6 h-6 rounded-full ${option.color} shadow-sm`} />
-                            <span className="text-sm font-medium text-slate-700">{option.label}</span>
+                            <span className="text-xs font-medium text-slate-700">{option.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="space-y-3 border-t border-slate-100 pt-6">
+                <label className="block text-sm font-medium text-slate-700">Background Pattern</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {[
+                        { value: 'dots', label: 'Subtle Dots', preview: 'radial-gradient(#cbd5e1 1px, transparent 1px)' },
+                        { value: 'grid', label: 'Modern Grid', preview: 'linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px)' },
+                        { value: 'graph', label: 'Graph Paper', preview: 'linear-gradient(transparent 95%, #e2e8f0 95%), linear-gradient(90deg, transparent 95%, #e2e8f0 95%)' },
+                        { value: 'polka', label: 'Polka Dots', preview: 'radial-gradient(#94a3b8 2px, transparent 2px)' },
+                        { value: 'diagonal', label: 'Diagonal Lines', preview: 'repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 10px, #f8fafc 10px, #f8fafc 20px)' },
+                        { value: 'none', label: 'Clean White', preview: 'none' },
+                    ].map((pattern) => (
+                        <button
+                            key={pattern.value}
+                            type="button"
+                            onClick={() => setSettings({...settings, background_pattern: pattern.value})}
+                            className={`relative h-24 rounded-lg border overflow-hidden transition-all group ${settings.background_pattern === pattern.value ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200 hover:border-slate-300'}`}
+                        >
+                            <div 
+                                className="absolute inset-0 opacity-50" 
+                                style={{ 
+                                    backgroundImage: pattern.preview !== 'none' ? pattern.preview : 'none',
+                                    backgroundSize: pattern.value === 'dots' ? '20px 20px' : 
+                                                   pattern.value === 'grid' ? '20px 20px' :
+                                                   pattern.value === 'graph' ? '10px 10px' :
+                                                   pattern.value === 'polka' ? '30px 30px' : 'auto',
+                                    backgroundColor: '#f8fafc'
+                                }} 
+                            />
+                            <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-2 border-t border-slate-100 text-xs font-medium text-slate-700 text-center">
+                                {pattern.label}
+                            </div>
+                            {settings.background_pattern === pattern.value && (
+                                <div className="absolute top-2 right-2 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-sm">
+                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                                </div>
+                            )}
                         </button>
                     ))}
                 </div>

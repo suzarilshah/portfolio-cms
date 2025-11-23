@@ -144,7 +144,7 @@ export default function BadgeManager() {
                 Showcase your professional certifications. Enter a Credly Badge ID to instantly verify and add it to your portfolio.
             </p>
 
-            <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20 flex gap-2">
+            <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20 flex flex-col md:flex-row gap-2">
                 <input 
                     type="text" 
                     placeholder="Enter Credly Badge ID (e.g. 12345-abcde...)" 
