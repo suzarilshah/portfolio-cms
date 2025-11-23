@@ -270,6 +270,53 @@ export class SecurityValidator {
           .map((item: string) => this.sanitizeHtml(item.trim()))
           .slice(0, 50); // Max 50 skills
       }
+
+      // Handle Community Section Arrays
+      if (content.communityEvents && Array.isArray(content.communityEvents)) {
+        sanitized.communityEvents = content.communityEvents.slice(0, 50).map((item: any) => {
+            const sanitizedItem: any = {};
+            if (item.title) sanitizedItem.title = this.sanitizeHtml((item.title as string).trim().substring(0, 200));
+            if (item.date) sanitizedItem.date = this.sanitizeHtml((item.date as string).trim().substring(0, 100));
+            if (item.role) sanitizedItem.role = this.sanitizeHtml((item.role as string).trim().substring(0, 100));
+            if (item.topic) sanitizedItem.topic = this.sanitizeHtml((item.topic as string).trim().substring(0, 500));
+            if (item.venue) sanitizedItem.venue = this.sanitizeHtml((item.venue as string).trim().substring(0, 200));
+            if (item.type) sanitizedItem.type = this.sanitizeHtml((item.type as string).trim().substring(0, 50));
+            if (item.link) {
+                try {
+                    const url = new URL(item.link);
+                    if (['http:', 'https:'].includes(url.protocol)) sanitizedItem.link = url.toString();
+                } catch {}
+            }
+            if (item.id) sanitizedItem.id = item.id; // Preserve ID
+            return sanitizedItem;
+        });
+      }
+
+      if (content.pastEvents && Array.isArray(content.pastEvents)) {
+        sanitized.pastEvents = content.pastEvents.slice(0, 100).map((item: any) => {
+            const sanitizedItem: any = {};
+            if (item.title) sanitizedItem.title = this.sanitizeHtml((item.title as string).trim().substring(0, 200));
+            if (item.date) sanitizedItem.date = this.sanitizeHtml((item.date as string).trim().substring(0, 100));
+            return sanitizedItem;
+        });
+      }
+
+      if (content.mlsaInvolvements && Array.isArray(content.mlsaInvolvements)) {
+        sanitized.mlsaInvolvements = content.mlsaInvolvements.slice(0, 50).map((item: any) => {
+            const sanitizedItem: any = {};
+            if (item.title) sanitizedItem.title = this.sanitizeHtml((item.title as string).trim().substring(0, 200));
+            if (item.date) sanitizedItem.date = this.sanitizeHtml((item.date as string).trim().substring(0, 100));
+            if (item.type) sanitizedItem.type = this.sanitizeHtml((item.type as string).trim().substring(0, 50));
+            if (item.link) {
+                try {
+                    const url = new URL(item.link);
+                    if (['http:', 'https:'].includes(url.protocol)) sanitizedItem.link = url.toString();
+                } catch {}
+            }
+            return sanitizedItem;
+        });
+      }
+
     } else {
       errors.push('Content must be a valid object');
     }

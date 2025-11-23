@@ -149,6 +149,10 @@ export default function CommunitySection({ content }: { content?: any }) {
   const [showAllPast, setShowAllPast] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const displayCommunityEvents = content?.communityEvents || communityEvents;
+  const displayMlsaInvolvements = content?.mlsaInvolvements || mlsaInvolvements;
+  const displayPastEvents = content?.pastEvents || pastEvents;
+
   useEffect(() => {
     const fetchSessions = async () => {
       try {
@@ -170,7 +174,7 @@ export default function CommunitySection({ content }: { content?: any }) {
     fetchSessions();
   }, []);
 
-  const displayEvents = showAllEvents ? communityEvents : communityEvents.slice(0, 4);
+  const displayEvents = showAllEvents ? displayCommunityEvents : displayCommunityEvents.slice(0, 4);
 
   return (
     <section id="community" className="py-24 relative overflow-hidden">
@@ -208,9 +212,9 @@ export default function CommunitySection({ content }: { content?: any }) {
                     </div>
 
                     <div className="space-y-6">
-                        {displayEvents.map((event, idx) => (
+                        {displayEvents.map((event: any, idx: number) => (
                             <motion.div
-                                key={event.id}
+                                key={event.id || idx}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -268,7 +272,7 @@ export default function CommunitySection({ content }: { content?: any }) {
                         ))}
                     </div>
                     
-                    {communityEvents.length > 4 && (
+                    {displayCommunityEvents.length > 4 && (
                         <div className="mt-8 text-center">
                             <button 
                                 onClick={() => setShowAllEvents(!showAllEvents)}
@@ -292,7 +296,7 @@ export default function CommunitySection({ content }: { content?: any }) {
                     </h3>
                     
                     <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
-                        {pastEvents.slice(0, showAllPast ? undefined : 6).map((event, idx) => (
+                        {displayPastEvents.slice(0, showAllPast ? undefined : 6).map((event: any, idx: number) => (
                             <div key={idx} className="flex items-start gap-3 py-2 border-b border-slate-200 last:border-0">
                                 <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-2 flex-shrink-0"></div>
                                 <div>
@@ -303,12 +307,12 @@ export default function CommunitySection({ content }: { content?: any }) {
                         ))}
                     </div>
                     
-                    {pastEvents.length > 6 && (
+                    {displayPastEvents.length > 6 && (
                         <button 
                             onClick={() => setShowAllPast(!showAllPast)}
                             className="mt-6 text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center gap-1"
                         >
-                            {showAllPast ? 'Show Less' : `View ${pastEvents.length - 6} More Past Events`}
+                            {showAllPast ? 'Show Less' : `View ${displayPastEvents.length - 6} More Past Events`}
                         </button>
                     )}
                 </div>
@@ -381,7 +385,7 @@ export default function CommunitySection({ content }: { content?: any }) {
                         MLSA Involvements
                     </h3>
                     <div className="space-y-3">
-                        {mlsaInvolvements.map((item, idx) => {
+                        {displayMlsaInvolvements.map((item: any, idx: number) => {
                             let Icon = Award;
                             if (item.type === 'video') Icon = Video;
                             if (item.type === 'content') Icon = Globe;

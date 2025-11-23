@@ -1,7 +1,7 @@
 'use client';
 
 import SectionEditor from '../components/SectionEditor';
-import { Plus, Trash2, Trophy, Award, Medal, Star } from 'lucide-react';
+import { Plus, Trash2, Trophy, Award, Medal, Star, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface AwardItem {
   title: string;
@@ -119,16 +119,50 @@ export default function AwardsPage() {
             <div className="grid gap-6">
                 {content.items?.map((item, index) => (
                 <div key={index} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group hover:border-blue-200 transition-colors">
-                    <button 
-                    onClick={() => {
-                        const newItems = [...content.items];
-                        newItems.splice(index, 1);
-                        onChange({ ...content, items: newItems });
-                    }}
-                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded"
-                    >
-                    <Trash2 size={18} />
-                    </button>
+                    <div className="absolute top-4 right-4 flex gap-2">
+                        {/* Reorder buttons */}
+                        <div className="flex flex-col gap-1">
+                            <button
+                                onClick={() => {
+                                    if (index > 0) {
+                                        const newItems = [...content.items];
+                                        [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+                                        onChange({ ...content, items: newItems });
+                                    }
+                                }}
+                                disabled={index === 0}
+                                className="text-slate-300 hover:text-slate-500 disabled:text-slate-200 disabled:cursor-not-allowed transition-colors p-1 hover:bg-slate-50 rounded"
+                                title="Move up"
+                            >
+                                <ChevronUp size={16} />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (index < content.items.length - 1) {
+                                        const newItems = [...content.items];
+                                        [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+                                        onChange({ ...content, items: newItems });
+                                    }
+                                }}
+                                disabled={index === content.items.length - 1}
+                                className="text-slate-300 hover:text-slate-500 disabled:text-slate-200 disabled:cursor-not-allowed transition-colors p-1 hover:bg-slate-50 rounded"
+                                title="Move down"
+                            >
+                                <ChevronDown size={16} />
+                            </button>
+                        </div>
+                        {/* Delete button */}
+                        <button 
+                        onClick={() => {
+                            const newItems = [...content.items];
+                            newItems.splice(index, 1);
+                            onChange({ ...content, items: newItems });
+                        }}
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded"
+                        >
+                        <Trash2 size={18} />
+                        </button>
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-8">
                         <div className="space-y-4">
