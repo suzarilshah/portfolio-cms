@@ -200,6 +200,9 @@ export class SecurityValidator {
           if (job.title) {
             sanitizedJob.title = this.sanitizeHtml((job.title as string).trim().substring(0, 200));
           }
+          if (job.role) {
+            sanitizedJob.role = this.sanitizeHtml((job.role as string).trim().substring(0, 200));
+          }
           if (job.company) {
             sanitizedJob.company = this.sanitizeHtml((job.company as string).trim().substring(0, 200));
           }
@@ -208,6 +211,15 @@ export class SecurityValidator {
           }
           if (job.period) {
             sanitizedJob.period = this.sanitizeHtml((job.period as string).trim().substring(0, 100));
+          }
+          if (job.location) {
+            sanitizedJob.location = this.sanitizeHtml((job.location as string).trim().substring(0, 100));
+          }
+          if (job.tags && Array.isArray(job.tags)) {
+            sanitizedJob.tags = job.tags
+              .filter((tag: any) => typeof tag === 'string' && tag.length <= 50)
+              .map((tag: string) => this.sanitizeHtml(tag.trim()))
+              .slice(0, 10);
           }
           return sanitizedJob;
         });
