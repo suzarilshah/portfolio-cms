@@ -115,7 +115,7 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
               viewport={{ once: true }}
             >
               <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
-                {title.split(' ')[0]} <br /> <span className="text-primary-600">{title.split(' ').slice(1).join(' ')}</span>
+                {title?.split(' ')[0] || 'Global'} <br /> <span className="text-primary-600">{title?.split(' ').slice(1).join(' ') || 'Recognition'}</span>
               </h2>
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
                 {subtitle}
@@ -227,7 +227,7 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
                                             </motion.div>
 
                                             <h4 className="font-display text-2xl md:text-3xl font-bold text-slate-900 mb-3 leading-tight">
-                                                {selectedBadge.title.split(' was issued by')[0]}
+                                                {selectedBadge.title ? selectedBadge.title.split(' was issued by')[0] : 'Credential'}
                                             </h4>
                                             
                                             {selectedBadge.issuer && (
@@ -280,7 +280,7 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
                                         <div className={`absolute left-1/2 -translate-x-1/2 w-max max-w-[150px] bg-slate-900 text-white text-xs font-medium py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-xl text-center z-20 ${
                                             idx < 5 ? 'top-full mt-2' : 'bottom-full mb-2'
                                         }`}>
-                                            {badge.title.split(' was issued by')[0]}
+                                            {badge.title ? badge.title.split(' was issued by')[0] : 'Credential'}
                                             <div className={`absolute left-1/2 -translate-x-1/2 border-4 border-transparent ${
                                                 idx < 5 ? 'bottom-full border-b-slate-900' : 'top-full border-t-slate-900'
                                             }`}></div>
