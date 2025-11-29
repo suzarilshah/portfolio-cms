@@ -225,8 +225,8 @@ export default function CommunitySection({ content }: { content?: any }) {
                                 
                                 <div className="flex flex-col md:flex-row md:items-start gap-6">
                                     <div className="flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 bg-primary-50 text-primary-700 rounded-2xl font-bold leading-none">
-                                        <span className="text-xs uppercase tracking-wider">{event.date.split(' ')[0].substring(0, 3)}</span>
-                                        <span className="text-xl">{event.date.split(' ')[1]}</span>
+                                        <span className="text-xs uppercase tracking-wider">{event.date ? event.date.split(' ')[0]?.substring(0, 3) : 'TBD'}</span>
+                                        <span className="text-xl">{event.date ? event.date.split(' ')[1] : ''}</span>
                                     </div>
                                     
                                     <div className="flex-grow">

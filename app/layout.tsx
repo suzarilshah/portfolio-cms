@@ -72,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL('https://www.suzarilshah.uk'),
     title: {
       default: title,
-      template: `%s | ${title.split('|')[0].trim()}`
+      template: `%s | ${title?.split('|')[0]?.trim() || 'Muhammad Suzaril Shah'}`
     },
     description,
     keywords,

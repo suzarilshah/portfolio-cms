@@ -98,10 +98,10 @@ export default function ExperienceSection({ content, settings }: { content?: any
                         {/* 1. Date/Period Column (Desktop) */}
                         <div className="hidden md:flex flex-col items-end pt-1 text-right px-2">
                             <span className={`font-display text-lg font-bold ${index === 0 ? 'text-primary-600' : 'text-slate-900'}`}>
-                                {exp.period}
+                                {exp.period || 'Present'}
                             </span>
                             <span className="text-xs font-medium text-slate-400 uppercase tracking-wider mt-1">
-                                {exp.location.split(',')[0]}
+                                {exp.location ? exp.location.split(',')[0] : 'Remote'}
                             </span>
                         </div>
 
