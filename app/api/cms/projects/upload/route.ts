@@ -29,8 +29,8 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
 
     // Initialize Appwrite client
     const client = new Client()
-      .setEndpoint(process.env.APPWRITE_ENDPOINT!)
-      .setProject(process.env.APPWRITE_PROJECT_ID!)
+      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
       .setKey(process.env.APPWRITE_API_KEY!);
 
     // Initialize Storage
@@ -44,7 +44,7 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     );
 
     // Get file preview URL
-    const fileUrl = `${process.env.APPWRITE_ENDPOINT}/storage/buckets/${process.env.APPWRITE_BUCKET_ID_ASSETS}/files/${response.$id}/preview`;
+    const fileUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${process.env.APPWRITE_BUCKET_ID_ASSETS}/files/${response.$id}/preview`;
 
     // Persist thumbnail to DB immediately so the public site reflects changes without requiring an extra "Save"
     const updated = await secureDb.query(
