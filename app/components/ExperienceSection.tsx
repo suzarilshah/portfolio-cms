@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Calendar, MapPin, ChevronDown, ChevronUp, Briefcase } from 'lucide-react';
+import { ArrowUpRight, Calendar, MapPin, ChevronDown, ChevronUp, Briefcase, Download } from 'lucide-react';
+import EmailCaptureModal from '@/components/EmailCaptureModal';
 
 const experiences = [
   {
@@ -42,6 +43,7 @@ const experiences = [
 export default function ExperienceSection({ content, settings }: { content?: any; settings?: any }) {
   const experiencesList = content?.jobs || experiences;
   const [showAll, setShowAll] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const displayedExperiences = showAll ? experiencesList : experiencesList.slice(0, 2);
   const resumeUrl = settings?.resume_url || '/resume.pdf';
 
@@ -64,18 +66,16 @@ export default function ExperienceSection({ content, settings }: { content?: any
             </p>
           </motion.div>
           
-          <motion.a 
+          <motion.button
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            href={resumeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            onClick={() => setShowEmailModal(true)}
             className="group flex items-center gap-3 px-6 py-3 rounded-full bg-slate-900 text-white font-medium hover:bg-primary-600 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
           >
+            <Download className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
             Download Resume
-            <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
-          </motion.a>
+          </motion.button>
         </div>
 
         {/* Premium Magazine Layout Timeline */}
@@ -189,6 +189,13 @@ export default function ExperienceSection({ content, settings }: { content?: any
         )}
 
       </div>
+
+      {/* Email Capture Modal */}
+      <EmailCaptureModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        resumeUrl={resumeUrl || ''}
+      />
     </section>
   );
 }

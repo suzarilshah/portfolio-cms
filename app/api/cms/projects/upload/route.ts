@@ -41,7 +41,7 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
       process.env.APPWRITE_BUCKET_ID_ASSETS!,
       ID.unique(),
       file,
-      ["read('any')"] // Make file publicly readable
+      ["read(\"any\")"] // Make file publicly readable
     );
 
     // Get file view URL (with project ID query param for Appwrite)
