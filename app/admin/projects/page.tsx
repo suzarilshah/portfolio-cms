@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Plus, Trash2, Edit2, ExternalLink, Code, Cloud, Zap, Server, Globe, History, RotateCcw } from 'lucide-react';
+import { Save, Loader2, Plus, Trash2, Edit2, ExternalLink, Code, Cloud, Zap, Server, Globe, History, RotateCcw, Camera, Upload, Image } from 'lucide-react';
 
 interface Project {
     id?: number;
@@ -15,6 +15,10 @@ interface Project {
     icon_name: string;
     year: string;
     link: string;
+    project_url?: string;
+    thumbnail_url?: string;
+    snapshot_url?: string;
+    has_snapshot?: boolean;
     updated_at?: string;
 }
 
@@ -51,6 +55,10 @@ export default function ProjectsAdminPage() {
     const [historyRecords, setHistoryRecords] = useState<any[]>([]);
     const [historyLoading, setHistoryLoading] = useState(false);
     const [selectedProjectForHistory, setSelectedProjectForHistory] = useState<number | null>(null);
+
+    // Snapshot and Upload State
+    const [snapshotLoading, setSnapshotLoading] = useState(false);
+    const [uploadLoading, setUploadLoading] = useState(false);
 
     useEffect(() => {
         fetchProjects();
@@ -366,6 +374,99 @@ export default function ProjectsAdminPage() {
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Project URL and Thumbnail */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Project URL</label>
+                                    <div className="flex items-center gap-2">
+                                        <Globe size={16} className="text-slate-400" />
+                                        <input type="text" className="w-full border p-2 rounded-lg" placeholder="https://your-project-url.com"
+                                            value={formData.project_url || ''} onChange={e => setFormData({...formData, project_url: e.target.value})} />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Thumbnail URL</label>
+                                    <div className="flex items-center gap-2">
+                                        <Image size={16} className="text-slate-400" />
+                                        <input type="text" className="w-full border p-2 rounded-lg" placeholder="Auto-filled on upload"
+                                            value={formData.thumbnail_url || ''} onChange={e => setFormData({...formData, thumbnail_url: e.target.value})} readOnly />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Snapshot and Upload Actions */}
+                            <div className="flex gap-3 pt-4 border-t">
+                                {formData.project_url && (
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            if (!editingId) {
+                                                alert('Save project first before capturing snapshot');
+                                                return;
+                                            }
+                                            setSnapshotLoading(true);
+                                            try {
+                                                const res = await fetch('/api/cms/projects/snapshot', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ project_id: editingId, url: formData.project_url })
+                                                });
+                                                const data = await res.json();
+                                                if (data.snapshot_url) {
+                                                    setFormData({ ...formData, snapshot_url: data.snapshot_url, has_snapshot: true });
+                                                    alert('Snapshot captured successfully!');
+                                                }
+                                            } catch (e) {
+                                                alert('Failed to capture snapshot');
+                                            } finally {
+                                                setSnapshotLoading(false);
+                                            }
+                                        }}
+                                        disabled={snapshotLoading}
+                                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                                    >
+                                        {snapshotLoading && <Loader2 size={16} className="animate-spin" />}
+                                        <Camera size={16} /> Capture Snapshot
+                                    </button>
+                                )}
+
+                                <label className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 cursor-pointer">
+                                    {uploadLoading && <Loader2 size={16} className="animate-spin" />}
+                                    <Upload size={16} /> Upload Thumbnail
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file || !editingId) {
+                                                if (!editingId) alert('Save project first before uploading thumbnail');
+                                                return;
+                                            }
+                                            setUploadLoading(true);
+                                            try {
+                                                const formData = new FormData();
+                                                formData.append('file', file);
+                                                formData.append('project_id', editingId.toString());
+                                                const res = await fetch('/api/cms/projects/upload', {
+                                                    method: 'POST',
+                                                    body: formData
+                                                });
+                                                const data = await res.json();
+                                                if (data.thumbnail_url) {
+                                                    setFormData({ ...formData, thumbnail_url: data.thumbnail_url });
+                                                    alert('Thumbnail uploaded successfully!');
+                                                }
+                                            } catch (e) {
+                                                alert('Failed to upload thumbnail');
+                                            } finally {
+                                                setUploadLoading(false);
+                                            }
+                                        }}
+                                    />
+                                </label>
                             </div>
 
                             <div className="flex justify-end gap-3 pt-4 border-t">
