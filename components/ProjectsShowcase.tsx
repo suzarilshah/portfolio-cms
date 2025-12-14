@@ -259,7 +259,7 @@ export default async function ProjectsShowcase({
   };
 
   return (
-    <section id="projects" className="relative py-20 sm:py-24">
+    <section id="projects" className="relative py-20 sm:py-24 font-sans">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger

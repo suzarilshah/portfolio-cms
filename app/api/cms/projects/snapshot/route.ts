@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server';
 import { secureDb } from '@/lib/security/database';
-import { stackServerApp } from '@/stack';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
 
 export const POST = createSecureAPIHandler(async (request: Request) => {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   try {
     const { project_id, url } = await request.json();
 
@@ -31,7 +27,7 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     // Update project with snapshot URL
     const result = await secureDb.query(
       `UPDATE projects SET snapshot_url = $1, has_snapshot = TRUE, updated_at = NOW() WHERE id = $2 RETURNING id`,
-      [screenshotUrl, project_id]
+      [screenshotUrl, Number(project_id)]
     );
 
     if (!result || result.length === 0) {
@@ -43,4 +39,4 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     console.error('Snapshot error:', error);
     return NextResponse.json({ error: 'Failed to capture snapshot: ' + (error as Error).message }, { status: 500 });
   }
-}, { requireAuth: false });
+}, { requireAuth: true });
