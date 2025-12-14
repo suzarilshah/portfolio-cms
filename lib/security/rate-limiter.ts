@@ -61,12 +61,14 @@ export const authRateLimiter = new InMemoryRateLimiter(15 * 60 * 1000, 10); // 1
 export const apiRateLimiter = new InMemoryRateLimiter(60 * 1000, 100); // 100 requests per minute
 export const uploadRateLimiter = new InMemoryRateLimiter(60 * 1000, 20); // 20 uploads per minute
 
-// Cleanup expired entries every 5 minutes
-setInterval(() => {
-  authRateLimiter.cleanup();
-  apiRateLimiter.cleanup();
-  uploadRateLimiter.cleanup();
-}, 5 * 60 * 1000);
+// Cleanup expired entries every 5 minutes (only in non-edge environments)
+if (typeof window === 'undefined') {
+  setInterval(() => {
+    authRateLimiter.cleanup();
+    apiRateLimiter.cleanup();
+    uploadRateLimiter.cleanup();
+  }, 5 * 60 * 1000);
+}
 
 export function getClientIdentifier(request: NextRequest): string {
   // Try to get user ID from auth headers first, fallback to IP

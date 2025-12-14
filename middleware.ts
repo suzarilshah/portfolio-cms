@@ -4,10 +4,10 @@ import { getClientIdentifier, apiRateLimiter, createRateLimitResponse } from '@/
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
-  
+
   // Get client identifier for rate limiting
   const identifier = getClientIdentifier(request);
-  
+
   // Apply rate limiting to API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     const rateLimitResult = apiRateLimiter.check(identifier);
@@ -15,9 +15,18 @@ export function middleware(request: NextRequest) {
       return createRateLimitResponse(rateLimitResult.resetTime);
     }
   }
-  
-  // Add security headers to all responses
+
+  // Block access to admin routes if not authenticated
   if (request.nextUrl.pathname.startsWith('/admin')) {
+    const hasAuth = request.cookies.get('stack-session') || request.headers.get('authorization');
+
+    if (!hasAuth) {
+      // Redirect to login or return unauthorized
+      if (request.nextUrl.pathname !== '/admin') {
+        return NextResponse.redirect(new URL('/handler/sign-in', request.url));
+      }
+    }
+
     // Enhanced security for admin routes
     addFullSecurityHeaders(response);
   } else {

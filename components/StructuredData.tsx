@@ -1,5 +1,17 @@
 import React from 'react'
 
+// Sanitize string to prevent XSS
+function sanitizeString(str: any): string {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*>?/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .trim();
+}
+
 interface StructuredDataProps {
   type?: 'person' | 'professional-service' | 'all'
 }
@@ -273,7 +285,7 @@ export function EventSchema({ event }: { event: any }) {
     },
     organizer: {
       '@type': 'Organization',
-      name: event.organizerName || 'Event Organizer',
+      name: sanitizeString(event.organizerName) || 'Event Organizer',
     },
   }
 
@@ -292,8 +304,8 @@ export function ArticleSchema({ article }: { article: any }) {
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'ScholarlyArticle',
-    headline: article.title,
-    description: article.description,
+    headline: sanitizeString(article.title),
+    description: sanitizeString(article.description),
     url: article.url,
     datePublished: article.publishedDate,
     author: {
@@ -303,9 +315,9 @@ export function ArticleSchema({ article }: { article: any }) {
     },
     publisher: {
       '@type': 'Organization',
-      name: article.publisher || 'Publisher',
+      name: sanitizeString(article.publisher) || 'Publisher',
     },
-    keywords: article.keywords?.join(', '),
+    keywords: article.keywords?.map((k: any) => sanitizeString(k)).join(', '),
   }
 
   return (

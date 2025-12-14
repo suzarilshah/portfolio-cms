@@ -89,7 +89,7 @@ export class SecureDatabase {
     // Ensure parameterized queries for user input
     const hasPlaceholders = /\$\d+/.test(query) || query.includes('?');
     if (!hasPlaceholders && /select|insert|update|delete/i.test(query)) {
-      console.warn('Warning: SQL query without parameters detected:', query);
+      throw new Error('All SQL queries must use parameterized queries. Query without parameters detected.');
     }
   }
 

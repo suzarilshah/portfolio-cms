@@ -11,6 +11,7 @@ export interface SecurityMiddlewareOptions {
   };
   validateContentType?: boolean;
   allowedMethods?: string[];
+  requireCSRF?: boolean;
 }
 
 export class SecurityMiddleware {
@@ -22,8 +23,30 @@ export class SecurityMiddleware {
       requireAuth = false,
       rateLimit,
       validateContentType = true,
-      allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+      allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      requireCSRF = false
     } = options;
+
+    // CSRF protection for state-changing requests
+    if (requireCSRF && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+      const origin = request.headers.get('origin');
+      const referer = request.headers.get('referer');
+      const host = request.headers.get('host');
+
+      if (!origin && !referer) {
+        return NextResponse.json(
+          { error: 'CSRF validation failed: Missing origin/referer' },
+          { status: 403 }
+        );
+      }
+
+      if (origin && !origin.includes(host || '')) {
+        return NextResponse.json(
+          { error: 'CSRF validation failed: Invalid origin' },
+          { status: 403 }
+        );
+      }
+    }
 
     // Method validation
     if (!allowedMethods.includes(request.method)) {
