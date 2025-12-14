@@ -462,12 +462,12 @@ export default function ProjectsAdminPage() {
                                             }
                                             setUploadLoading(true);
                                             try {
-                                                const formData = new FormData();
-                                                formData.append('file', file);
-                                                formData.append('project_id', editingId.toString());
+                                                const uploadFormData = new FormData();
+                                                uploadFormData.append('file', file);
+                                                uploadFormData.append('project_id', editingId.toString());
                                                 const res = await fetch('/api/cms/projects/upload', {
                                                     method: 'POST',
-                                                    body: formData
+                                                    body: uploadFormData
                                                 });
                                                 const data = await res.json();
                                                 if (data.thumbnail_url) {

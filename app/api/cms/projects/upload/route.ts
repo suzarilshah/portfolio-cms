@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { stackServerApp } from '@/stack';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
-import { createAdminClient } from '@appwrite.io/appwrite';
+import { Client, Storage, ID } from 'node-appwrite';
 
 export const POST = createSecureAPIHandler(async (request: Request) => {
   const user = await stackServerApp.getUser();
@@ -27,15 +27,18 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     }
 
     // Initialize Appwrite client
-    const client = createAdminClient({
-      endpoint: process.env.APPWRITE_ENDPOINT!,
-      projectId: process.env.APPWRITE_PROJECT_ID!,
-    });
+    const client = new Client()
+      .setEndpoint(process.env.APPWRITE_ENDPOINT!)
+      .setProject(process.env.APPWRITE_PROJECT_ID!)
+      .setKey(process.env.APPWRITE_API_KEY!);
+
+    // Initialize Storage
+    const storage = new Storage(client);
 
     // Upload to Appwrite Storage
-    const response = await client.storage.createFile(
+    const response = await storage.createFile(
       process.env.APPWRITE_BUCKET_ID_ASSETS!,
-      'unique()',
+      ID.unique(),
       file
     );
 
