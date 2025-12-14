@@ -14,16 +14,16 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
       return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
     }
 
-    // Use screenshot API service (e.g., screenshotapi.net, urlbox.io, or screenshotlayer.com)
+    // Use ScreenshotLayer API for URL snapshots
     const screenshotApiKey = process.env.SCREENSHOT_API_KEY;
-    const screenshotApiUrl = process.env.SCREENSHOT_API_URL || 'https://api.screenshotapi.net/screen';
+    const screenshotApiUrl = process.env.SCREENSHOT_API_URL || 'http://api.screenshotlayer.com/api/capture';
 
     if (!screenshotApiKey || screenshotApiKey === 'your_screenshot_api_key') {
       return NextResponse.json({ error: 'Screenshot API key not configured' }, { status: 500 });
     }
 
-    // Build the screenshot API URL
-    const screenshotUrl = `${screenshotApiUrl}?url=${encodeURIComponent(url)}&token=${screenshotApiKey}&width=1200&height=630&output=image&file_type=png`;
+    // Build the screenshot API URL (ScreenshotLayer format)
+    const screenshotUrl = `${screenshotApiUrl}?access_key=${screenshotApiKey}&url=${encodeURIComponent(url)}&width=1200&height=630&format=PNG`;
 
     // Update project with snapshot URL
     const result = await secureDb.query(
