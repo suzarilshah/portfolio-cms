@@ -339,21 +339,26 @@ export default function ProjectsShowcase({
               })}
             </div>
 
-            {/* Blurred overlay for hidden projects */}
-            <div className="relative -mt-48 pt-48 pb-32">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white to-white" />
-              <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent" />
-            </div>
+            {/* Sophisticated Gaussian Blur Overlay */}
+            <div className="blur-overlay" />
 
-            {/* View More Button */}
+            {/* Premium View More Button */}
             <motion.button
               onClick={() => setShowAllProjects(true)}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-full font-medium hover:bg-primary-600 transition-all duration-300 shadow-xl hover:shadow-primary-500/25 hover:scale-105"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="view-more-button absolute bottom-4 left-1/2 -translate-x-1/2 z-10"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              View More Projects
-              <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+              <span>View More Projects</span>
+              <motion.div
+                animate={{ y: [0, 4, 0] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              >
+                <ChevronDown className="w-5 h-5" />
+              </motion.div>
             </motion.button>
           </div>
         ) : (
@@ -443,16 +448,18 @@ export default function ProjectsShowcase({
               );
             })}
 
-            {/* Show Less Button */}
+            {/* Premium Show Less Button */}
             {projects.length > 6 && (
-              <div className="col-span-full flex justify-center mt-4">
-                <button
+              <div className="col-span-full flex justify-center mt-6">
+                <motion.button
                   onClick={() => setShowAllProjects(false)}
-                  className="inline-flex items-center gap-2 px-8 py-3 bg-white border-2 border-slate-200 text-slate-900 rounded-full font-medium hover:border-primary-200 hover:bg-slate-50 transition-all duration-300"
+                  className="show-less-button"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <ChevronDown className="w-4 h-4 rotate-180" />
-                  Show Less
-                </button>
+                  <ChevronDown className="w-5 h-5 rotate-180" />
+                  <span>Show Less</span>
+                </motion.button>
               </div>
             )}
           </div>
