@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Plus, Trash2, Edit2, ExternalLink, Code, Cloud, Zap, Server, Globe, History, RotateCcw, Camera, Upload, Image } from 'lucide-react';
+import { Save, Loader2, Plus, Trash2, Edit2, ExternalLink, Code, Cloud, Zap, Server, Globe, History, RotateCcw, Camera, Upload, Image, Settings } from 'lucide-react';
 
 interface Project {
     id?: number;
@@ -177,18 +177,24 @@ export default function ProjectsAdminPage() {
     return (
         <div className="space-y-8">
             {/* Tab Switcher */}
-            <div className="flex gap-1 bg-slate-100 p-1 rounded-lg w-fit mb-8">
-                <button 
+            <div className="flex gap-1 bg-gradient-to-r from-slate-100 to-slate-200 p-1.5 rounded-2xl w-fit mb-12 shadow-inner">
+                <button
                     onClick={() => setActiveTab('projects')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'projects' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'projects' ? 'bg-white text-slate-900 shadow-lg transform scale-105' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'}`}
                 >
-                    Manage Projects
+                    <span className="flex items-center gap-2">
+                        <Code size={16} />
+                        Manage Projects
+                    </span>
                 </button>
-                <button 
+                <button
                     onClick={() => setActiveTab('settings')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'settings' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === 'settings' ? 'bg-white text-slate-900 shadow-lg transform scale-105' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'}`}
                 >
-                    Section Settings
+                    <span className="flex items-center gap-2">
+                        <Settings size={16} />
+                        Section Settings
+                    </span>
                 </button>
             </div>
 
@@ -284,8 +290,15 @@ export default function ProjectsAdminPage() {
                     </div>
 
                     {/* Editor Form */}
-                    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-                        <h3 className="text-lg font-semibold mb-6">{editingId ? 'Edit Project' : 'New Project'}</h3>
+                    <div className="bg-gradient-to-br from-white via-slate-50/50 to-white rounded-3xl border border-slate-200/50 p-8 md:p-12 shadow-xl shadow-primary-500/5 backdrop-blur-sm">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-3 bg-gradient-to-br from-primary-500 to-purple-600 text-white rounded-xl">
+                                <Edit2 size={20} />
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                                {editingId ? 'Edit Project' : 'Create New Project'}
+                            </h3>
+                        </div>
                         <form onSubmit={handleSave} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
@@ -425,16 +438,18 @@ export default function ProjectsAdminPage() {
                                             }
                                         }}
                                         disabled={snapshotLoading}
-                                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50"
                                     >
                                         {snapshotLoading && <Loader2 size={16} className="animate-spin" />}
-                                        <Camera size={16} /> Capture Snapshot
+                                        <Camera size={16} />
+                                        <span className="font-bold">Capture Snapshot</span>
                                     </button>
                                 )}
 
-                                <label className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 cursor-pointer">
+                                <label className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 flex items-center gap-2 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                                     {uploadLoading && <Loader2 size={16} className="animate-spin" />}
-                                    <Upload size={16} /> Upload Thumbnail
+                                    <Upload size={16} />
+                                    <span className="font-bold">Upload Thumbnail</span>
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -486,10 +501,15 @@ export default function ProjectsAdminPage() {
                     {/* Projects List */}
                     <div className="grid gap-4">
                         {projects.map(project => (
-                            <div key={project.id} className="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between group hover:shadow-md transition-all">
-                                <div>
-                                    <h4 className="font-bold text-slate-900">{project.title}</h4>
-                                    <p className="text-sm text-slate-500">{project.category} • {project.year}</p>
+                            <div key={project.id} className="bg-gradient-to-br from-white via-slate-50/30 to-white p-6 rounded-2xl border border-slate-200/50 flex items-center justify-between group hover:shadow-xl hover:border-primary-200/50 transition-all duration-300">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-gradient-to-br from-primary-500/10 to-purple-500/10 rounded-xl">
+                                        <Code className="w-5 h-5 text-primary-600" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-black text-slate-900 text-lg">{project.title}</h4>
+                                        <p className="text-sm text-slate-500 font-medium">{project.category} • {project.year}</p>
+                                    </div>
                                 </div>
                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button onClick={() => handleHistoryClick(project.id!)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg" title="History">
