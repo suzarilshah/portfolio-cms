@@ -8,25 +8,16 @@ export function middleware(request: NextRequest) {
   // Get client identifier for rate limiting
   const identifier = getClientIdentifier(request);
 
-  // Apply rate limiting to API routes
-  if (request.nextUrl.pathname.startsWith('/api/')) {
+  // Apply rate limiting to API routes (excluding auth routes)
+  if (request.nextUrl.pathname.startsWith('/api/') && !request.nextUrl.pathname.startsWith('/api/cms/')) {
     const rateLimitResult = apiRateLimiter.check(identifier);
     if (!rateLimitResult.allowed) {
       return createRateLimitResponse(rateLimitResult.resetTime);
     }
   }
 
-  // Block access to admin routes if not authenticated
+  // Add security headers to all responses
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    const hasAuth = request.cookies.get('stack-session') || request.headers.get('authorization');
-
-    if (!hasAuth) {
-      // Redirect to login or return unauthorized
-      if (request.nextUrl.pathname !== '/admin') {
-        return NextResponse.redirect(new URL('/handler/sign-in', request.url));
-      }
-    }
-
     // Enhanced security for admin routes
     addFullSecurityHeaders(response);
   } else {

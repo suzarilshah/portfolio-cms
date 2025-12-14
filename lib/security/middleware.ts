@@ -27,24 +27,29 @@ export class SecurityMiddleware {
       requireCSRF = false
     } = options;
 
-    // CSRF protection for state-changing requests
+    // CSRF protection for state-changing requests (only if explicitly enabled)
     if (requireCSRF && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
       const origin = request.headers.get('origin');
       const referer = request.headers.get('referer');
       const host = request.headers.get('host');
 
-      if (!origin && !referer) {
-        return NextResponse.json(
-          { error: 'CSRF validation failed: Missing origin/referer' },
-          { status: 403 }
-        );
-      }
+      // Skip CSRF check for API-to-API requests (server-side)
+      if (request.headers.get('x-requested-with') === 'XMLHttpRequest') {
+        // Allow AJAX requests
+      } else {
+        if (!origin && !referer) {
+          return NextResponse.json(
+            { error: 'CSRF validation failed: Missing origin/referer' },
+            { status: 403 }
+          );
+        }
 
-      if (origin && !origin.includes(host || '')) {
-        return NextResponse.json(
-          { error: 'CSRF validation failed: Invalid origin' },
-          { status: 403 }
-        );
+        if (origin && !origin.includes(host || '')) {
+          return NextResponse.json(
+            { error: 'CSRF validation failed: Invalid origin' },
+            { status: 403 }
+          );
+        }
       }
     }
 
