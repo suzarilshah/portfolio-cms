@@ -32,13 +32,15 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     const sanitized = validation.sanitized!;
 
     const result = await secureDb.query(
-      `INSERT INTO projects (title, tagline, challenge, solution, impact, technologies, category, icon_name, year, link) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+      `INSERT INTO projects (title, tagline, challenge, solution, impact, technologies, category, icon_name, year, link, project_url, thumbnail_url, snapshot_url, has_snapshot)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
       [
-        sanitized.title, sanitized.tagline, sanitized.challenge, sanitized.solution, 
-        JSON.stringify(sanitized.impact), JSON.stringify(sanitized.technologies), 
-        sanitized.category, sanitized.icon_name, sanitized.year, sanitized.link
+        sanitized.title, sanitized.tagline, sanitized.challenge, sanitized.solution,
+        JSON.stringify(sanitized.impact), JSON.stringify(sanitized.technologies),
+        sanitized.category, sanitized.icon_name, sanitized.year, sanitized.link,
+        sanitized.project_url || null, sanitized.thumbnail_url || null,
+        sanitized.snapshot_url || null, sanitized.has_snapshot || false
       ]
     );
 
