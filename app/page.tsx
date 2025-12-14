@@ -3,7 +3,7 @@ import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
 import SkillsMatrix from '@/components/SkillsMatrix';
-import ProjectsShowcase from '@/components/ProjectsShowcase';
+import ProjectsShowcase from '@/components/ProjectsShowcaseWrapper';
 import ExperienceSection from './components/ExperienceSection';
 import EducationSection from './components/EducationSection';
 import AwardsSection from './components/AwardsSection';

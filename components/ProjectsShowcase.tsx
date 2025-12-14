@@ -1,5 +1,7 @@
-import React from 'react';
-import pool from '@/lib/db';
+'use client';
+
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   Award,
   ExternalLink,
@@ -13,6 +15,7 @@ import {
   Globe,
   TrendingUp,
   X,
+  ChevronDown,
 } from 'lucide-react';
 
 type ProjectsSectionContent = {
@@ -40,6 +43,11 @@ type Project = {
   snapshot_url: string | null;
   has_snapshot: boolean | null;
 };
+
+interface ProjectsShowcaseProps {
+  content?: ProjectsSectionContent;
+  projects?: Project[];
+}
 
 function getIconByName(name: string | null) {
   switch (name) {
@@ -175,62 +183,12 @@ const FALLBACK_PROJECTS: Omit<Project, 'id'>[] = [
   },
 ];
 
-async function getProjects(): Promise<Project[]> {
-  if (!process.env.DATABASE_URL) {
-    return FALLBACK_PROJECTS.map((p, idx) => ({ ...p, id: idx + 1 }));
-  }
-
-  try {
-    const res = await pool.query(
-      `SELECT
-        id,
-        title,
-        tagline,
-        challenge,
-        solution,
-        impact,
-        technologies,
-        category,
-        icon_name,
-        year,
-        link,
-        project_url,
-        thumbnail_url,
-        snapshot_url,
-        has_snapshot
-      FROM projects
-      WHERE is_visible = TRUE
-      ORDER BY sort_order ASC, created_at DESC`
-    );
-
-    return (res.rows as any[]).map((row) => ({
-      id: Number(row.id),
-      title: String(row.title || ''),
-      tagline: row.tagline ?? null,
-      challenge: row.challenge ?? null,
-      solution: row.solution ?? null,
-      impact: normalizeImpact(row.impact),
-      technologies: normalizeTech(row.technologies),
-      category: row.category ?? null,
-      icon_name: row.icon_name ?? null,
-      year: row.year ?? null,
-      link: row.link ?? null,
-      project_url: row.project_url ?? null,
-      thumbnail_url: row.thumbnail_url ?? null,
-      snapshot_url: row.snapshot_url ?? null,
-      has_snapshot: row.has_snapshot ?? null,
-    }));
-  } catch {
-    return FALLBACK_PROJECTS.map((p, idx) => ({ ...p, id: idx + 1 }));
-  }
-}
-
-export default async function ProjectsShowcase({
+export default function ProjectsShowcase({
   content,
-}: {
-  content?: ProjectsSectionContent;
-}) {
-  const projects = await getProjects();
+  projects: projectsProp,
+}: ProjectsShowcaseProps) {
+  const [showAllProjects, setShowAllProjects] = useState(false);
+  const projects = projectsProp || FALLBACK_PROJECTS.map((p, idx) => ({ ...p, id: idx + 1 }));
 
   const title = content?.title?.trim() || 'Projects & Case Studies';
   const description =
@@ -292,92 +250,213 @@ export default async function ProjectsShowcase({
         </div>
 
         {/* Gallery grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-          {projects.map((project) => {
-            const Icon = getIconByName(project.icon_name);
-            const preview = project.thumbnail_url || project.snapshot_url;
-            const liveUrl = project.project_url || project.link;
-            const chips = project.technologies.slice(0, 3);
-            const headlineMetric = project.impact[0];
+        {projects.length > 6 && !showAllProjects ? (
+          <div className="relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+              {projects.slice(0, 6).map((project) => {
+                const Icon = getIconByName(project.icon_name);
+                const preview = project.thumbnail_url || project.snapshot_url;
+                const liveUrl = project.project_url || project.link;
+                const chips = project.technologies.slice(0, 3);
+                const headlineMetric = project.impact[0];
 
-            return (
-              <a
-                key={project.id}
-                href={`#project-${project.id}`}
-                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/55 backdrop-blur-xl shadow-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl hover:border-primary-200/60 focus:outline-none focus:ring-4 focus:ring-primary-500/20"
-                aria-label={`Open case study: ${project.title}`}
-              >
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  {preview ? (
-                    <img
-                      src={preview}
-                      alt={`${project.title} preview`}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gradient-to-br from-primary-100/60 via-white/40 to-purple-100/60" />
-                  )}
+                return (
+                  <a
+                    key={project.id}
+                    href={`#project-${project.id}`}
+                    className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/55 backdrop-blur-xl shadow-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl hover:border-primary-200/60 focus:outline-none focus:ring-4 focus:ring-primary-500/20"
+                    aria-label={`Open case study: ${project.title}`}
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      {preview ? (
+                        <img
+                          src={preview}
+                          alt={`${project.title} preview`}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gradient-to-br from-primary-100/60 via-white/40 to-purple-100/60" />
+                      )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/0 to-slate-950/0" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/0 to-slate-950/0" />
 
-                  <div className="absolute left-4 bottom-4 flex items-center gap-2">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-900 shadow-sm">
-                      <Icon className="h-4 w-4 text-primary-700" />
-                      {project.category || 'Project'}
-                    </span>
-                    {project.year ? (
-                      <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-mono font-semibold text-slate-700">
-                        {project.year}
-                      </span>
-                    ) : null}
-                  </div>
+                      <div className="absolute left-4 bottom-4 flex items-center gap-2">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-900 shadow-sm">
+                          <Icon className="h-4 w-4 text-primary-700" />
+                          {project.category || 'Project'}
+                        </span>
+                        {project.year ? (
+                          <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-mono font-semibold text-slate-700">
+                            {project.year}
+                          </span>
+                        ) : null}
+                      </div>
 
-                  {liveUrl ? (
-                    <div className="absolute right-4 top-4 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-slate-800 shadow-sm">
-                      Live
+                      {liveUrl ? (
+                        <div className="absolute right-4 top-4 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-slate-800 shadow-sm">
+                          Live
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>
 
-                <div className="p-5">
-                  <h3 className="text-lg font-black tracking-tight text-slate-900">
-                    {project.title}
-                  </h3>
-                  {project.tagline ? (
-                    <p className="mt-1 text-sm text-slate-600 font-medium">
-                      {project.tagline}
-                    </p>
-                  ) : null}
+                    <div className="p-5">
+                      <h3 className="text-lg font-black tracking-tight text-slate-900">
+                        {project.title}
+                      </h3>
+                      {project.tagline ? (
+                        <p className="mt-1 text-sm text-slate-600 font-medium">
+                          {project.tagline}
+                        </p>
+                      ) : null}
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {chips.map((tech) => (
-                      <span
-                        key={tech}
-                        className="rounded-full border border-slate-200/70 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700"
-                      >
-                        {tech}
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {chips.map((tech) => (
+                          <span
+                            key={tech}
+                            className="rounded-full border border-slate-200/70 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                        {headlineMetric ? (
+                          <span className="rounded-full border border-primary-200/60 bg-primary-50/80 px-3 py-1 text-xs font-bold text-primary-700">
+                            {headlineMetric.metric}: {headlineMetric.value}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-between">
+                        <span className="text-sm font-bold text-primary-700">
+                          View case study
+                        </span>
+                        <span className="text-xs text-slate-500">Opens modal</span>
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* Blurred overlay for hidden projects */}
+            <div className="relative -mt-48 pt-48 pb-32">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white to-white" />
+              <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent" />
+            </div>
+
+            {/* View More Button */}
+            <motion.button
+              onClick={() => setShowAllProjects(true)}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-full font-medium hover:bg-primary-600 transition-all duration-300 shadow-xl hover:shadow-primary-500/25 hover:scale-105"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              View More Projects
+              <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+            </motion.button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {projects.map((project) => {
+              const Icon = getIconByName(project.icon_name);
+              const preview = project.thumbnail_url || project.snapshot_url;
+              const liveUrl = project.project_url || project.link;
+              const chips = project.technologies.slice(0, 3);
+              const headlineMetric = project.impact[0];
+
+              return (
+                <a
+                  key={project.id}
+                  href={`#project-${project.id}`}
+                  className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/55 backdrop-blur-xl shadow-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl hover:border-primary-200/60 focus:outline-none focus:ring-4 focus:ring-primary-500/20"
+                  aria-label={`Open case study: ${project.title}`}
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    {preview ? (
+                      <img
+                        src={preview}
+                        alt={`${project.title} preview`}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-primary-100/60 via-white/40 to-purple-100/60" />
+                    )}
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/0 to-slate-950/0" />
+
+                    <div className="absolute left-4 bottom-4 flex items-center gap-2">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-900 shadow-sm">
+                        <Icon className="h-4 w-4 text-primary-700" />
+                        {project.category || 'Project'}
                       </span>
-                    ))}
-                    {headlineMetric ? (
-                      <span className="rounded-full border border-primary-200/60 bg-primary-50/80 px-3 py-1 text-xs font-bold text-primary-700">
-                        {headlineMetric.metric}: {headlineMetric.value}
-                      </span>
+                      {project.year ? (
+                        <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-mono font-semibold text-slate-700">
+                          {project.year}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {liveUrl ? (
+                      <div className="absolute right-4 top-4 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-slate-800 shadow-sm">
+                        Live
+                      </div>
                     ) : null}
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm font-bold text-primary-700">
-                      View case study
-                    </span>
-                    <span className="text-xs text-slate-500">Opens modal</span>
+                  <div className="p-5">
+                    <h3 className="text-lg font-black tracking-tight text-slate-900">
+                      {project.title}
+                    </h3>
+                    {project.tagline ? (
+                      <p className="mt-1 text-sm text-slate-600 font-medium">
+                        {project.tagline}
+                      </p>
+                    ) : null}
+
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {chips.map((tech) => (
+                        <span
+                          key={tech}
+                          className="rounded-full border border-slate-200/70 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                      {headlineMetric ? (
+                        <span className="rounded-full border border-primary-200/60 bg-primary-50/80 px-3 py-1 text-xs font-bold text-primary-700">
+                          {headlineMetric.metric}: {headlineMetric.value}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-sm font-bold text-primary-700">
+                        View case study
+                      </span>
+                      <span className="text-xs text-slate-500">Opens modal</span>
+                    </div>
                   </div>
-                </div>
-              </a>
-            );
-          })}
-        </div>
+                </a>
+              );
+            })}
+
+            {/* Show Less Button */}
+            {projects.length > 6 && (
+              <div className="col-span-full flex justify-center mt-4">
+                <button
+                  onClick={() => setShowAllProjects(false)}
+                  className="inline-flex items-center gap-2 px-8 py-3 bg-white border-2 border-slate-200 text-slate-900 rounded-full font-medium hover:border-primary-200 hover:bg-slate-50 transition-all duration-300"
+                >
+                  <ChevronDown className="w-4 h-4 rotate-180" />
+                  Show Less
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Case study modals (CSS :target) */}
         {projects.map((project) => {
