@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { secureDb } from '@/lib/security/database';
-import { stackServerApp } from '@/stack';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
 
 export const GET = createSecureAPIHandler(async () => {
@@ -14,9 +13,6 @@ export const GET = createSecureAPIHandler(async () => {
 });
 
 export const POST = createSecureAPIHandler(async (request: Request) => {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   try {
     const body = await request.json();
 

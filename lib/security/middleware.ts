@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getClientIdentifier, apiRateLimiter, createRateLimitResponse } from './rate-limiter';
 import { InMemoryRateLimiter } from './rate-limiter';
 import { addDefaultSecurityHeaders, addFullSecurityHeaders } from './headers';
+import { stackServerApp } from '@/stack';
 
 export interface SecurityMiddlewareOptions {
   requireAuth?: boolean;
@@ -88,8 +89,16 @@ export class SecurityMiddleware {
 
     // Authentication check
     if (requireAuth) {
-      const authHeader = request.headers.get('authorization');
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      try {
+        const user = await stackServerApp.getUser();
+        if (!user) {
+          return NextResponse.json(
+            { error: 'Authorization required' },
+            { status: 401 }
+          );
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
         return NextResponse.json(
           { error: 'Authorization required' },
           { status: 401 }
