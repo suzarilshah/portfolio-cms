@@ -22,7 +22,7 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     }
 
     // Validate each section entry
-    const allowedSectionKeys = ['hero', 'about', 'experience', 'projects', 'projects-showcase', 'skills', 'awards', 'community', 'contact'];
+    const allowedSectionKeys = ['hero', 'about', 'experience', 'projects', 'skills', 'education', 'awards', 'publications', 'community', 'contact'];
     for (const section of sections) {
       if (!section.section_key || section.sort_order === undefined || section.is_visible === undefined) {
         return NextResponse.json({ error: 'Each section requires section_key, sort_order, and is_visible' }, { status: 400 });

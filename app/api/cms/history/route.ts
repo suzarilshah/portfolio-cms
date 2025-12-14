@@ -4,7 +4,7 @@ import { createSecureAPIHandler } from '@/lib/security/middleware';
 
 // Validate section key is allowed
 function validateSectionKey(key: string): boolean {
-  const allowedKeys = ['hero', 'about', 'experience', 'projects', 'skills', 'awards', 'community', 'contact'];
+  const allowedKeys = ['hero', 'about', 'experience', 'projects', 'skills', 'education', 'awards', 'publications', 'community', 'contact'];
   return allowedKeys.includes(key);
 }
 
