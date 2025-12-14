@@ -193,7 +193,7 @@ export default function ProjectsShowcase() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="group relative bg-gradient-to-br from-white via-slate-50/30 to-white rounded-3xl p-8 md:p-12 hover:bg-white hover:shadow-2xl transition-all duration-700 border border-slate-100/50 hover:border-primary-200/50 overflow-hidden"
+              className="group relative bg-white/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 hover:bg-white/80 hover:shadow-2xl transition-all duration-700 border border-white/40 hover:border-primary-200/50 overflow-hidden"
             >
               {/* Animated gradient background */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10" />

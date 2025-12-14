@@ -290,7 +290,7 @@ export default function ProjectsAdminPage() {
                     </div>
 
                     {/* Editor Form */}
-                    <div className="bg-gradient-to-br from-white via-slate-50/50 to-white rounded-3xl border border-slate-200/50 p-8 md:p-12 shadow-xl shadow-primary-500/5 backdrop-blur-sm">
+                    <div className="bg-white/60 backdrop-blur-xl rounded-3xl border border-white/40 p-8 md:p-12 shadow-xl shadow-primary-500/5">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="p-3 bg-gradient-to-br from-primary-500 to-purple-600 text-white rounded-xl">
                                 <Edit2 size={20} />
