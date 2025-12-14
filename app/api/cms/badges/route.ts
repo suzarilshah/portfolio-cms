@@ -1,30 +1,43 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
-import { stackServerApp } from '@/stack';
+import { secureDb } from '@/lib/security/database';
+import { createSecureAPIHandler } from '@/lib/security/middleware';
 import * as cheerio from 'cheerio';
 
-export async function GET() {
+// SSRF Protection: Validate badge_id to only allow alphanumeric characters
+function validateBadgeId(badgeId: string): boolean {
+  return /^[a-zA-Z0-9]+$/.test(badgeId);
+}
+
+export const GET = createSecureAPIHandler(async () => {
   try {
-    const result = await pool.query('SELECT * FROM badges ORDER BY sort_order ASC');
-    return NextResponse.json(result.rows);
+    const result = await secureDb.query('SELECT * FROM badges ORDER BY sort_order ASC');
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}
+});
 
-export async function PATCH(request: Request) {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+export const PATCH = createSecureAPIHandler(async (request: Request) => {
   try {
     const body = await request.json();
     const { id } = body;
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-    const current = await pool.query('SELECT * FROM badges WHERE id = $1', [id]);
-    if (current.rowCount === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    const { badge_id } = current.rows[0];
+    // Validate ID is a number
+    const idNum = parseInt(String(id));
+    if (isNaN(idNum) || idNum <= 0) {
+      return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
+    }
+
+    const current = await secureDb.query('SELECT * FROM badges WHERE id = $1', [idNum]);
+    if (current.length === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    const { badge_id } = current[0];
+
+    // SSRF Protection: Validate badge_id before making external request
+    if (!validateBadgeId(badge_id)) {
+      return NextResponse.json({ error: 'Invalid badge ID format' }, { status: 400 });
+    }
 
     let title = '';
     let image_url = '';
@@ -45,24 +58,37 @@ export async function PATCH(request: Request) {
       console.error('Failed to refetch Credly metadata:', e);
     }
 
-    const updated = await pool.query(
+    const updated = await secureDb.query(
       'UPDATE badges SET title = $1, image_url = $2, issuer = $3 WHERE id = $4 RETURNING *',
-      [title, image_url, issuer, id]
+      [title, image_url, issuer, idNum]
     );
-    return NextResponse.json(updated.rows[0]);
+    return NextResponse.json(updated[0]);
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}
+}, { requireAuth: true });
 
-export async function POST(request: Request) {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+export const POST = createSecureAPIHandler(async (request: Request) => {
   try {
     const body = await request.json();
     const { badge_id, sort_order } = body;
+
+    // Validate inputs
+    if (!badge_id) {
+      return NextResponse.json({ error: 'Badge ID required' }, { status: 400 });
+    }
+
+    // SSRF Protection: Validate badge_id before making external request
+    if (!validateBadgeId(badge_id)) {
+      return NextResponse.json({ error: 'Invalid badge ID format' }, { status: 400 });
+    }
+
+    // Validate sort_order
+    const sortOrderNum = sort_order !== undefined ? parseInt(String(sort_order)) : 0;
+    if (isNaN(sortOrderNum) || sortOrderNum < 0) {
+      return NextResponse.json({ error: 'Invalid sort order' }, { status: 400 });
+    }
 
     // Fetch Credly Metadata
     let title = '';
@@ -79,38 +105,30 @@ export async function POST(request: Request) {
         if (res.ok) {
             const html = await res.text();
             const $ = cheerio.load(html);
-            
+
             // OpenGraph Tags
             const fullTitle = $('meta[property="og:title"]').attr('content') || '';
             image_url = $('meta[property="og:image"]').attr('content') || '';
-            
+
             // Clean title: usually "Badge Name was issued to Name" or similar
-            // We'll just use the full title for now or try to extract
             title = fullTitle.split(' was issued to')[0] || fullTitle;
-            
-            // Try to find issuer
-            // Often in <a class="issuer-name"> or similar? 
-            // We'll rely on title parsing or generic "Credly" if not found
         }
     } catch (e) {
         console.error('Failed to fetch Credly metadata:', e);
     }
 
-    const result = await pool.query(
+    const result = await secureDb.query(
       `INSERT INTO badges (badge_id, sort_order, title, image_url, issuer) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [badge_id, sort_order || 0, title, image_url, issuer]
+      [badge_id, sortOrderNum, title, image_url, issuer]
     );
-    return NextResponse.json(result.rows[0]);
+    return NextResponse.json(result[0]);
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}
+}, { requireAuth: true });
 
-export async function PUT(request: Request) {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+export const PUT = createSecureAPIHandler(async (request: Request) => {
   try {
     const body = await request.json();
     const { badges } = body; // Array of { id, sort_order }
@@ -119,46 +137,54 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
-    // Begin transaction
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      
-      for (const badge of badges) {
-        await client.query(
-          'UPDATE badges SET sort_order = $1 WHERE id = $2',
-          [badge.sort_order, badge.id]
-        );
+    // Validate each badge entry
+    for (const badge of badges) {
+      if (!badge.id || badge.sort_order === undefined) {
+        return NextResponse.json({ error: 'Each badge requires id and sort_order' }, { status: 400 });
       }
-      
-      await client.query('COMMIT');
-      return NextResponse.json({ success: true });
-    } catch (e) {
-      await client.query('ROLLBACK');
-      throw e;
-    } finally {
-      client.release();
+      const idNum = parseInt(String(badge.id));
+      const sortOrderNum = parseInt(String(badge.sort_order));
+      if (isNaN(idNum) || idNum <= 0 || isNaN(sortOrderNum) || sortOrderNum < 0) {
+        return NextResponse.json({ error: 'Invalid badge id or sort_order' }, { status: 400 });
+      }
     }
+
+    // Perform updates with secureDb (atomic transaction)
+    const updatePromises = badges.map(badge => {
+      const idNum = parseInt(String(badge.id));
+      const sortOrderNum = parseInt(String(badge.sort_order));
+      return secureDb.query(
+        'UPDATE badges SET sort_order = $1 WHERE id = $2',
+        [sortOrderNum, idNum]
+      );
+    });
+
+    await Promise.all(updatePromises);
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}
+}, { requireAuth: true });
 
-export async function DELETE(request: Request) {
-    const user = await stackServerApp.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export const DELETE = createSecureAPIHandler(async (request: Request) => {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
 
-    try {
-        const { searchParams } = new URL(request.url);
-        const id = searchParams.get('id');
-        
-        if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+    if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-        await pool.query('DELETE FROM badges WHERE id = $1', [id]);
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error('Database error:', error);
-        return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    // Validate ID is a number
+    const idNum = parseInt(String(id));
+    if (isNaN(idNum) || idNum <= 0) {
+      return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
     }
-}
+
+    await secureDb.query('DELETE FROM badges WHERE id = $1', [idNum]);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Database error:', error);
+    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+  }
+}, { requireAuth: true });

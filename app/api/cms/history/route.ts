@@ -1,31 +1,49 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { secureDb } from '@/lib/security/database';
+import { createSecureAPIHandler } from '@/lib/security/middleware';
 
-export async function GET(request: Request) {
+// Validate section key is allowed
+function validateSectionKey(key: string): boolean {
+  const allowedKeys = ['hero', 'about', 'experience', 'projects', 'skills', 'awards', 'community', 'contact'];
+  return allowedKeys.includes(key);
+}
+
+export const GET = createSecureAPIHandler(async (request: Request) => {
   const { searchParams } = new URL(request.url);
   const key = searchParams.get('key');
   const id = searchParams.get('id');
 
   try {
     if (id) {
-        // Fetch specific version content
-        const result = await pool.query('SELECT * FROM content_history WHERE id = $1', [id]);
-        if (result.rows.length === 0) {
-            return NextResponse.json({ error: 'Version not found' }, { status: 404 });
-        }
-        return NextResponse.json(result.rows[0]);
+      // Validate ID is a number
+      const idNum = parseInt(String(id));
+      if (isNaN(idNum) || idNum <= 0) {
+        return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
+      }
+
+      // Fetch specific version content
+      const result = await secureDb.query('SELECT * FROM content_history WHERE id = $1', [idNum]);
+      if (result.length === 0) {
+        return NextResponse.json({ error: 'Version not found' }, { status: 404 });
+      }
+      return NextResponse.json(result[0]);
     } else if (key) {
-        // Fetch list of versions (metadata only)
-        const result = await pool.query(
-            'SELECT id, created_at FROM content_history WHERE section_key = $1 ORDER BY created_at DESC LIMIT 20',
-            [key]
-        );
-        return NextResponse.json(result.rows);
+      // Validate section key is allowed
+      if (!validateSectionKey(key)) {
+        return NextResponse.json({ error: 'Invalid section key' }, { status: 400 });
+      }
+
+      // Fetch list of versions (metadata only)
+      const result = await secureDb.query(
+        'SELECT id, created_at FROM content_history WHERE section_key = $1 ORDER BY created_at DESC LIMIT 20',
+        [key]
+      );
+      return NextResponse.json(result);
     }
-    
+
     return NextResponse.json({ error: 'Key or ID required' }, { status: 400 });
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}
+});
