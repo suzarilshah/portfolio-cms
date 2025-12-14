@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
-import { stackServerApp } from '@/stack';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
 import { secureDb } from '@/lib/security/database';
 import { Client, Storage, ID } from 'node-appwrite';
 
 export const POST = createSecureAPIHandler(async (request: Request) => {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
