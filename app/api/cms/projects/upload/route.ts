@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { stackServerApp } from '@/stack';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
+import { secureDb } from '@/lib/security/database';
 import { Client, Storage, ID } from 'node-appwrite';
 
 export const POST = createSecureAPIHandler(async (request: Request) => {
@@ -14,6 +15,10 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
 
     if (!file || !projectId) {
       return NextResponse.json({ error: 'Missing file or project_id' }, { status: 400 });
+    }
+
+    if (!/^\d+$/.test(projectId)) {
+      return NextResponse.json({ error: 'Invalid project_id' }, { status: 400 });
     }
 
     // Validate file type
@@ -44,6 +49,16 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
 
     // Get file preview URL
     const fileUrl = `${process.env.APPWRITE_ENDPOINT}/storage/buckets/${process.env.APPWRITE_BUCKET_ID_ASSETS}/files/${response.$id}/preview`;
+
+    // Persist thumbnail to DB immediately so the public site reflects changes without requiring an extra "Save"
+    const updated = await secureDb.query(
+      `UPDATE projects SET thumbnail_url = $1, updated_at = NOW() WHERE id = $2 RETURNING id`,
+      [fileUrl, Number(projectId)]
+    );
+
+    if (!updated || updated.length === 0) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
 
     return NextResponse.json({ thumbnail_url: fileUrl, success: true });
   } catch (error) {

@@ -499,19 +499,46 @@ export default function ProjectsAdminPage() {
                     </div>
 
                     {/* Projects List */}
-                    <div className="grid gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {projects.map(project => (
-                            <div key={project.id} className="bg-gradient-to-br from-white via-slate-50/30 to-white p-6 rounded-2xl border border-slate-200/50 flex items-center justify-between group hover:shadow-xl hover:border-primary-200/50 transition-all duration-300">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-gradient-to-br from-primary-500/10 to-purple-500/10 rounded-xl">
-                                        <Code className="w-5 h-5 text-primary-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-black text-slate-900 text-lg">{project.title}</h4>
-                                        <p className="text-sm text-slate-500 font-medium">{project.category} • {project.year}</p>
+                            <div key={project.id} className="group overflow-hidden rounded-2xl border border-white/40 bg-white/60 backdrop-blur-xl shadow-sm hover:shadow-xl hover:border-primary-200/60 transition-all duration-300">
+                                <div className="relative aspect-[16/10] bg-gradient-to-br from-primary-100/60 via-white/40 to-purple-100/60">
+                                    {(project.thumbnail_url || project.snapshot_url) ? (
+                                        <img
+                                            src={project.thumbnail_url || project.snapshot_url}
+                                            alt={`${project.title} preview`}
+                                            className="h-full w-full object-cover"
+                                            loading="lazy"
+                                            decoding="async"
+                                        />
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="p-3 rounded-2xl bg-white/80 border border-white/60 shadow-sm">
+                                                <Code className="w-6 h-6 text-primary-600" />
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-slate-950/0 to-slate-950/0" />
+                                    <div className="absolute left-4 bottom-4 flex items-center gap-2">
+                                        <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-900">
+                                            {project.category || 'Project'}
+                                        </span>
+                                        <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-mono font-semibold text-slate-700">
+                                            {project.year || '—'}
+                                        </span>
                                     </div>
                                 </div>
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+
+                                <div className="p-5 flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <h4 className="font-black text-slate-900 text-base truncate">{project.title}</h4>
+                                        <p className="text-sm text-slate-500 font-medium truncate">
+                                            {(project.project_url || project.link) ? 'Live link available' : 'No live link'}
+                                            {project.has_snapshot ? ' • Snapshot' : ''}
+                                            {project.thumbnail_url ? ' • Thumbnail' : ''}
+                                        </p>
+                                    </div>
+                                    <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                     <button onClick={() => handleHistoryClick(project.id!)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg" title="History">
                                         <History size={18} />
                                     </button>
@@ -521,6 +548,7 @@ export default function ProjectsAdminPage() {
                                     <button onClick={() => handleDelete(project.id!)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
                                         <Trash2 size={18} />
                                     </button>
+                                    </div>
                                 </div>
                             </div>
                         ))}

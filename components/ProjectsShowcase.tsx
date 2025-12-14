@@ -1,12 +1,8 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
+import pool from '@/lib/db';
 import {
-  ExternalLink,
   Award,
-  TrendingUp,
-  Users,
+  ExternalLink,
   Cloud,
   Container,
   Cpu,
@@ -14,327 +10,542 @@ import {
   Zap,
   Code,
   Server,
-  Globe
+  Globe,
+  TrendingUp,
+  X,
 } from 'lucide-react';
 
-// CSS animations for premium effects
-const floatKeyframes = `
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(5deg); }
-  }
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-`;
+type ProjectsSectionContent = {
+  title?: string;
+  description?: string;
+  subtitle?: string;
+};
 
-// Inject styles
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style');
-  styleSheet.innerText = floatKeyframes;
-  document.head.appendChild(styleSheet);
-}
+type ImpactItem = { metric: string; value: string };
 
-interface Project {
+type Project = {
+  id: number;
   title: string;
-  tagline: string;
-  challenge: string;
-  solution: string;
-  impact: {
-    metric: string;
-    value: string;
-  }[];
+  tagline: string | null;
+  challenge: string | null;
+  solution: string | null;
+  impact: ImpactItem[];
   technologies: string[];
-  category: string;
-  icon: React.ReactNode;
-  icon_name?: string;
-  year: string;
-  link?: string;
-  project_url?: string;
-  thumbnail_url?: string;
-  snapshot_url?: string;
-  has_snapshot?: boolean;
+  category: string | null;
+  icon_name: string | null;
+  year: string | null;
+  link: string | null;
+  project_url: string | null;
+  thumbnail_url: string | null;
+  snapshot_url: string | null;
+  has_snapshot: boolean | null;
+};
+
+function getIconByName(name: string | null) {
+  switch (name) {
+    case 'Cloud':
+      return Cloud;
+    case 'Container':
+      return Container;
+    case 'Cpu':
+      return Cpu;
+    case 'Network':
+      return Network;
+    case 'Zap':
+      return Zap;
+    case 'Server':
+      return Server;
+    case 'Globe':
+      return Globe;
+    case 'Code':
+    default:
+      return Code;
+  }
 }
 
-export default function ProjectsShowcase() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+function normalizeImpact(value: unknown): ImpactItem[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item: any) => ({
+        metric: typeof item?.metric === 'string' ? item.metric : '',
+        value: typeof item?.value === 'string' ? item.value : '',
+      }))
+      .filter((x) => x.metric && x.value)
+      .slice(0, 10);
+  }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-      },
-    },
+  if (typeof value === 'string') {
+    try {
+      return normalizeImpact(JSON.parse(value));
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function normalizeTech(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .filter((x) => typeof x === 'string')
+      .map((x) => x.trim())
+      .filter(Boolean)
+      .slice(0, 20);
+  }
+
+  if (typeof value === 'string') {
+    try {
+      return normalizeTech(JSON.parse(value));
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+const FALLBACK_PROJECTS: Omit<Project, 'id'>[] = [
+  {
+    title: 'Enterprise Cloud Infrastructure Optimization',
+    tagline: 'Swift Banking Operations',
+    challenge:
+      'Managing complex cloud infrastructure for critical banking operations requiring 99.9% uptime while optimizing costs and performance.',
+    solution:
+      'Architected and implemented Azure cloud infrastructure with Kubernetes orchestration, automated CI/CD, and advanced monitoring. Deployed infrastructure as code using Terraform for consistency and scalability.',
+    impact: [
+      { metric: 'Uptime', value: '99.9%' },
+      { metric: 'Incident Response', value: '-40%' },
+      { metric: 'Deployment Speed', value: '3× Faster' },
+      { metric: 'Infrastructure Cost', value: '-25%' },
+    ],
+    technologies: ['Azure', 'Kubernetes', 'Terraform', 'CI/CD', 'Observability'],
+    category: 'Cloud Architecture',
+    icon_name: 'Cloud',
+    year: '2024–2025',
+    link: null,
+    project_url: null,
+    thumbnail_url: null,
+    snapshot_url: null,
+    has_snapshot: false,
+  },
+  {
+    title: 'Containerization & Deployment Optimization',
+    tagline: 'Virtual Spirit Cloud Migration',
+    challenge:
+      'Legacy infrastructure with manual deployments causing delays and resource inefficiency. Needed a modern container platform for scalability and reliability.',
+    solution:
+      'Led containerization using Docker + Kubernetes, introduced GitOps workflows, and improved deployment reliability with monitoring and rollbacks.',
+    impact: [
+      { metric: 'Deployment Time', value: '-85%' },
+      { metric: 'Reliability', value: '+45%' },
+      { metric: 'Developer Productivity', value: '+50%' },
+    ],
+    technologies: ['Docker', 'Kubernetes', 'GitOps', 'Helm', 'Observability'],
+    category: 'DevOps Transformation',
+    icon_name: 'Container',
+    year: '2023–2024',
+    link: null,
+    project_url: null,
+    thumbnail_url: null,
+    snapshot_url: null,
+    has_snapshot: false,
+  },
+  {
+    title: 'Azure AI‑Powered Smart Aquaponics',
+    tagline: 'Imagine Cup 2022 — Top 4 Asia',
+    challenge:
+      'Sustainable agriculture needs intelligent automation and real‑time monitoring. Traditional methods are inefficient and resource‑intensive.',
+    solution:
+      'Built an IoT + AI system with Azure IoT Hub, ML, and computer vision to automate monitoring and optimize yields.',
+    impact: [
+      { metric: 'Water Savings', value: '90%' },
+      { metric: 'Crop Yield', value: '+40%' },
+      { metric: 'Monitoring', value: '24/7' },
+    ],
+    technologies: ['Azure IoT Hub', 'Azure ML', 'Python', 'Computer Vision', 'React'],
+    category: 'IoT / AI',
+    icon_name: 'Cpu',
+    year: '2022',
+    link: null,
+    project_url: null,
+    thumbnail_url: null,
+    snapshot_url: null,
+    has_snapshot: false,
+  },
+];
+
+async function getProjects(): Promise<Project[]> {
+  if (!process.env.DATABASE_URL) {
+    return FALLBACK_PROJECTS.map((p, idx) => ({ ...p, id: idx + 1 }));
+  }
+
+  try {
+    const res = await pool.query(
+      `SELECT
+        id,
+        title,
+        tagline,
+        challenge,
+        solution,
+        impact,
+        technologies,
+        category,
+        icon_name,
+        year,
+        link,
+        project_url,
+        thumbnail_url,
+        snapshot_url,
+        has_snapshot
+      FROM projects
+      WHERE is_visible = TRUE
+      ORDER BY sort_order ASC, created_at DESC`
+    );
+
+    return (res.rows as any[]).map((row) => ({
+      id: Number(row.id),
+      title: String(row.title || ''),
+      tagline: row.tagline ?? null,
+      challenge: row.challenge ?? null,
+      solution: row.solution ?? null,
+      impact: normalizeImpact(row.impact),
+      technologies: normalizeTech(row.technologies),
+      category: row.category ?? null,
+      icon_name: row.icon_name ?? null,
+      year: row.year ?? null,
+      link: row.link ?? null,
+      project_url: row.project_url ?? null,
+      thumbnail_url: row.thumbnail_url ?? null,
+      snapshot_url: row.snapshot_url ?? null,
+      has_snapshot: row.has_snapshot ?? null,
+    }));
+  } catch {
+    return FALLBACK_PROJECTS.map((p, idx) => ({ ...p, id: idx + 1 }));
+  }
+}
+
+export default async function ProjectsShowcase({
+  content,
+}: {
+  content?: ProjectsSectionContent;
+}) {
+  const projects = await getProjects();
+
+  const title = content?.title?.trim() || 'Projects & Case Studies';
+  const description =
+    content?.description?.trim() ||
+    'A selection of real-world systems I’ve built—measurable outcomes, clean execution, and maintainable engineering.';
+
+  const baseUrl = 'https://www.suzarilshah.uk';
+  const itemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: title,
+    itemListElement: projects.map((p, idx) => {
+      const url = p.project_url || p.link || `${baseUrl}/#project-${p.id}`;
+      const desc = p.tagline || p.challenge || '';
+      return {
+        '@type': 'ListItem',
+        position: idx + 1,
+        item: {
+          '@type': 'CreativeWork',
+          name: p.title,
+          description: desc,
+          url,
+        },
+      };
+    }),
   };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-      },
-    },
-  };
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-        try {
-            // In a real scenario, we might want to fetch this server-side in the parent and pass it down
-            // But for now, client-side fetch is fine for this component
-            const res = await fetch('/api/cms/projects');
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.length > 0) {
-                    // Map icon string names to components
-                    const mappedData = data.map((p: any) => ({
-                        ...p,
-                        icon: getIconComponent(p.icon_name)
-                    }));
-                    setProjects(mappedData);
-                } else {
-                    // Fallback to hardcoded if DB is empty
-                    setProjects(fallbackProjects);
-                }
-            }
-        } catch (e) {
-            console.error('Failed to fetch projects', e);
-            setProjects(fallbackProjects);
-        } finally {
-            setLoading(false);
-        }
-    };
-    fetchProjects();
-  }, []);
-
-  const getIconComponent = (name: string) => {
-      switch(name) {
-          case 'Cloud': return <Cloud className="w-6 h-6" />;
-          case 'Container': return <Container className="w-6 h-6" />;
-          case 'Cpu': return <Cpu className="w-6 h-6" />;
-          case 'Network': return <Network className="w-6 h-6" />;
-          case 'Zap': return <Zap className="w-6 h-6" />;
-          case 'Code': return <Code className="w-6 h-6" />;
-          case 'Server': return <Server className="w-6 h-6" />;
-          case 'Globe': return <Globe className="w-6 h-6" />;
-          default: return <Code className="w-6 h-6" />;
-      }
-  };
-
-  const fallbackProjects: Project[] = [
-    {
-      title: 'Enterprise Cloud Infrastructure Optimization',
-      tagline: 'Swift Banking Operations',
-      challenge: 'Managing complex cloud infrastructure for critical banking operations requiring 99.9% uptime while optimizing costs and performance.',
-      solution: 'Architected and implemented a comprehensive Azure cloud infrastructure with Kubernetes orchestration, automated CI/CD pipelines, and advanced monitoring systems. Deployed infrastructure as code using Terraform for consistency and scalability.',
-      impact: [
-        { metric: 'Uptime', value: '99.9%' },
-        { metric: 'Incident Response', value: '-40%' },
-        { metric: 'Deployment Speed', value: '3x Faster' },
-        { metric: 'Infrastructure Cost', value: '-25%' },
-      ],
-      technologies: ['Azure', 'Kubernetes', 'Terraform', 'Azure DevOps', 'Monitoring'],
-      category: 'Cloud Architecture',
-      icon: <Cloud className="w-6 h-6" />,
-      year: '2024-2025',
-    },
-    // ... (rest of fallback projects if needed, but for brevity let's keep just one or rely on DB)
-  ];
-
-  if (loading) return null; // Or a skeleton loader
 
   return (
-    <section id="projects" className="py-24 bg-white">
+    <section id="projects" className="relative py-20 sm:py-24">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
+
       <div className="max-w-7xl mx-auto px-6">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-20"
-        >
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary-500/10 to-purple-500/10 text-primary-700 rounded-full mb-6 backdrop-blur-sm border border-primary-200/50">
-            <Award className="w-5 h-5" />
-            <span className="font-mono text-sm font-bold uppercase tracking-widest">
-              Featured Work
+        {/* Header */}
+        <div className="text-center mb-10 sm:mb-12">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/50 backdrop-blur-md px-4 py-2 text-primary-700 shadow-sm">
+            <Award className="w-4 h-4" />
+            <span className="font-mono text-xs font-bold tracking-[0.2em] uppercase">
+              Selected Work
             </span>
-            <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
           </div>
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-8 tracking-tight">
+
+          <h2 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900">
             <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent">
-              Projects &
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-primary-600 via-purple-600 to-primary-600 bg-clip-text text-transparent">
-              Case Studies
+              {title}
             </span>
           </h2>
-          <p className="text-xl md:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-            Real-world cloud architecture, DevOps transformations, and IoT solutions
-            <br />
-            <span className="text-primary-600 font-semibold">driving measurable business impact</span>
+
+          <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            {description}
           </p>
-        </motion.div>
 
-        {/* Projects Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="space-y-8"
-        >
-          {projects.map((project, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              className="group relative bg-white/60 backdrop-blur-xl rounded-3xl p-8 md:p-12 hover:bg-white/80 hover:shadow-2xl transition-all duration-700 border border-white/40 hover:border-primary-200/50 overflow-hidden"
-            >
-              {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10" />
+          <p className="mt-3 text-sm text-slate-500 max-w-3xl mx-auto">
+            Click a project to open the full case study.
+          </p>
+        </div>
 
-              {/* Floating particles effect */}
-              <div className="absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-primary-400/20 to-purple-400/20 rounded-full mix-blend-multiply filter blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-float" />
+        {/* Gallery grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          {projects.map((project) => {
+            const Icon = getIconByName(project.icon_name);
+            const preview = project.thumbnail_url || project.snapshot_url;
+            const liveUrl = project.project_url || project.link;
+            const chips = project.technologies.slice(0, 3);
+            const headlineMetric = project.impact[0];
 
-              {/* Project Header */}
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="p-4 bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-500">
-                      {project.icon}
-                    </div>
-                    <div>
-                      <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-100 to-purple-100 text-primary-700 text-xs font-bold rounded-full mb-3 border border-primary-200/50">
-                        {project.category}
-                        <div className="w-1.5 h-1.5 bg-primary-500 rounded-full" />
+            return (
+              <a
+                key={project.id}
+                href={`#project-${project.id}`}
+                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/55 backdrop-blur-xl shadow-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl hover:border-primary-200/60 focus:outline-none focus:ring-4 focus:ring-primary-500/20"
+                aria-label={`Open case study: ${project.title}`}
+              >
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt={`${project.title} preview`}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-gradient-to-br from-primary-100/60 via-white/40 to-purple-100/60" />
+                  )}
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/0 to-slate-950/0" />
+
+                  <div className="absolute left-4 bottom-4 flex items-center gap-2">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-900 shadow-sm">
+                      <Icon className="h-4 w-4 text-primary-700" />
+                      {project.category || 'Project'}
+                    </span>
+                    {project.year ? (
+                      <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-mono font-semibold text-slate-700">
+                        {project.year}
                       </span>
-                      <p className="text-sm text-slate-500 font-mono font-semibold">{project.year}</p>
-                    </div>
+                    ) : null}
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-black text-slate-900 mb-3 tracking-tight">
+
+                  {liveUrl ? (
+                    <div className="absolute right-4 top-4 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-slate-800 shadow-sm">
+                      Live
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="p-5">
+                  <h3 className="text-lg font-black tracking-tight text-slate-900">
                     {project.title}
                   </h3>
-                  <p className="text-xl text-primary-600 font-bold">
-                    {project.tagline}
-                  </p>
-                </div>
-                {(project.project_url || project.link) && (
-                  <a
-                    href={project.project_url || project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full hover:from-primary-700 hover:to-primary-800 transition-all duration-300 group-hover:scale-105 shadow-lg hover:shadow-xl"
-                  >
-                    <span className="font-medium">Live Preview</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
+                  {project.tagline ? (
+                    <p className="mt-1 text-sm text-slate-600 font-medium">
+                      {project.tagline}
+                    </p>
+                  ) : null}
 
-              {/* Snapshot/Thumbnail Display */}
-              {(project.thumbnail_url || project.snapshot_url) && (
-                <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200">
-                  <img
-                    src={project.thumbnail_url || project.snapshot_url}
-                    alt={`${project.title} preview`}
-                    className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                </div>
-              )}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {chips.map((tech) => (
+                      <span
+                        key={tech}
+                        className="rounded-full border border-slate-200/70 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                    {headlineMetric ? (
+                      <span className="rounded-full border border-primary-200/60 bg-primary-50/80 px-3 py-1 text-xs font-bold text-primary-700">
+                        {headlineMetric.metric}: {headlineMetric.value}
+                      </span>
+                    ) : null}
+                  </div>
 
-
-              {/* Challenge & Solution */}
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <div className="w-1 h-4 bg-primary-500 rounded-full" />
-                    Challenge
-                  </h4>
-                  <p className="text-slate-600 leading-relaxed">
-                    {project.challenge}
-                  </p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-sm font-bold text-primary-700">
+                      View case study
+                    </span>
+                    <span className="text-xs text-slate-500">Opens modal</span>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <div className="w-1 h-4 bg-emerald-500 rounded-full" />
-                    Solution
-                  </h4>
-                  <p className="text-slate-600 leading-relaxed">
-                    {project.solution}
-                  </p>
-                </div>
-              </div>
+              </a>
+            );
+          })}
+        </div>
 
-              {/* Impact Metrics */}
-              <div className="mb-6">
-                <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-primary-600" />
-                  Measurable Impact
-                </h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {project.impact.map((item, impactIndex) => (
-                    <div
-                      key={impactIndex}
-                      className="bg-white p-4 rounded-xl border border-slate-200 text-center hover:border-primary-300 transition-colors"
-                    >
-                      <p className="text-2xl md:text-3xl font-bold text-primary-600 mb-1">
-                        {item.value}
-                      </p>
-                      <p className="text-xs text-slate-600 font-medium">
-                        {item.metric}
+        {/* Case study modals (CSS :target) */}
+        {projects.map((project) => {
+          const Icon = getIconByName(project.icon_name);
+          const preview = project.thumbnail_url || project.snapshot_url;
+          const liveUrl = project.project_url || project.link;
+
+          return (
+            <div
+              key={`modal-${project.id}`}
+              id={`project-${project.id}`}
+              className="project-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`project-${project.id}-title`}
+            >
+              <a
+                href="#projects"
+                className="project-modal__backdrop"
+                aria-label="Close case study"
+              />
+
+              <div className="project-modal__panel">
+                <div className="p-5 sm:p-7 border-b border-slate-200/60">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-bold text-primary-700">
+                          <Icon className="h-4 w-4" />
+                          {project.category || 'Project'}
+                        </span>
+                        {project.year ? (
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-mono font-semibold text-slate-700">
+                            {project.year}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <h3
+                        id={`project-${project.id}-title`}
+                        className="mt-3 text-2xl sm:text-3xl font-black tracking-tight text-slate-900"
+                      >
+                        {project.title}
+                      </h3>
+
+                      {project.tagline ? (
+                        <p className="mt-2 text-base sm:text-lg text-slate-600 font-medium">
+                          {project.tagline}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {liveUrl ? (
+                        <a
+                          href={liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-primary-700 transition-colors"
+                        >
+                          Live
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      ) : null}
+
+                      <a
+                        href="#projects"
+                        className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-700 hover:bg-slate-50 transition-colors"
+                        aria-label="Close"
+                      >
+                        <X className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-5 sm:p-7 space-y-8">
+                  {preview ? (
+                    <div className="overflow-hidden rounded-2xl border border-slate-200/60 bg-slate-50">
+                      <img
+                        src={preview}
+                        alt={`${project.title} preview`}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-auto"
+                      />
+                    </div>
+                  ) : null}
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="rounded-2xl border border-slate-200/60 bg-white/60 p-5">
+                      <h4 className="text-xs font-black tracking-[0.2em] uppercase text-slate-500">
+                        Challenge
+                      </h4>
+                      <p className="mt-3 text-slate-700 leading-relaxed">
+                        {project.challenge || '—'}
                       </p>
                     </div>
-                  ))}
+
+                    <div className="rounded-2xl border border-slate-200/60 bg-white/60 p-5">
+                      <h4 className="text-xs font-black tracking-[0.2em] uppercase text-slate-500">
+                        Solution
+                      </h4>
+                      <p className="mt-3 text-slate-700 leading-relaxed">
+                        {project.solution || '—'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {project.impact.length > 0 ? (
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-primary-700" />
+                        <h4 className="text-sm font-black text-slate-900">
+                          Outcomes
+                        </h4>
+                      </div>
+                      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {project.impact.slice(0, 6).map((item, idx) => (
+                          <div
+                            key={`${project.id}-impact-${idx}`}
+                            className="rounded-2xl border border-slate-200/60 bg-white/70 p-4"
+                          >
+                            <div className="text-lg font-black text-slate-900">
+                              {item.value}
+                            </div>
+                            <div className="mt-1 text-xs font-semibold text-slate-600">
+                              {item.metric}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {project.technologies.length > 0 ? (
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900">
+                        Stack
+                      </h4>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {project.technologies.map((tech) => (
+                          <span
+                            key={`${project.id}-tech-${tech}`}
+                            className="rounded-full border border-slate-200/70 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
+            </div>
+          );
+        })}
 
-              {/* Technologies */}
-              <div>
-                <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-primary-600" />
-                  Technologies Used
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {project.technologies.map((tech, techIndex) => (
-                    <span
-                      key={techIndex}
-                      className="px-3 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded-full hover:bg-primary-100 hover:text-primary-700 transition-colors"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Hover Effect */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary-400/5 to-primary-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* SEO-Optimized Projects Summary (Hidden but crawlable) */}
-        <div className="sr-only" aria-label="Projects Summary">
-          <h3>Cloud Architecture and DevOps Projects</h3>
-          <p>
-            Muhammad Suzaril Shah has delivered multiple enterprise-scale cloud architecture projects
-            including Azure cloud migration, Kubernetes container orchestration, DevOps transformation,
-            and IoT cloud solutions. Notable achievements include 99.9% uptime for Swift banking operations,
-            60% improvement in resource utilization through containerization, and Top 4 Asia recognition
-            in Microsoft Imagine Cup for AI-powered smart agriculture.
-          </p>
-          <p>
-            Expertise demonstrated across Azure cloud infrastructure, Kubernetes deployment optimization,
-            Infrastructure as Code with Terraform, CI/CD pipeline automation, Platform Engineering,
-            IoT solutions with Azure IoT Hub, and published IEEE research on LoRa network optimization.
-          </p>
+        {/* SEO-friendly text fallback for crawlers (kept minimal and honest) */}
+        <div className="sr-only" aria-label="Project case studies text">
+          <h3>Project Case Studies</h3>
+          <ul>
+            {projects.map((p) => (
+              <li key={`seo-${p.id}`}>
+                <strong>{p.title}.</strong> {p.tagline || ''} {p.challenge || ''} {p.solution || ''}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

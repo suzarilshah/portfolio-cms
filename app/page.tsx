@@ -95,7 +95,7 @@ export default async function Home() {
     hero: <HeroSection key="hero" content={sectionData.hero} settings={settings} />,
     about: <AboutSection key="about" content={sectionData.about} settings={settings} />,
     skills: <SkillsMatrix key="skills" />,
-    projects: <ProjectsShowcase key="projects" />,
+    projects: <ProjectsShowcase key="projects" content={sectionData.projects} />,
     experience: <ExperienceSection key="experience" content={sectionData.experience} settings={settings} />,
     education: <EducationSection key="education" content={sectionData.education} />,
     awards: <AwardsSection key="awards" badges={badges} content={sectionData.awards} />,

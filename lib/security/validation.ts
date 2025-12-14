@@ -70,14 +70,23 @@ export class SecurityValidator {
       }
     }
 
-    // Impact validation (array of strings)
-    if (data.impact) {
+    // Impact validation (array of { metric, value })
+    if (data.impact !== undefined) {
       if (!Array.isArray(data.impact)) {
         errors.push('Impact must be an array');
       } else {
         sanitized.impact = data.impact
-          .filter((item: any) => typeof item === 'string' && item.length <= 200)
-          .map((item: string) => this.sanitizeHtml(item.trim()))
+          .slice(0, 12)
+          .map((item: any) => {
+            const metricRaw = typeof item?.metric === 'string' ? item.metric : '';
+            const valueRaw = typeof item?.value === 'string' ? item.value : '';
+
+            const metric = this.sanitizeHtml(metricRaw.trim()).slice(0, 80);
+            const value = this.sanitizeHtml(valueRaw.trim()).slice(0, 80);
+
+            return { metric, value };
+          })
+          .filter((item: any) => item.metric.length > 0 && item.value.length > 0)
           .slice(0, 10); // Max 10 impact items
       }
     }
@@ -94,13 +103,12 @@ export class SecurityValidator {
       }
     }
 
-    // Category validation
+    // Category validation (free-text, stored as TEXT in DB)
     if (data.category) {
-      const allowedCategories = ['web', 'mobile', 'cloud', 'ai', 'data', 'infrastructure', 'other'];
-      if (!allowedCategories.includes(data.category)) {
-        errors.push('Invalid category');
+      if (typeof data.category !== 'string' || data.category.length > 120) {
+        errors.push('Category must be a string with max 120 characters');
       } else {
-        sanitized.category = data.category;
+        sanitized.category = this.sanitizeHtml(data.category.trim());
       }
     }
 
@@ -113,13 +121,12 @@ export class SecurityValidator {
       }
     }
 
-    // Year validation
+    // Year validation (free-text like "2024-2025", stored as TEXT in DB)
     if (data.year) {
-      const year = parseInt(data.year);
-      if (isNaN(year) || year < 1990 || year > new Date().getFullYear() + 1) {
-        errors.push('Invalid year');
+      if (typeof data.year !== 'string' || data.year.length > 50) {
+        errors.push('Year must be a string with max 50 characters');
       } else {
-        sanitized.year = year;
+        sanitized.year = this.sanitizeHtml(data.year.trim());
       }
     }
 
@@ -160,7 +167,16 @@ export class SecurityValidator {
       if (typeof data.thumbnail_url !== 'string' || data.thumbnail_url.length > 1000) {
         errors.push('Thumbnail URL must be a string with max 1000 characters');
       } else {
-        sanitized.thumbnail_url = this.sanitizeHtml(data.thumbnail_url.trim());
+        try {
+          const url = new URL(data.thumbnail_url);
+          if (!['http:', 'https:'].includes(url.protocol)) {
+            errors.push('Thumbnail URL must be a valid HTTP or HTTPS URL');
+          } else {
+            sanitized.thumbnail_url = url.toString();
+          }
+        } catch {
+          errors.push('Invalid thumbnail URL format');
+        }
       }
     }
 
@@ -169,7 +185,16 @@ export class SecurityValidator {
       if (typeof data.snapshot_url !== 'string' || data.snapshot_url.length > 1000) {
         errors.push('Snapshot URL must be a string with max 1000 characters');
       } else {
-        sanitized.snapshot_url = this.sanitizeHtml(data.snapshot_url.trim());
+        try {
+          const url = new URL(data.snapshot_url);
+          if (!['http:', 'https:'].includes(url.protocol)) {
+            errors.push('Snapshot URL must be a valid HTTP or HTTPS URL');
+          } else {
+            sanitized.snapshot_url = url.toString();
+          }
+        } catch {
+          errors.push('Invalid snapshot URL format');
+        }
       }
     }
 
