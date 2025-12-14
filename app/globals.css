@@ -375,6 +375,17 @@
     }
   }
 
+  /* Hide navbar when project modal is open */
+  body.modal-open nav {
+    transform: translateY(-150%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body.modal-open nav .project-modal {
+    z-index: 60;
+  }
+
   /* Custom Scrollbar for Badge Selector */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;

@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Download } from 'lucide-react';
+import EmailCaptureModal from '@/components/EmailCaptureModal';
 
 interface HeroContent {
   headline?: string;
@@ -19,6 +21,7 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
   const subheadline = content?.subheadline || "Microsoft MVP • Docker Captain • Platform Engineering Leader";
   const description = content?.description || "Muhammad Suzaril Shah - Senior IT Systems Engineer at Swift specializing in Azure Cloud Architecture, Kubernetes orchestration, DevOps automation, and IoT cloud solutions. Microsoft MVP & Docker Captain driving digital transformation across Southeast Asia.";
   const resumeUrl = settings?.resume_url;
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
@@ -81,15 +84,13 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
               </a>
               
               {resumeUrl ? (
-                <a 
-                  href={resumeUrl} 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex items-center justify-between px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-full hover:border-primary-200 hover:bg-slate-50 transition-all duration-300 hover:scale-105"
+                <button
+                  onClick={() => setShowEmailModal(true)}
+                  className="group inline-flex items-center justify-between px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-full hover:border-primary-200 hover:bg-slate-50 transition-all duration-300 hover:scale-105 w-full"
                 >
                   <span className="font-medium text-lg">Download Resume</span>
                   <Download className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
-                </a>
+                </button>
               ) : (
                 <a 
                   href="#experience" 
@@ -114,13 +115,20 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
       >
         <span className="font-mono text-xs tracking-widest text-slate-400 uppercase rotate-90 origin-right translate-x-2">Scroll</span>
         <div className="h-16 w-[1px] bg-slate-200 overflow-hidden">
-          <motion.div 
+          <motion.div
             className="h-full w-full bg-slate-900"
             animate={{ y: [-64, 64] }}
             transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
           />
         </div>
       </motion.div>
+
+      {/* Email Capture Modal */}
+      <EmailCaptureModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        resumeUrl={resumeUrl || ''}
+      />
     </section>
   );
 }

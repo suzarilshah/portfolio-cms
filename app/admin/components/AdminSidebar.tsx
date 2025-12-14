@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { LayoutDashboard, Settings, Award, Menu, X } from "lucide-react";
+import { LayoutDashboard, Settings, Award, Menu, X, Mail } from "lucide-react";
 import UserMenu from "./UserMenu";
 import { Suspense, useState } from "react";
 
@@ -114,6 +114,10 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                <Link href="/admin/badges" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm rounded-md transition-all">
                 <Award size={16} />
                 Verified Badges
+              </Link>
+               <Link href="/admin/resume" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm rounded-md transition-all">
+                <Mail size={16} />
+                Resume Downloads
               </Link>
               <Link href="/admin/settings" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm rounded-md transition-all">
                 <Settings size={16} />

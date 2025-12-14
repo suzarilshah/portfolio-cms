@@ -40,8 +40,34 @@ export default function Navigation({ settings }: { settings?: any }) {
       if (current) setActiveSection(current);
     };
 
+    // Check if any project modal is open
+    const checkModalOpen = () => {
+      const modals = document.querySelectorAll('.project-modal');
+      const isModalOpen = Array.from(modals).some(modal => {
+        // Check if modal has :target pseudo-class by checking computed style
+        // or by checking if URL hash matches modal ID
+        const hash = window.location.hash;
+        return hash && modal.id === hash.slice(1);
+      });
+      return isModalOpen;
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    // Listen for hash changes (when modal opens/closes)
+    const handleHashChange = () => {
+      const isOpen = checkModalOpen();
+      document.body.classList.toggle('modal-open', isOpen);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    // Check on mount
+    handleHashChange();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, []);
 
   return (
