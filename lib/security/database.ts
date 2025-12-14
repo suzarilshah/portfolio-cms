@@ -86,10 +86,13 @@ export class SecureDatabase {
       }
     }
 
-    // Ensure parameterized queries for user input
+    // Ensure parameterized queries for queries with dynamic values
+    // Only check for parameterized queries if the query contains WHERE, VALUES, or SET clauses
+    const needsParams = /(where\s+.+|values\s*\(|set\s+.+)/i.test(query);
     const hasPlaceholders = /\$\d+/.test(query) || query.includes('?');
-    if (!hasPlaceholders && /select|insert|update|delete/i.test(query)) {
-      throw new Error('All SQL queries must use parameterized queries. Query without parameters detected.');
+
+    if (needsParams && !hasPlaceholders && /select|insert|update|delete/i.test(query)) {
+      throw new Error('Queries with dynamic values must use parameterized queries. Query without parameters detected.');
     }
   }
 
