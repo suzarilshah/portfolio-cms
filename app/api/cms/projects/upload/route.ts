@@ -61,4 +61,4 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     console.error('Upload error:', error);
     return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
   }
-}, { requireAuth: false });
+}, { requireAuth: false, validateContentType: false });
