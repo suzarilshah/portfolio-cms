@@ -36,11 +36,12 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     // Initialize Storage
     const storage = new Storage(client);
 
-    // Upload to Appwrite Storage
+    // Upload to Appwrite Storage with public read permissions
     const response = await storage.createFile(
       process.env.APPWRITE_BUCKET_ID_ASSETS!,
       ID.unique(),
-      file
+      file,
+      ["read('any')"] // Make file publicly readable
     );
 
     // Get file view URL (with project ID query param for Appwrite)
