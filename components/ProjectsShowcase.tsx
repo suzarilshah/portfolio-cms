@@ -17,6 +17,24 @@ import {
   Globe
 } from 'lucide-react';
 
+// CSS animations for premium effects
+const floatKeyframes = `
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement('style');
+  styleSheet.innerText = floatKeyframes;
+  document.head.appendChild(styleSheet);
+}
+
 interface Project {
   title: string;
   tagline: string;
@@ -137,20 +155,29 @@ export default function ProjectsShowcase() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full mb-4">
-            <Award className="w-4 h-4" />
-            <span className="font-mono text-sm font-semibold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary-500/10 to-purple-500/10 text-primary-700 rounded-full mb-6 backdrop-blur-sm border border-primary-200/50">
+            <Award className="w-5 h-5" />
+            <span className="font-mono text-sm font-bold uppercase tracking-widest">
               Featured Work
             </span>
+            <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
-            Projects & Case Studies
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-8 tracking-tight">
+            <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Projects &
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-primary-600 via-purple-600 to-primary-600 bg-clip-text text-transparent">
+              Case Studies
+            </span>
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            Real-world cloud architecture, DevOps transformations, and IoT solutions driving measurable business impact
+          <p className="text-xl md:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+            Real-world cloud architecture, DevOps transformations, and IoT solutions
+            <br />
+            <span className="text-primary-600 font-semibold">driving measurable business impact</span>
           </p>
         </motion.div>
 
@@ -166,26 +193,33 @@ export default function ProjectsShowcase() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="group relative bg-slate-50/50 rounded-3xl p-8 md:p-10 hover:bg-white hover:shadow-2xl transition-all duration-500 border border-slate-100"
+              className="group relative bg-gradient-to-br from-white via-slate-50/30 to-white rounded-3xl p-8 md:p-12 hover:bg-white hover:shadow-2xl transition-all duration-700 border border-slate-100/50 hover:border-primary-200/50 overflow-hidden"
             >
+              {/* Animated gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10" />
+
+              {/* Floating particles effect */}
+              <div className="absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-primary-400/20 to-purple-400/20 rounded-full mix-blend-multiply filter blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-float" />
+
               {/* Project Header */}
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-6">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-3 bg-primary-100 text-primary-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="p-4 bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-500">
                       {project.icon}
                     </div>
                     <div>
-                      <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 text-xs font-semibold rounded-full mb-2">
+                      <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-100 to-purple-100 text-primary-700 text-xs font-bold rounded-full mb-3 border border-primary-200/50">
                         {project.category}
+                        <div className="w-1.5 h-1.5 bg-primary-500 rounded-full" />
                       </span>
-                      <p className="text-sm text-slate-500 font-mono">{project.year}</p>
+                      <p className="text-sm text-slate-500 font-mono font-semibold">{project.year}</p>
                     </div>
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
+                  <h3 className="text-3xl md:text-4xl font-black text-slate-900 mb-3 tracking-tight">
                     {project.title}
                   </h3>
-                  <p className="text-lg text-primary-600 font-semibold">
+                  <p className="text-xl text-primary-600 font-bold">
                     {project.tagline}
                   </p>
                 </div>
