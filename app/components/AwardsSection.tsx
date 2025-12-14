@@ -186,27 +186,21 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
                   })}
                 </div>
 
-                {/* Sophisticated Gaussian Blur Overlay */}
-                <div className="blur-overlay" />
+                {/* Gradient overlay matching Experience section */}
+                {!showAllAwards && (
+                    <div className="absolute bottom-full w-full h-32 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent pointer-events-none" />
+                )}
 
-                {/* Premium View More Button */}
-                <motion.button
-                  onClick={() => setShowAllAwards(true)}
-                  className="view-more-button absolute bottom-4 left-1/2 -translate-x-1/2 z-10"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span>View More Recognition</span>
-                  <motion.div
-                    animate={{ y: [0, 4, 0] }}
-                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                  >
-                    <ChevronDown className="w-5 h-5" />
-                  </motion.div>
-                </motion.button>
+                {/* View More Button - matching Experience section */}
+                <div className="mt-8 flex justify-center relative z-20">
+                    <button
+                        onClick={() => setShowAllAwards(true)}
+                        className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
+                    >
+                        View More Recognition
+                        <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                    </button>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -266,24 +260,17 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
                   );
                 })}
 
-                {/* Premium Show Less Button */}
+                {/* Show Less Button - matching Experience section */}
                 {items.length > 6 && (
-                  <motion.div
-                    className="col-span-2 flex justify-center mt-6"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <motion.button
+                  <div className="col-span-2 mt-8 flex justify-center">
+                    <button
                       onClick={() => setShowAllAwards(false)}
-                      className="show-less-button"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
                     >
-                      <ChevronDown className="w-5 h-5 rotate-180" />
-                      <span>Show Less</span>
-                    </motion.button>
-                  </motion.div>
+                      Show Less
+                      <ChevronDown size={16} className="rotate-180 group-hover:-translate-y-0.5 transition-transform" />
+                    </button>
+                  </div>
                 )}
               </div>
             )}

@@ -339,27 +339,21 @@ export default function ProjectsShowcase({
               })}
             </div>
 
-            {/* Sophisticated Gaussian Blur Overlay */}
-            <div className="blur-overlay" />
+            {/* Gradient overlay matching Experience section */}
+            {!showAllProjects && (
+                <div className="absolute bottom-full w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+            )}
 
-            {/* Premium View More Button */}
-            <motion.button
-              onClick={() => setShowAllProjects(true)}
-              className="view-more-button absolute bottom-4 left-1/2 -translate-x-1/2 z-10"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <span>View More Projects</span>
-              <motion.div
-                animate={{ y: [0, 4, 0] }}
-                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-              >
-                <ChevronDown className="w-5 h-5" />
-              </motion.div>
-            </motion.button>
+            {/* View More Button - matching Experience section */}
+            <div className="mt-8 flex justify-center relative z-20">
+                <button
+                    onClick={() => setShowAllProjects(true)}
+                    className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
+                >
+                    View More Projects
+                    <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
@@ -448,18 +442,16 @@ export default function ProjectsShowcase({
               );
             })}
 
-            {/* Premium Show Less Button */}
+            {/* Show Less Button - matching Experience section */}
             {projects.length > 6 && (
-              <div className="col-span-full flex justify-center mt-6">
-                <motion.button
+              <div className="col-span-full mt-8 flex justify-center">
+                <button
                   onClick={() => setShowAllProjects(false)}
-                  className="show-less-button"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
                 >
-                  <ChevronDown className="w-5 h-5 rotate-180" />
-                  <span>Show Less</span>
-                </motion.button>
+                  Show Less
+                  <ChevronDown size={16} className="rotate-180 group-hover:-translate-y-0.5 transition-transform" />
+                </button>
               </div>
             )}
           </div>

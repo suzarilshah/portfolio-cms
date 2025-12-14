@@ -159,27 +159,21 @@ export default function PublicationsSection({ content }: { content?: any }) {
                                     })}
                                 </div>
 
-                                {/* Sophisticated Gaussian Blur Overlay */}
-                                <div className="blur-overlay" />
+                                {/* Gradient overlay matching Experience section */}
+                                {!showAllPublications && (
+                                    <div className="absolute bottom-full w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                                )}
 
-                                {/* Premium View More Button */}
-                                <motion.button
-                                    onClick={() => setShowAllPublications(true)}
-                                    className="view-more-button absolute bottom-4 left-1/2 -translate-x-1/2 z-10"
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.2 }}
-                                >
-                                    <span>View More Publications</span>
-                                    <motion.div
-                                        animate={{ y: [0, 4, 0] }}
-                                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                                {/* View More Button - matching Experience section */}
+                                <div className="mt-8 flex justify-center relative z-20">
+                                    <button
+                                        onClick={() => setShowAllPublications(true)}
+                                        className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
                                     >
-                                        <ChevronDown className="w-5 h-5" />
-                                    </motion.div>
-                                </motion.button>
+                                        View More Publications
+                                        <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <div className="grid md:grid-cols-2 gap-5">
@@ -220,20 +214,17 @@ export default function PublicationsSection({ content }: { content?: any }) {
                                     );
                                 })}
 
-                                {/* Premium Show Less Button */}
+                                {/* Show Less Button - matching Experience section */}
                                 {(activeTab === 'articles' ? articles : journals).length > 6 && (
-                                    <motion.button
-                                        onClick={() => setShowAllPublications(false)}
-                                        className="show-less-button col-span-2 mt-6"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3 }}
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                    >
-                                        <ChevronDown className="w-5 h-5 rotate-180" />
-                                        <span>Show Less</span>
-                                    </motion.button>
+                                    <div className="col-span-2 mt-8 flex justify-center">
+                                        <button
+                                            onClick={() => setShowAllPublications(false)}
+                                            className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
+                                        >
+                                            Show Less
+                                            <ChevronDown size={16} className="rotate-180 group-hover:-translate-y-0.5 transition-transform" />
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         )}
