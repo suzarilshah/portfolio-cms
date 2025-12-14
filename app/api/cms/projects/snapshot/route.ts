@@ -22,6 +22,7 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
       return NextResponse.json({ error: 'Screenshot API key not configured' }, { status: 500 });
     }
 
+    // Build the screenshot API URL
     const screenshotUrl = `${screenshotApiUrl}?url=${encodeURIComponent(url)}&token=${screenshotApiKey}&width=1200&height=630&output=image&file_type=png`;
 
     // Update project with snapshot URL
@@ -37,6 +38,10 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     return NextResponse.json({ snapshot_url: screenshotUrl, success: true });
   } catch (error) {
     console.error('Snapshot error:', error);
-    return NextResponse.json({ error: 'Failed to capture snapshot: ' + (error as Error).message }, { status: 500 });
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    return NextResponse.json({
+      error: 'Failed to capture snapshot: ' + (error as Error).message,
+      details: error instanceof Error ? error.stack : String(error)
+    }, { status: 500 });
   }
 }, { requireAuth: true });
