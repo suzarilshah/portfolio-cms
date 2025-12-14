@@ -137,6 +137,47 @@ export class SecurityValidator {
       }
     }
 
+    // Project URL validation
+    if (data.project_url) {
+      if (typeof data.project_url !== 'string' || data.project_url.length > 500) {
+        errors.push('Project URL must be a string with max 500 characters');
+      } else {
+        try {
+          const url = new URL(data.project_url);
+          if (!['http:', 'https:'].includes(url.protocol)) {
+            errors.push('Project URL must be a valid HTTP or HTTPS URL');
+          } else {
+            sanitized.project_url = url.toString();
+          }
+        } catch {
+          errors.push('Invalid project URL format');
+        }
+      }
+    }
+
+    // Thumbnail URL validation
+    if (data.thumbnail_url) {
+      if (typeof data.thumbnail_url !== 'string' || data.thumbnail_url.length > 1000) {
+        errors.push('Thumbnail URL must be a string with max 1000 characters');
+      } else {
+        sanitized.thumbnail_url = this.sanitizeHtml(data.thumbnail_url.trim());
+      }
+    }
+
+    // Snapshot URL validation
+    if (data.snapshot_url) {
+      if (typeof data.snapshot_url !== 'string' || data.snapshot_url.length > 1000) {
+        errors.push('Snapshot URL must be a string with max 1000 characters');
+      } else {
+        sanitized.snapshot_url = this.sanitizeHtml(data.snapshot_url.trim());
+      }
+    }
+
+    // Has snapshot validation
+    if (data.has_snapshot !== undefined) {
+      sanitized.has_snapshot = Boolean(data.has_snapshot);
+    }
+
     // ID validation for updates
     if (data.id) {
       const id = parseInt(data.id);
