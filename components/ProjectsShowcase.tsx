@@ -32,6 +32,10 @@ interface Project {
   icon_name?: string;
   year: string;
   link?: string;
+  project_url?: string;
+  thumbnail_url?: string;
+  snapshot_url?: string;
+  has_snapshot?: boolean;
 }
 
 export default function ProjectsShowcase() {
@@ -185,18 +189,33 @@ export default function ProjectsShowcase() {
                     {project.tagline}
                   </p>
                 </div>
-                {project.link && (
+                {(project.project_url || project.link) && (
                   <a
-                    href={project.link}
+                    href={project.project_url || project.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full hover:bg-primary-600 transition-all duration-300 group-hover:scale-105"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full hover:from-primary-700 hover:to-primary-800 transition-all duration-300 group-hover:scale-105 shadow-lg hover:shadow-xl"
                   >
-                    <span className="font-medium">View Project</span>
+                    <span className="font-medium">Live Preview</span>
                     <ExternalLink className="w-4 h-4" />
                   </a>
                 )}
               </div>
+
+              {/* Snapshot/Thumbnail Display */}
+              {(project.thumbnail_url || project.snapshot_url) && (
+                <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200">
+                  <img
+                    src={project.thumbnail_url || project.snapshot_url}
+                    alt={`${project.title} preview`}
+                    className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+
 
               {/* Challenge & Solution */}
               <div className="grid md:grid-cols-2 gap-6 mb-8">
