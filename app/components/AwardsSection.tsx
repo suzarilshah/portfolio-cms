@@ -262,7 +262,7 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
 
                 {/* Show Less Button - matching Experience section */}
                 {items.length > 6 && (
-                  <div className="col-span-2 mt-8 flex justify-center">
+                  <div className="col-span-1 md:col-span-2 mt-8 flex justify-center">
                     <button
                       onClick={() => setShowAllAwards(false)}
                       className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
