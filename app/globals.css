@@ -405,3 +405,71 @@
     background: rgba(0, 0, 0, 0.2);
   }
 }
+
+@layer utilities {
+  /* Mobile touch target optimization - minimum 44px touch targets (WCAG 2.1) */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Touch-friendly spacing between interactive elements */
+  .touch-safe {
+    margin-bottom: 12px;
+  }
+
+  /* Mobile-friendly button with adequate touch target */
+  .btn-mobile {
+    @apply px-6 py-3 min-h-[48px] min-w-[48px];
+  }
+
+  /* Prevent text selection on touch interactions */
+  .no-touch-select {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Mobile viewport height fixes */
+  .mobile-safe-h {
+    min-height: -webkit-fill-available;
+  }
+
+  /* Responsive text sizing */
+  .text-mobile-lg {
+    @apply text-lg leading-relaxed;
+  }
+
+  @media (min-width: 768px) {
+    .text-mobile-lg {
+      @apply text-xl;
+    }
+  }
+
+  /* Smooth tap highlight for mobile */
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Better touch scrolling */
+  .touch-scroll-y {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile-safe focus states */
+  .focus-mobile {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  /* Prevent iOS zoom on input focus */
+  @media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="url"],
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+}

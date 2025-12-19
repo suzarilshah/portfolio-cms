@@ -116,7 +116,8 @@ export default function Navigation({ settings }: { settings?: any }) {
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-full hover:bg-slate-100 text-slate-900 transition-colors"
+              className="md:hidden p-3 rounded-full hover:bg-slate-100 text-slate-900 transition-colors touch-target"
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </motion.button>
@@ -142,7 +143,7 @@ export default function Navigation({ settings }: { settings?: any }) {
               className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-2xl border-l border-slate-200"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col gap-2 p-6 mt-20">
+              <div className="flex flex-col gap-2 p-4 mt-20">
                 {navItems.map((item, index) => (
                   <motion.a
                     key={item.name}
@@ -151,7 +152,7 @@ export default function Navigation({ settings }: { settings?: any }) {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 p-3 rounded-xl font-medium transition-all duration-300 ${
+                    className={`flex items-center gap-3 p-4 rounded-xl font-medium transition-all duration-300 touch-target ${
                       activeSection === item.href.slice(1)
                         ? 'bg-primary-50 text-primary-700'
                         : 'hover:bg-slate-50 text-slate-600'
