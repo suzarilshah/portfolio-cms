@@ -78,9 +78,11 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
   // Initialize selected badge
   useEffect(() => {
     if (badges && badges.length > 0 && !selectedBadgeId) {
-      setSelectedBadgeId(badges[0].id);
+      // Prefer badges with images, but select first badge if none have images
+      const badgeWithImage = badges.find(b => b.image_url);
+      setSelectedBadgeId((badgeWithImage || badges[0])?.id);
     }
-  }, [badges]);
+  }, [badges, selectedBadgeId]);
 
   const selectedBadge = badges?.find(b => b.id === selectedBadgeId) || badges?.[0];
 
@@ -313,11 +315,21 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
                                                 whileHover={{ scale: 1.1, rotate: 2 }}
                                                 transition={{ type: "spring", stiffness: 300 }}
                                             >
-                                                <img 
-                                                    src={selectedBadge.image_url} 
-                                                    alt={selectedBadge.title}
-                                                    className="w-full h-full object-contain"
-                                                />
+                                                {selectedBadge.image_url ? (
+                                                    <img 
+                                                        src={selectedBadge.image_url} 
+                                                        alt={selectedBadge.title || 'Badge'}
+                                                        className="w-full h-full object-contain"
+                                                    />
+                                                ) : (
+                                                    <div 
+                                                        data-iframe-width="150" 
+                                                        data-iframe-height="270" 
+                                                        data-share-badge-id={selectedBadge.badge_id} 
+                                                        data-share-badge-host="https://www.credly.com"
+                                                        className="w-full h-full"
+                                                    />
+                                                )}
                                             </motion.div>
 
                                             <h4 className="font-display text-2xl md:text-3xl font-bold text-slate-900 mb-3 leading-tight">
@@ -360,14 +372,24 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
                                         }`}
                                     >
                                         <div className="w-full h-full flex items-center justify-center relative">
-                                            <img 
-                                                src={badge.image_url} 
-                                                alt={badge.title}
-                                                className={`w-full h-full object-contain transition-all duration-300 ${
-                                                    selectedBadgeId === badge.id ? 'scale-110' : 'scale-100 group-hover:scale-110'
-                                                }`}
-                                                loading="lazy"
-                                            />
+                                            {badge.image_url ? (
+                                                <img 
+                                                    src={badge.image_url} 
+                                                    alt={badge.title || 'Badge'}
+                                                    className={`w-full h-full object-contain transition-all duration-300 ${
+                                                        selectedBadgeId === badge.id ? 'scale-110' : 'scale-100 group-hover:scale-110'
+                                                    }`}
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <div 
+                                                    data-iframe-width="150" 
+                                                    data-iframe-height="270" 
+                                                    data-share-badge-id={badge.badge_id} 
+                                                    data-share-badge-host="https://www.credly.com"
+                                                    className="w-full h-full"
+                                                />
+                                            )}
                                         </div>
                                         
                                         {/* Hover Badge Name Tooltip */}

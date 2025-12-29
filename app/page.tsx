@@ -13,6 +13,7 @@ import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching completely
 
 async function getData() {
   // Default fallback data in case database fails
@@ -44,6 +45,9 @@ async function getData() {
     const sectionsRes = await pool.query('SELECT * FROM content_sections ORDER BY sort_order ASC');
     const badgesRes = await pool.query('SELECT * FROM badges ORDER BY sort_order ASC');
     const settingsRes = await pool.query('SELECT * FROM site_settings LIMIT 1');
+    
+    // Log badge count for debugging
+    console.log(`[getData] Fetched ${badgesRes.rows.length} badges from database`);
     
     // Convert to dictionary for content access but keep array for ordering
     const sectionData = sectionsRes.rows.reduce((acc: any, row: any) => {

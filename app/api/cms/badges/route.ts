@@ -11,12 +11,18 @@ function validateBadgeId(badgeId: string): boolean {
 export const GET = createSecureAPIHandler(async () => {
   try {
     const result = await secureDb.query('SELECT * FROM badges ORDER BY sort_order ASC');
-    return NextResponse.json(result);
+    console.log(`[GET /api/cms/badges] Returning ${result.length} badges`);
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
   } catch (error) {
-    console.error('Database error:', error);
+    console.error('[GET /api/cms/badges] Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-});
+}, { requireAuth: false });
 
 export const PATCH = createSecureAPIHandler(async (request: Request) => {
   try {
@@ -121,7 +127,13 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
       `INSERT INTO badges (badge_id, sort_order, title, image_url, issuer) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [badge_id, sortOrderNum, title, image_url, issuer]
     );
-    return NextResponse.json(result[0]);
+    console.log(`[POST /api/cms/badges] Created badge with ID: ${result[0].id}, badge_id: ${badge_id}`);
+    return NextResponse.json(result[0], {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
