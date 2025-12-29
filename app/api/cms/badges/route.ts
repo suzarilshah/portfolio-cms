@@ -3,9 +3,12 @@ import { secureDb } from '@/lib/security/database';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
 import * as cheerio from 'cheerio';
 
-// SSRF Protection: Validate badge_id to only allow alphanumeric characters
+// SSRF Protection: Validate badge_id to allow alphanumeric characters and hyphens (for UUID format)
+// Prevents SSRF by disallowing URL schemes, path separators, and other dangerous characters
 function validateBadgeId(badgeId: string): boolean {
-  return /^[a-zA-Z0-9]+$/.test(badgeId);
+  // Allow alphanumeric and hyphens (Credly badge IDs are typically UUIDs like: 22860ff8-d68d-4471-9922-f1f2a6cd1668)
+  // This prevents SSRF by blocking: /, \, :, ?, #, &, <, >, etc.
+  return /^[a-zA-Z0-9-]+$/.test(badgeId) && badgeId.length > 0 && badgeId.length <= 100;
 }
 
 export const GET = createSecureAPIHandler(async () => {
@@ -42,7 +45,10 @@ export const PATCH = createSecureAPIHandler(async (request: Request) => {
 
     // SSRF Protection: Validate badge_id before making external request
     if (!validateBadgeId(badge_id)) {
-      return NextResponse.json({ error: 'Invalid badge ID format' }, { status: 400 });
+      console.error(`[PATCH /api/cms/badges] Invalid badge ID format: ${badge_id}`);
+      return NextResponse.json({ 
+        error: 'Invalid badge ID format. Badge IDs should contain only letters, numbers, and hyphens (e.g., 22860ff8-d68d-4471-9922-f1f2a6cd1668)' 
+      }, { status: 400 });
     }
 
     let title = '';
@@ -87,7 +93,10 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
 
     // SSRF Protection: Validate badge_id before making external request
     if (!validateBadgeId(badge_id)) {
-      return NextResponse.json({ error: 'Invalid badge ID format' }, { status: 400 });
+      console.error(`[POST /api/cms/badges] Invalid badge ID format: ${badge_id}`);
+      return NextResponse.json({ 
+        error: 'Invalid badge ID format. Badge IDs should contain only letters, numbers, and hyphens (e.g., 22860ff8-d68d-4471-9922-f1f2a6cd1668)' 
+      }, { status: 400 });
     }
 
     // Validate sort_order
