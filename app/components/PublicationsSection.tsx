@@ -1,8 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, ExternalLink, BookOpen, ArrowUpRight, ChevronDown } from 'lucide-react';
+import { FileText, ExternalLink, BookOpen, ArrowUpRight, ChevronDown, Rss, Calendar, Tag, Loader2 } from 'lucide-react';
+
+interface BlogPost {
+  title: string;
+  link: string;
+  pubDate: string;
+  description: string;
+  categories: string[];
+  thumbnail?: string;
+}
 
 // Default articles for fallback
 const defaultArticles = [
@@ -85,23 +94,83 @@ export default function PublicationsSection({ content }: { content?: any }) {
   const articles = content?.articles?.length > 0 ? content.articles : defaultArticles;
   const journals = content?.journals?.length > 0 ? content.journals : defaultJournals;
   const title = content?.title || "Publications & Thought Leadership";
-  const description = content?.description || "Sharing knowledge through technical articles and academic research.";
+  const description = content?.description || "Sharing knowledge through technical articles, academic research, and blog posts.";
+  const blogSettings = content?.blog || { showCategories: true, maxPosts: 6, blogUrl: 'https://blog.suzarilshah.uk' };
 
-  const [activeTab, setActiveTab] = useState<'articles' | 'journals'>('articles');
+  const [activeTab, setActiveTab] = useState<'articles' | 'journals' | 'blog'>('articles');
   const [showAllPublications, setShowAllPublications] = useState(false);
 
-  // Always use new structure since we have proper defaults
-  const hasNewStructure = true;
+  // Blog posts state
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [blogLoading, setBlogLoading] = useState(false);
+  const [blogError, setBlogError] = useState<string | null>(null);
+  const [blogUrl, setBlogUrl] = useState('https://blog.suzarilshah.uk');
+
+  // Fetch blog posts when blog tab is selected
+  useEffect(() => {
+    if (activeTab === 'blog' && blogPosts.length === 0 && !blogLoading) {
+      setBlogLoading(true);
+      fetch('/api/blog')
+        .then(res => res.json())
+        .then(data => {
+          if (data.posts && data.posts.length > 0) {
+            setBlogPosts(data.posts.slice(0, blogSettings.maxPosts || 6));
+          }
+          if (data.blogUrl) {
+            setBlogUrl(data.blogUrl);
+          }
+          if (data.error) {
+            setBlogError(data.error);
+          }
+        })
+        .catch(() => {
+          setBlogError('Failed to load blog posts');
+        })
+        .finally(() => {
+          setBlogLoading(false);
+        });
+    }
+  }, [activeTab, blogPosts.length, blogLoading, blogSettings.maxPosts]);
+
+  // Reset show all when tab changes
+  useEffect(() => {
+    setShowAllPublications(false);
+  }, [activeTab]);
 
   // Helper to determine tab counts for badge
   const articleCount = articles.length;
   const journalCount = journals.length;
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Get current items based on active tab
+  const getCurrentItems = () => {
+    if (activeTab === 'articles') return articles;
+    if (activeTab === 'journals') return journals;
+    return [];
+  };
+
+  const currentItems = getCurrentItems();
+  const showViewMore = currentItems.length > 6 && !showAllPublications;
+  const displayItems = showViewMore ? currentItems.slice(0, 6) : currentItems;
+
   return (
     <section id="publications" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-12 gap-12">
-          
+
           {/* Header Column (Left) */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -116,54 +185,70 @@ export default function PublicationsSection({ content }: { content?: any }) {
               <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
                 {description}
               </p>
-              
-              {/* Tabs Switcher */}
-              {hasNewStructure && (
-                  <div className="flex flex-col gap-2 mb-8">
-                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Filter Content</p>
-                      <div className="flex gap-2 p-1 bg-slate-100 rounded-xl w-fit">
-                        <button
-                            onClick={() => setActiveTab('articles')}
-                            className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === 'articles' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            {activeTab === 'articles' && (
-                                <motion.div
-                                    layoutId="activeTab"
-                                    className="absolute inset-0 bg-white shadow-sm rounded-lg"
-                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                />
-                            )}
-                            <span className="relative z-10 flex items-center gap-2">
-                                Technical Articles
-                                <span className="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full text-[10px] leading-none border border-slate-200 group-hover:border-slate-300">
-                                    {articleCount}
-                                </span>
-                            </span>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('journals')}
-                            className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === 'journals' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            {activeTab === 'journals' && (
-                                <motion.div
-                                    layoutId="activeTab"
-                                    className="absolute inset-0 bg-white shadow-sm rounded-lg"
-                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                />
-                            )}
-                            <span className="relative z-10 flex items-center gap-2">
-                                Research Journals
-                                <span className="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full text-[10px] leading-none border border-slate-200">
-                                    {journalCount}
-                                </span>
-                            </span>
-                        </button>
-                      </div>
-                  </div>
-              )}
 
-              <a 
-                href="https://blog.suzarilshah.uk/" 
+              {/* Tabs Switcher */}
+              <div className="flex flex-col gap-2 mb-8">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Filter Content</p>
+                <div className="flex flex-wrap gap-2 p-1 bg-slate-100 rounded-xl w-fit">
+                  <button
+                    onClick={() => setActiveTab('articles')}
+                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === 'articles' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    {activeTab === 'articles' && (
+                      <motion.div
+                        layoutId="activePublicationTab"
+                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2">
+                      <FileText size={14} />
+                      Articles
+                      <span className="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full text-[10px] leading-none border border-slate-200">
+                        {articleCount}
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('journals')}
+                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === 'journals' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    {activeTab === 'journals' && (
+                      <motion.div
+                        layoutId="activePublicationTab"
+                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2">
+                      <BookOpen size={14} />
+                      Journals
+                      <span className="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full text-[10px] leading-none border border-slate-200">
+                        {journalCount}
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('blog')}
+                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === 'blog' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    {activeTab === 'blog' && (
+                      <motion.div
+                        layoutId="activePublicationTab"
+                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2">
+                      <Rss size={14} />
+                      Blog
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <a
+                href={blogUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm font-medium text-slate-900 hover:text-primary-600 transition-colors group"
@@ -176,124 +261,179 @@ export default function PublicationsSection({ content }: { content?: any }) {
           {/* Content Column (Right) */}
           <div className="lg:col-span-8 min-h-[500px]">
             <AnimatePresence mode='wait'>
+              {/* Articles & Journals Tab Content */}
+              {(activeTab === 'articles' || activeTab === 'journals') && (
                 <motion.div
-                        key={activeTab}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        {(activeTab === 'articles' ? articles : journals).length > 6 && !showAllPublications ? (
-                            <div className="relative">
-                                <div className="grid md:grid-cols-2 gap-5">
-                                    {(activeTab === 'articles' ? articles : journals).slice(0, 6).map((item: any, index: number) => {
-                                        const isJournal = activeTab === 'journals';
-                                        return (
-                                            <motion.a
-                                                key={index}
-                                                href={item.link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: index * 0.05 }}
-                                                className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 relative overflow-hidden"
-                                            >
-                                                <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
-                                                    <ExternalLink className="text-primary-500" size={20} />
-                                                </div>
-
-                                                <div className="mb-6">
-                                                    <div className={`inline-flex p-3 rounded-xl mb-4 transition-colors ${isJournal ? 'bg-purple-50 text-purple-600 group-hover:bg-purple-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
-                                                        {isJournal ? <BookOpen size={24} /> : <FileText size={24} />}
-                                                    </div>
-                                                    <h3 className="font-display font-bold text-slate-900 group-hover:text-primary-600 transition-colors text-lg leading-snug line-clamp-3">
-                                                        {item.title}
-                                                    </h3>
-                                                </div>
-
-                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 border-t border-slate-50 pt-4 mt-auto">
-                                                    <span className="text-slate-700 px-2 py-1 bg-slate-50 rounded-md">{item.publisher || item.platform}</span>
-                                                    <span>{item.date || item.year}</span>
-                                                    {isJournal && item.doi && (
-                                                        <span className="font-mono text-[10px] text-slate-400 truncate max-w-[120px]" title={item.doi}>DOI: {item.doi}</span>
-                                                    )}
-                                                </div>
-                                            </motion.a>
-                                        );
-                                    })}
-                                </div>
-
-                                {/* Gradient overlay matching Experience section */}
-                                {!showAllPublications && (
-                                    <div className="absolute bottom-full w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-                                )}
-
-                                {/* View More Button - matching Experience section */}
-                                <div className="mt-8 flex justify-center relative z-20">
-                                    <button
-                                        onClick={() => setShowAllPublications(true)}
-                                        className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
-                                    >
-                                        View More Publications
-                                        <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
-                                    </button>
-                                </div>
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="relative">
+                    <div className="grid md:grid-cols-2 gap-5">
+                      {displayItems.map((item: any, index: number) => {
+                        const isJournal = activeTab === 'journals';
+                        return (
+                          <motion.a
+                            key={index}
+                            href={item.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 relative overflow-hidden"
+                          >
+                            <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
+                              <ExternalLink className="text-primary-500" size={20} />
                             </div>
-                        ) : (
-                            <div className="grid md:grid-cols-2 gap-5">
-                                {(activeTab === 'articles' ? articles : journals).map((item: any, index: number) => {
-                                    const isJournal = activeTab === 'journals';
-                                    return (
-                                        <motion.a
-                                            key={index}
-                                            href={item.link}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.05 }}
-                                            className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 relative overflow-hidden"
-                                        >
-                                            <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
-                                                <ExternalLink className="text-primary-500" size={20} />
-                                            </div>
 
-                                            <div className="mb-6">
-                                                <div className={`inline-flex p-3 rounded-xl mb-4 transition-colors ${isJournal ? 'bg-purple-50 text-purple-600 group-hover:bg-purple-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
-                                                    {isJournal ? <BookOpen size={24} /> : <FileText size={24} />}
-                                                </div>
-                                                <h3 className="font-display font-bold text-slate-900 group-hover:text-primary-600 transition-colors text-lg leading-snug line-clamp-3">
-                                                    {item.title}
-                                                </h3>
-                                            </div>
-
-                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 border-t border-slate-50 pt-4 mt-auto">
-                                                <span className="text-slate-700 px-2 py-1 bg-slate-50 rounded-md">{item.publisher || item.platform}</span>
-                                                <span>{item.date || item.year}</span>
-                                                {isJournal && item.doi && (
-                                                    <span className="font-mono text-[10px] text-slate-400 truncate max-w-[120px]" title={item.doi}>DOI: {item.doi}</span>
-                                                )}
-                                            </div>
-                                        </motion.a>
-                                    );
-                                })}
-
-                                {/* Show Less Button - matching Experience section */}
-                                {(activeTab === 'articles' ? articles : journals).length > 6 && (
-                                    <div className="col-span-1 md:col-span-2 mt-8 flex justify-center">
-                                        <button
-                                            onClick={() => setShowAllPublications(false)}
-                                            className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
-                                        >
-                                            Show Less
-                                            <ChevronDown size={16} className="rotate-180 group-hover:-translate-y-0.5 transition-transform" />
-                                        </button>
-                                    </div>
-                                )}
+                            <div className="mb-6">
+                              <div className={`inline-flex p-3 rounded-xl mb-4 transition-colors ${isJournal ? 'bg-purple-50 text-purple-600 group-hover:bg-purple-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
+                                {isJournal ? <BookOpen size={24} /> : <FileText size={24} />}
+                              </div>
+                              <h3 className="font-display font-bold text-slate-900 group-hover:text-primary-600 transition-colors text-lg leading-snug line-clamp-3">
+                                {item.title}
+                              </h3>
                             </div>
-                        )}
+
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 border-t border-slate-50 pt-4 mt-auto">
+                              <span className="text-slate-700 px-2 py-1 bg-slate-50 rounded-md">{item.publisher || item.platform}</span>
+                              <span>{item.date || item.year}</span>
+                              {isJournal && item.doi && (
+                                <span className="font-mono text-[10px] text-slate-400 truncate max-w-[120px]" title={item.doi}>DOI: {item.doi}</span>
+                              )}
+                            </div>
+                          </motion.a>
+                        );
+                      })}
+                    </div>
+
+                    {/* View More / Show Less Button */}
+                    {currentItems.length > 6 && (
+                      <div className="mt-8 flex justify-center relative z-20">
+                        <button
+                          onClick={() => setShowAllPublications(!showAllPublications)}
+                          className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
+                        >
+                          {showAllPublications ? 'Show Less' : 'View More Publications'}
+                          <ChevronDown size={16} className={`transition-transform ${showAllPublications ? 'rotate-180' : ''}`} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
+              )}
+
+              {/* Blog Tab Content */}
+              {activeTab === 'blog' && (
+                <motion.div
+                  key="blog"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {/* Loading State */}
+                  {blogLoading && (
+                    <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+                      <Loader2 className="w-8 h-8 animate-spin mb-4" />
+                      <p>Loading latest posts...</p>
+                    </div>
+                  )}
+
+                  {/* Error or No Posts State */}
+                  {!blogLoading && (blogPosts.length === 0 || blogError) && (
+                    <div className="text-center py-16">
+                      <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <Rss className="w-8 h-8 text-orange-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-900 mb-2">
+                        Check out my blog
+                      </h3>
+                      <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                        I write about cloud architecture, DevOps practices, and lessons learned from building scalable systems.
+                      </p>
+                      <a
+                        href={blogUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full font-medium hover:bg-primary-600 transition-colors"
+                      >
+                        Visit blog.suzarilshah.uk
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Blog Posts Grid */}
+                  {!blogLoading && blogPosts.length > 0 && (
+                    <div className="grid md:grid-cols-2 gap-5">
+                      {blogPosts.map((post, index) => (
+                        <motion.a
+                          key={post.link}
+                          href={post.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-orange-200 hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 relative overflow-hidden"
+                        >
+                          <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
+                            <ExternalLink className="text-orange-500" size={20} />
+                          </div>
+
+                          <div className="mb-6">
+                            <div className="inline-flex p-3 rounded-xl mb-4 transition-colors bg-orange-50 text-orange-600 group-hover:bg-orange-100">
+                              <Rss size={24} />
+                            </div>
+                            <h3 className="font-display font-bold text-slate-900 group-hover:text-orange-600 transition-colors text-lg leading-snug line-clamp-3">
+                              {post.title}
+                            </h3>
+                            {post.description && (
+                              <p className="text-sm text-slate-500 mt-2 line-clamp-2">
+                                {post.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 border-t border-slate-50 pt-4 mt-auto">
+                            {post.pubDate && (
+                              <span className="flex items-center gap-1">
+                                <Calendar size={12} />
+                                {formatDate(post.pubDate)}
+                              </span>
+                            )}
+                            {blogSettings.showCategories !== false && post.categories?.length > 0 && (
+                              <span className="flex items-center gap-1">
+                                <Tag size={12} />
+                                {post.categories.slice(0, 2).join(', ')}
+                              </span>
+                            )}
+                          </div>
+                        </motion.a>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* View All Link */}
+                  {!blogLoading && blogPosts.length > 0 && (
+                    <div className="mt-8 flex justify-center">
+                      <a
+                        href={blogUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-orange-500 hover:text-orange-600 transition-all duration-300 hover:-translate-y-1"
+                      >
+                        View all posts on blog.suzarilshah.uk
+                        <ArrowUpRight size={16} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    </div>
+                  )}
+                </motion.div>
+              )}
             </AnimatePresence>
           </div>
 

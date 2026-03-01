@@ -91,11 +91,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
               </Link>
               <Link href="/admin/publications" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm rounded-md transition-all">
                 <span className="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
-                Publications
-              </Link>
-              <Link href="/admin/blog" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm rounded-md transition-all">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                Blog
+                Publications & Blog
               </Link>
               <Link href="/admin/community" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm rounded-md transition-all">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>

@@ -430,6 +430,15 @@ export class SecurityValidator {
         });
       }
 
+      // Handle Blog Settings (nested in publications)
+      if (content.blog && typeof content.blog === 'object') {
+        sanitized.blog = {
+            showCategories: content.blog.showCategories !== false,
+            maxPosts: typeof content.blog.maxPosts === 'number' ? Math.min(Math.max(content.blog.maxPosts, 1), 20) : 6,
+            blogUrl: 'https://blog.suzarilshah.uk' // Fixed URL for security
+        };
+      }
+
     } else {
       errors.push('Content must be a valid object');
     }
