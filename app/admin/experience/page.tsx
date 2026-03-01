@@ -1,7 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import SectionEditor from '../components/SectionEditor';
-import { Plus, Trash2, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 interface Job {
@@ -11,6 +12,91 @@ interface Job {
   location: string;
   description: string;
   tags: string[];
+}
+
+// Tag Input Component with proper state management
+function TagInput({
+  tags,
+  onChange
+}: {
+  tags: string[];
+  onChange: (tags: string[]) => void;
+}) {
+  const [inputValue, setInputValue] = useState('');
+
+  const addTag = (tag: string) => {
+    const trimmedTag = tag.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      onChange([...tags, trimmedTag]);
+    }
+    setInputValue('');
+  };
+
+  const removeTag = (indexToRemove: number) => {
+    onChange(tags.filter((_, index) => index !== indexToRemove));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(inputValue);
+    } else if (e.key === 'Backspace' && inputValue === '' && tags.length > 0) {
+      // Remove last tag when backspace is pressed on empty input
+      removeTag(tags.length - 1);
+    }
+  };
+
+  const handleBlur = () => {
+    if (inputValue.trim()) {
+      addTag(inputValue);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text');
+    const pastedTags = pastedText.split(',').map(t => t.trim()).filter(Boolean);
+    const newTags = [...tags];
+    pastedTags.forEach(tag => {
+      if (!newTags.includes(tag)) {
+        newTags.push(tag);
+      }
+    });
+    onChange(newTags);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 min-h-[32px]">
+        {tags.map((tag, index) => (
+          <span
+            key={`${tag}-${index}`}
+            className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full group"
+          >
+            {tag}
+            <button
+              type="button"
+              onClick={() => removeTag(index)}
+              className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+            >
+              <X size={12} />
+            </button>
+          </span>
+        ))}
+      </div>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        onPaste={handlePaste}
+        placeholder={tags.length === 0 ? "Type a tag and press Enter or comma..." : "Add another tag..."}
+        className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm"
+      />
+      <p className="text-[10px] text-slate-400">Press Enter or comma to add a tag. Backspace to remove.</p>
+    </div>
+  );
 }
 
 interface ExperienceContent {
@@ -194,16 +280,14 @@ function JobCard({ job, index, content, onChange, dragHandleProps }: {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Tags (comma separated)</label>
-            <input
-              type="text"
-              value={job.tags?.join(', ') || ''}
-              onChange={(e) => {
+            <label className="text-xs font-medium text-slate-500">Tags</label>
+            <TagInput
+              tags={job.tags || []}
+              onChange={(newTags) => {
                 const newJobs = [...content.jobs];
-                newJobs[index].tags = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                newJobs[index] = { ...newJobs[index], tags: newTags };
                 onChange({ ...content, jobs: newJobs });
               }}
-              className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm font-mono text-blue-600"
             />
           </div>
         </div>
