@@ -4,28 +4,94 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, ExternalLink, BookOpen, ArrowUpRight, ChevronDown } from 'lucide-react';
 
-const defaultPublications = [
+// Default articles for fallback
+const defaultArticles = [
   {
-    title: 'LoRa Network Based Wearable Tracker - A Preliminary Work',
-    platform: 'IEEE Xplore',
-    year: '2022',
-    type: 'Research Paper',
-    link: 'https://ieeexplore.ieee.org/document/10033340'
+    title: 'Deploying GPT-4o AI Chat app on Azure via Azure AI Services – a step-by-step guide',
+    publisher: 'Microsoft Tech Community',
+    date: '2024',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/deploying-gpt-4o-ai-chat-app-on-azure-via-azure-ai-services-%e2%80%93-a-step-by-step-gui/4179472'
+  },
+  {
+    title: 'Vulnerability Assessment on Azure Container Registry with Microsoft Defender and Docker Scout',
+    publisher: 'Microsoft Tech Community',
+    date: '2024',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/vulnerability-assessment-on-azure-container-registry-with-microsoft-defender-and/4169136'
+  },
+  {
+    title: 'Host and Deploy Images on Azure Container Registries (ACR) via App Service - A step-by-step guide',
+    publisher: 'Microsoft Tech Community',
+    date: '2024',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/host-and-deploy-images-on-azure-container-registries-acr-via-app-service---a-ste/4148105'
+  },
+  {
+    title: 'Setting up Azure API on Postman and Azure CLI – Step-by-step guide',
+    publisher: 'Microsoft Tech Community',
+    date: '2024',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/setting-up-azure-api-on-postman-and-azure-cli-%E2%80%93-step-by-step-guide/4137250'
+  },
+  {
+    title: 'Deploy Open Web UI on Azure VM via Docker: A Step-by-Step Guide with Custom Domain Setup',
+    publisher: 'Microsoft Tech Community',
+    date: '2025',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/deploy-open-web-ui-on-azure-vm-via-docker-a-step-by-step-guide-with-custom-domai/4387717'
+  },
+  {
+    title: 'Step-by-step: Integrate Ollama Web UI to use Azure Open AI API with LiteLLM Proxy',
+    publisher: 'Microsoft Tech Community',
+    date: '2025',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/step-by-step-integrate-ollama-web-ui-to-use-azure-open-ai-api-with-litellm-proxy/4386612'
+  },
+  {
+    title: 'Power Up Your Open WebUI with Azure AI Speech: Quick STT & TTS Integration',
+    publisher: 'Microsoft Tech Community',
+    date: '2025',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/power-up-your-open-webui-with-azure-ai-speech-quick-stt--tts-integration/4412985'
+  },
+  {
+    title: 'Configure Embedding Models on Azure AI Foundry with Open Web UI',
+    publisher: 'Microsoft Tech Community',
+    date: '2025',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/configure-embedding-models-on-azure-ai-foundry-with-open-web-ui/4420304'
+  },
+  {
+    title: 'Create Stunning AI Videos with Sora on Azure AI Foundry!',
+    publisher: 'Microsoft Tech Community',
+    date: '2025',
+    link: 'https://techcommunity.microsoft.com/blog/educatordeveloperblog/create-stunning-ai-videos-with-sora-on-azure-ai-foundry/4426442'
+  }
+];
+
+// Default journals for fallback
+const defaultJournals = [
+  {
+    title: 'LoRa Network-Based Wearable Tracker - A Preliminary Work',
+    publisher: 'IEEE',
+    date: '2022',
+    link: 'https://ieeexplore.ieee.org/document/10033340',
+    doi: '10.1109/IVIT55443.2022.10033340'
+  },
+  {
+    title: 'Automated Aquaponics Systems to Support Sustainable Development Goals',
+    publisher: 'SpringerLink',
+    date: '2024',
+    link: 'https://link.springer.com/chapter/10.1007/978-3-031-67437-2_11',
+    doi: '10.1007/978-3-031-67437-2_11'
   }
 ];
 
 export default function PublicationsSection({ content }: { content?: any }) {
-  const articles = content?.articles || [];
-  const journals = content?.journals || [];
-  const title = content?.title || "Publications & Research";
-  const description = content?.description || "Documenting my findings and sharing technical knowledge through research papers, articles, and community guides.";
+  // Use content from database, or fall back to rich defaults
+  const articles = content?.articles?.length > 0 ? content.articles : defaultArticles;
+  const journals = content?.journals?.length > 0 ? content.journals : defaultJournals;
+  const title = content?.title || "Publications & Thought Leadership";
+  const description = content?.description || "Sharing knowledge through technical articles and academic research.";
 
   const [activeTab, setActiveTab] = useState<'articles' | 'journals'>('articles');
   const [showAllPublications, setShowAllPublications] = useState(false);
 
-  // Fallback: if no articles/journals but legacy items exist, map them
-  const legacyItems = content?.items || defaultPublications;
-  const hasNewStructure = articles.length > 0 || journals.length > 0;
+  // Always use new structure since we have proper defaults
+  const hasNewStructure = true;
 
   // Helper to determine tab counts for badge
   const articleCount = articles.length;
@@ -110,8 +176,7 @@ export default function PublicationsSection({ content }: { content?: any }) {
           {/* Content Column (Right) */}
           <div className="lg:col-span-8 min-h-[500px]">
             <AnimatePresence mode='wait'>
-                {hasNewStructure ? (
-                    <motion.div
+                <motion.div
                         key={activeTab}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -228,18 +293,7 @@ export default function PublicationsSection({ content }: { content?: any }) {
                                 )}
                             </div>
                         )}
-                    </motion.div>
-                ) : (
-                    // Legacy Fallback List
-                    <div className="grid gap-4">
-                        {legacyItems.map((pub: any, index: number) => (
-                            <div key={index} className="p-6 bg-slate-50 rounded-xl">
-                                <h3 className="font-bold">{pub.title}</h3>
-                                <p className="text-sm text-slate-500">{pub.platform} • {pub.year}</p>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                </motion.div>
             </AnimatePresence>
           </div>
 
