@@ -20,6 +20,7 @@ const SECTION_LABELS: Record<string, string> = {
     education: 'Education',
     awards: 'Awards & Certs',
     publications: 'Publications',
+    blog: 'Blog Posts',
     community: 'Community & Speaking',
     contact: 'Contact Footer'
 };

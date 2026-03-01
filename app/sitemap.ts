@@ -43,6 +43,12 @@ async function getAllUrls(): Promise<{ url: string; lastmod?: string; changefreq
       priority: 0.7,
     },
     {
+      url: `${baseUrl}#blog`,
+      lastmod: currentDate,
+      changefreq: 'daily' as const,
+      priority: 0.85,
+    },
+    {
       url: `${baseUrl}#community`,
       lastmod: currentDate,
       changefreq: 'weekly' as const,

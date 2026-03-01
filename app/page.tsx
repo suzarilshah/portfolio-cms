@@ -9,6 +9,7 @@ import EducationSection from './components/EducationSection';
 import AwardsSection from './components/AwardsSection';
 import PublicationsSection from './components/PublicationsSection';
 import CommunitySection from './components/CommunitySection';
+import BlogSection from './components/BlogSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 
@@ -27,7 +28,7 @@ async function getData() {
     resume_url: null,
   };
 
-  const defaultOrder = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'awards', 'publications', 'community', 'contact'];
+  const defaultOrder = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'awards', 'publications', 'blog', 'community', 'contact'];
   
   // Check if database URL is available
   if (!process.env.DATABASE_URL) {
@@ -104,6 +105,7 @@ export default async function Home() {
     education: <EducationSection key="education" content={sectionData.education} />,
     awards: <AwardsSection key="awards" badges={badges} content={sectionData.awards} />,
     publications: <PublicationsSection key="publications" content={sectionData.publications} />,
+    blog: <BlogSection key="blog" content={sectionData.blog} />,
     community: <CommunitySection key="community" content={sectionData.community} />,
     contact: <ContactSection key="contact" content={sectionData.contact} />
   };

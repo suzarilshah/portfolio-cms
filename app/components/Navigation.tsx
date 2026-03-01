@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home, User, Briefcase, Award, BookOpen, Users, Mail } from 'lucide-react';
+import { Menu, X, Home, User, Briefcase, Award, BookOpen, Users, Mail, Rss } from 'lucide-react';
 
 const navItems = [
   { name: 'Home', href: '#home', icon: Home },
@@ -10,6 +10,7 @@ const navItems = [
   { name: 'Experience', href: '#experience', icon: Briefcase },
   { name: 'Awards', href: '#awards', icon: Award },
   { name: 'Publications', href: '#publications', icon: BookOpen },
+  { name: 'Blog', href: '#blog', icon: Rss },
   { name: 'Community', href: '#community', icon: Users },
   { name: 'Contact', href: '#contact', icon: Mail },
 ];
