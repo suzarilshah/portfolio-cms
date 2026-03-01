@@ -331,7 +331,7 @@ export default function PublicationsPage() {
                         onClick={() => onChange({
                         ...content,
                         articles: [
-                            { title: 'New Article', publisher: 'Microsoft Tech Community', date: '2025', link: '#' },
+                            { title: 'New Article', publisher: 'Microsoft Tech Community', date: '2026', link: 'https://techcommunity.microsoft.com/' },
                             ...(content.articles || [])
                         ]
                         })}
@@ -438,7 +438,7 @@ export default function PublicationsPage() {
                         onClick={() => onChange({
                         ...content,
                         journals: [
-                            { title: 'New Journal', publisher: 'IEEE', date: '2025', link: '#', doi: '' },
+                            { title: 'New Journal', publisher: 'IEEE', date: '2026', link: 'https://ieeexplore.ieee.org/', doi: '' },
                             ...(content.journals || [])
                         ]
                         })}

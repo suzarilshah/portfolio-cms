@@ -89,10 +89,22 @@ const defaultJournals = [
   }
 ];
 
+// Helper to sort items by year (most recent first)
+const sortByYear = (items: any[]) => {
+  return [...items].sort((a, b) => {
+    const yearA = parseInt(a.date || a.year || '0');
+    const yearB = parseInt(b.date || b.year || '0');
+    return yearB - yearA; // Descending order (newest first)
+  });
+};
+
 export default function PublicationsSection({ content }: { content?: any }) {
   // Use content from database, or fall back to rich defaults
-  const articles = content?.articles?.length > 0 ? content.articles : defaultArticles;
-  const journals = content?.journals?.length > 0 ? content.journals : defaultJournals;
+  // Sort by year (most recent first)
+  const rawArticles = content?.articles?.length > 0 ? content.articles : defaultArticles;
+  const rawJournals = content?.journals?.length > 0 ? content.journals : defaultJournals;
+  const articles = sortByYear(rawArticles);
+  const journals = sortByYear(rawJournals);
   const title = content?.title || "Publications & Thought Leadership";
   const description = content?.description || "Sharing knowledge through technical articles, academic research, and blog posts.";
   const blogSettings = content?.blog || { showCategories: true, maxPosts: 6, blogUrl: 'https://blog.suzarilshah.uk' };
@@ -274,26 +286,34 @@ export default function PublicationsSection({ content }: { content?: any }) {
                     <div className="grid md:grid-cols-2 gap-5">
                       {displayItems.map((item: any, index: number) => {
                         const isJournal = activeTab === 'journals';
+                        const hasValidLink = item.link && item.link.startsWith('http');
+                        const CardWrapper = hasValidLink ? motion.a : motion.div;
+                        const linkProps = hasValidLink ? {
+                          href: item.link,
+                          target: "_blank",
+                          rel: "noopener noreferrer"
+                        } : {};
+
                         return (
-                          <motion.a
+                          <CardWrapper
                             key={index}
-                            href={item.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            {...linkProps}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
-                            className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 relative overflow-hidden"
+                            className={`group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 relative overflow-hidden ${hasValidLink ? 'cursor-pointer' : 'cursor-default'}`}
                           >
-                            <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
-                              <ExternalLink className="text-primary-500" size={20} />
-                            </div>
+                            {hasValidLink && (
+                              <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
+                                <ExternalLink className="text-primary-500" size={20} />
+                              </div>
+                            )}
 
                             <div className="mb-6">
                               <div className={`inline-flex p-3 rounded-xl mb-4 transition-colors ${isJournal ? 'bg-purple-50 text-purple-600 group-hover:bg-purple-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
                                 {isJournal ? <BookOpen size={24} /> : <FileText size={24} />}
                               </div>
-                              <h3 className="font-display font-bold text-slate-900 group-hover:text-primary-600 transition-colors text-lg leading-snug line-clamp-3">
+                              <h3 className={`font-display font-bold text-slate-900 transition-colors text-lg leading-snug line-clamp-3 ${hasValidLink ? 'group-hover:text-primary-600' : ''}`}>
                                 {item.title}
                               </h3>
                             </div>
@@ -305,7 +325,7 @@ export default function PublicationsSection({ content }: { content?: any }) {
                                 <span className="font-mono text-[10px] text-slate-400 truncate max-w-[120px]" title={item.doi}>DOI: {item.doi}</span>
                               )}
                             </div>
-                          </motion.a>
+                          </CardWrapper>
                         );
                       })}
                     </div>
