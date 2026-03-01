@@ -12,17 +12,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   // Strict email lock for the "1 Trillion USD" security standard
   if (user.primaryEmail !== 'suzarilshah@gmail.com') {
-    // return (
-    //   <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-900">
-    //     <div className="max-w-md text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200">
-    //       <h1 className="text-xl font-bold text-red-600 mb-2">Access Denied</h1>
-    //       <p className="text-slate-600 mb-4">
-    //         This CMS is restricted to the site owner only.
-    //       </p>
-    //       <p className="text-xs font-mono text-slate-400">User: {user.primaryEmail}</p>
-    //     </div>
-    //   </div>
-    // );
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-900">
+        <div className="max-w-md text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200">
+          <h1 className="text-xl font-bold text-red-600 mb-2">Access Denied</h1>
+          <p className="text-slate-600 mb-4">
+            This CMS is restricted to the site owner only.
+          </p>
+          <p className="text-xs font-mono text-slate-400">User: {user.primaryEmail}</p>
+        </div>
+      </div>
+    );
   }
 
   const clientUser = {

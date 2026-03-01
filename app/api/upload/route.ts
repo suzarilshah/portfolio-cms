@@ -137,7 +137,9 @@ export const POST = createSecureAPIHandler(async (request: NextRequest) => {
 
         return NextResponse.json({ error: message }, { status: 500 });
     }
-}, { 
+}, {
+  requireAuth: true,
+  requireCSRF: true,
   rateLimit: { windowMs: 60000, maxRequests: 20 },
   validateContentType: false // FormData uploads use multipart/form-data
 });
