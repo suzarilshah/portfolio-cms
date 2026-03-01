@@ -196,6 +196,13 @@ export async function GET() {
 
     const posts = await fetchBlogPosts();
 
+    // Sort posts by date (most recent first)
+    posts.sort((a, b) => {
+      const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+      const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+      return dateB - dateA; // Descending order (newest first)
+    });
+
     // Update cache
     cachedPosts = posts;
     cacheTimestamp = now;
