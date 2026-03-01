@@ -395,6 +395,41 @@ export class SecurityValidator {
         });
       }
 
+      // Handle Publications Section Arrays (articles and journals)
+      if (content.articles && Array.isArray(content.articles)) {
+        sanitized.articles = content.articles.slice(0, 50).map((item: any) => {
+            const sanitizedItem: any = {};
+            if (item.title) sanitizedItem.title = this.sanitizeHtml((item.title as string).trim().substring(0, 500));
+            if (item.publisher) sanitizedItem.publisher = this.sanitizeHtml((item.publisher as string).trim().substring(0, 200));
+            if (item.date) sanitizedItem.date = this.sanitizeHtml((item.date as string).trim().substring(0, 50));
+            if (item.link) {
+                try {
+                    const url = new URL(item.link);
+                    if (['http:', 'https:'].includes(url.protocol)) sanitizedItem.link = url.toString();
+                } catch {}
+            }
+            if (item.doi) sanitizedItem.doi = this.sanitizeHtml((item.doi as string).trim().substring(0, 100));
+            return sanitizedItem;
+        });
+      }
+
+      if (content.journals && Array.isArray(content.journals)) {
+        sanitized.journals = content.journals.slice(0, 50).map((item: any) => {
+            const sanitizedItem: any = {};
+            if (item.title) sanitizedItem.title = this.sanitizeHtml((item.title as string).trim().substring(0, 500));
+            if (item.publisher) sanitizedItem.publisher = this.sanitizeHtml((item.publisher as string).trim().substring(0, 200));
+            if (item.date) sanitizedItem.date = this.sanitizeHtml((item.date as string).trim().substring(0, 50));
+            if (item.link) {
+                try {
+                    const url = new URL(item.link);
+                    if (['http:', 'https:'].includes(url.protocol)) sanitizedItem.link = url.toString();
+                } catch {}
+            }
+            if (item.doi) sanitizedItem.doi = this.sanitizeHtml((item.doi as string).trim().substring(0, 100));
+            return sanitizedItem;
+        });
+      }
+
     } else {
       errors.push('Content must be a valid object');
     }
