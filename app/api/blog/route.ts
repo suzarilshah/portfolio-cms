@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import * as cheerio from 'cheerio';
 
 interface BlogPost {
   title: string;
@@ -8,6 +7,42 @@ interface BlogPost {
   description: string;
   categories: string[];
   thumbnail?: string;
+  readTime?: number;
+}
+
+interface ApiBlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  url: string;
+  summary: string;
+  ogImage?: string;
+  featuredImage?: string;
+  publishedAt: string;
+  updatedAt: string;
+  readTime?: number;
+  tags?: { name: string; slug: string }[];
+  author?: {
+    name: string;
+    title: string;
+    avatar: string;
+  };
+}
+
+interface BlogApiResponse {
+  success: boolean;
+  data: ApiBlogPost[];
+  pagination?: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+    nextOffset: number;
+  };
+  meta?: {
+    fetchedAt: string;
+    source: string;
+  };
 }
 
 // Cache for blog posts (5 minute TTL)
@@ -16,177 +51,52 @@ let cacheTimestamp: number = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 async function fetchBlogPosts(): Promise<BlogPost[]> {
-  const blogUrl = 'https://blog.suzarilshah.uk';
+  const apiUrl = 'https://blog.suzarilshah.uk/api/public/blog?limit=20';
 
-  // Try multiple RSS feed URLs
-  const rssUrls = [
-    `${blogUrl}/feed`,
-    `${blogUrl}/feed.xml`,
-    `${blogUrl}/rss`,
-    `${blogUrl}/rss.xml`,
-    `${blogUrl}/index.xml`,
-    `${blogUrl}/atom.xml`,
-  ];
-
-  for (const rssUrl of rssUrls) {
-    try {
-      const response = await fetch(rssUrl, {
-        headers: {
-          'Accept': 'application/rss+xml, application/xml, text/xml, application/atom+xml',
-          'User-Agent': 'SuzarilShah-Portfolio/1.0',
-        },
-        next: { revalidate: 300 }, // Revalidate every 5 minutes
-      });
-
-      if (!response.ok) continue;
-
-      const xml = await response.text();
-      const $ = cheerio.load(xml, { xml: true });
-
-      const posts: BlogPost[] = [];
-
-      // Parse RSS 2.0 format
-      $('item').each((_, element) => {
-        const $item = $(element);
-        const title = $item.find('title').text().trim();
-        const link = $item.find('link').text().trim() || $item.find('guid').text().trim();
-        const pubDate = $item.find('pubDate').text().trim();
-        const description = $item.find('description').text().trim()
-          .replace(/<[^>]*>/g, '') // Strip HTML
-          .substring(0, 200) + '...';
-
-        const categories: string[] = [];
-        $item.find('category').each((_, cat) => {
-          categories.push($(cat).text().trim());
-        });
-
-        // Try to extract thumbnail from content or media
-        let thumbnail = $item.find('media\\:content, media\\:thumbnail').attr('url') ||
-          $item.find('enclosure[type^="image"]').attr('url');
-
-        if (!thumbnail) {
-          // Try to extract from content
-          const content = $item.find('content\\:encoded').text();
-          const imgMatch = content.match(/<img[^>]+src=["']([^"']+)["']/);
-          if (imgMatch) thumbnail = imgMatch[1];
-        }
-
-        if (title && link) {
-          posts.push({
-            title,
-            link,
-            pubDate,
-            description,
-            categories,
-            thumbnail,
-          });
-        }
-      });
-
-      // If no items found in RSS 2.0, try Atom format
-      if (posts.length === 0) {
-        $('entry').each((_, element) => {
-          const $item = $(element);
-          const title = $item.find('title').text().trim();
-          const link = $item.find('link').attr('href') || '';
-          const pubDate = $item.find('published').text().trim() || $item.find('updated').text().trim();
-          const description = ($item.find('summary').text().trim() || $item.find('content').text().trim())
-            .replace(/<[^>]*>/g, '')
-            .substring(0, 200) + '...';
-
-          const categories: string[] = [];
-          $item.find('category').each((_, cat) => {
-            categories.push($(cat).attr('term') || $(cat).text().trim());
-          });
-
-          if (title && link) {
-            posts.push({
-              title,
-              link,
-              pubDate,
-              description,
-              categories,
-            });
-          }
-        });
-      }
-
-      if (posts.length > 0) {
-        return posts;
-      }
-    } catch (error) {
-      console.log(`Failed to fetch from ${rssUrl}:`, error);
-      continue;
-    }
-  }
-
-  // Fallback: Try to scrape the blog homepage for posts
   try {
-    const response = await fetch(blogUrl, {
+    const response = await fetch(apiUrl, {
       headers: {
+        'Accept': 'application/json',
         'User-Agent': 'SuzarilShah-Portfolio/1.0',
       },
+      next: { revalidate: 300 }, // Revalidate every 5 minutes
     });
 
-    if (response.ok) {
-      const html = await response.text();
-      const $ = cheerio.load(html);
-      const posts: BlogPost[] = [];
-
-      // Try common blog post selectors
-      const articleSelectors = [
-        'article',
-        '.post',
-        '.blog-post',
-        '.entry',
-        '[class*="post"]',
-        '[class*="article"]',
-      ];
-
-      for (const selector of articleSelectors) {
-        $(selector).slice(0, 6).each((_, element) => {
-          const $article = $(element);
-          const $titleLink = $article.find('h1 a, h2 a, h3 a, .title a, .post-title a').first();
-          const title = $titleLink.text().trim() || $article.find('h1, h2, h3').first().text().trim();
-          const link = $titleLink.attr('href') || $article.find('a').first().attr('href') || '';
-          const fullLink = link.startsWith('http') ? link : `${blogUrl}${link.startsWith('/') ? '' : '/'}${link}`;
-
-          const description = $article.find('p, .excerpt, .summary, .description').first().text().trim().substring(0, 200);
-          const thumbnail = $article.find('img').first().attr('src');
-          const dateText = $article.find('time, .date, .published, [class*="date"]').first().text().trim() ||
-            $article.find('[datetime]').attr('datetime') || '';
-
-          if (title && link) {
-            posts.push({
-              title,
-              link: fullLink,
-              pubDate: dateText,
-              description: description ? description + '...' : 'Read more on the blog...',
-              categories: [],
-              thumbnail,
-            });
-          }
-        });
-
-        if (posts.length > 0) break;
-      }
-
-      if (posts.length > 0) {
-        return posts.slice(0, 6);
-      }
+    if (!response.ok) {
+      console.error(`Blog API returned ${response.status}`);
+      return [];
     }
-  } catch (error) {
-    console.error('Failed to scrape blog:', error);
-  }
 
-  return [];
+    const data: BlogApiResponse = await response.json();
+
+    if (!data.success || !data.data || !Array.isArray(data.data)) {
+      console.error('Blog API returned invalid data structure');
+      return [];
+    }
+
+    // Transform API response to our BlogPost format
+    const posts: BlogPost[] = data.data.map((post) => ({
+      title: post.title,
+      link: post.url, // Use the full URL from API
+      pubDate: post.publishedAt,
+      description: post.summary || '',
+      categories: post.tags?.map(tag => tag.name) || [],
+      thumbnail: post.featuredImage || post.ogImage,
+      readTime: post.readTime,
+    }));
+
+    return posts;
+  } catch (error) {
+    console.error('Failed to fetch from Blog API:', error);
+    return [];
+  }
 }
 
 export async function GET() {
   try {
     // Check cache
     const now = Date.now();
-    if (cachedPosts && (now - cacheTimestamp) < CACHE_TTL) {
+    if (cachedPosts && cachedPosts.length > 0 && (now - cacheTimestamp) < CACHE_TTL) {
       return NextResponse.json({
         posts: cachedPosts,
         cached: true,
@@ -203,9 +113,11 @@ export async function GET() {
       return dateB - dateA; // Descending order (newest first)
     });
 
-    // Update cache
-    cachedPosts = posts;
-    cacheTimestamp = now;
+    // Update cache only if we got posts
+    if (posts.length > 0) {
+      cachedPosts = posts;
+      cacheTimestamp = now;
+    }
 
     return NextResponse.json({
       posts,
