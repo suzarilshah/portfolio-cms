@@ -178,6 +178,37 @@ export default function PublicationsSection({ content }: { content?: any }) {
   const showViewMore = currentItems.length > 6 && !showAllPublications;
   const displayItems = showViewMore ? currentItems.slice(0, 6) : currentItems;
 
+  // Tab configuration for cleaner rendering
+  const tabs = [
+    {
+      id: 'articles' as const,
+      label: 'Technical Articles',
+      description: 'Microsoft Tech Community',
+      icon: FileText,
+      count: articleCount,
+      color: 'blue',
+      gradient: 'from-blue-500 to-blue-600'
+    },
+    {
+      id: 'journals' as const,
+      label: 'Research Journals',
+      description: 'IEEE & Academic',
+      icon: BookOpen,
+      count: journalCount,
+      color: 'purple',
+      gradient: 'from-purple-500 to-purple-600'
+    },
+    {
+      id: 'blog' as const,
+      label: 'Blog Posts',
+      description: 'blog.suzarilshah.uk',
+      icon: Rss,
+      count: null,
+      color: 'orange',
+      gradient: 'from-orange-500 to-orange-600'
+    }
+  ];
+
   return (
     <section id="publications" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -198,65 +229,59 @@ export default function PublicationsSection({ content }: { content?: any }) {
                 {description}
               </p>
 
-              {/* Tabs Switcher */}
-              <div className="flex flex-col gap-2 mb-8">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Filter Content</p>
-                <div className="flex flex-wrap gap-2 p-1 bg-slate-100 rounded-xl w-fit">
-                  <button
-                    onClick={() => setActiveTab('articles')}
-                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === 'articles' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
-                  >
-                    {activeTab === 'articles' && (
-                      <motion.div
-                        layoutId="activePublicationTab"
-                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <span className="relative z-10 flex items-center gap-2">
-                      <FileText size={14} />
-                      Articles
-                      <span className="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full text-[10px] leading-none border border-slate-200">
-                        {articleCount}
-                      </span>
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('journals')}
-                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === 'journals' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
-                  >
-                    {activeTab === 'journals' && (
-                      <motion.div
-                        layoutId="activePublicationTab"
-                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <span className="relative z-10 flex items-center gap-2">
-                      <BookOpen size={14} />
-                      Journals
-                      <span className="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full text-[10px] leading-none border border-slate-200">
-                        {journalCount}
-                      </span>
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('blog')}
-                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === 'blog' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
-                  >
-                    {activeTab === 'blog' && (
-                      <motion.div
-                        layoutId="activePublicationTab"
-                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <span className="relative z-10 flex items-center gap-2">
-                      <Rss size={14} />
-                      Blog
-                    </span>
-                  </button>
-                </div>
+              {/* Beautiful Vertical Tab Switcher */}
+              <div className="space-y-3 mb-8">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full group relative overflow-hidden rounded-2xl transition-all duration-300 ${
+                        isActive
+                          ? 'bg-gradient-to-r ' + tab.gradient + ' text-white shadow-lg shadow-' + tab.color + '-500/25'
+                          : 'bg-white border border-slate-200 hover:border-' + tab.color + '-300 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="relative z-10 flex items-center gap-4 p-4">
+                        <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+                          isActive
+                            ? 'bg-white/20'
+                            : 'bg-' + tab.color + '-50 text-' + tab.color + '-600 group-hover:bg-' + tab.color + '-100'
+                        }`}>
+                          <Icon size={24} className={isActive ? 'text-white' : ''} />
+                        </div>
+                        <div className="flex-1 text-left">
+                          <div className={`font-semibold ${isActive ? 'text-white' : 'text-slate-900'}`}>
+                            {tab.label}
+                          </div>
+                          <div className={`text-sm ${isActive ? 'text-white/80' : 'text-slate-500'}`}>
+                            {tab.description}
+                          </div>
+                        </div>
+                        {tab.count !== null && (
+                          <div className={`flex-shrink-0 px-3 py-1 rounded-full text-sm font-bold ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {tab.count}
+                          </div>
+                        )}
+                        {tab.count === null && (
+                          <div className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : 'bg-' + tab.color + '-100 text-' + tab.color + '-600'
+                          }`}>
+                            Live
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
 
               <a
@@ -287,22 +312,9 @@ export default function PublicationsSection({ content }: { content?: any }) {
                       {displayItems.map((item: any, index: number) => {
                         const isJournal = activeTab === 'journals';
                         const hasValidLink = item.link && item.link.startsWith('http');
-                        const CardWrapper = hasValidLink ? motion.a : motion.div;
-                        const linkProps = hasValidLink ? {
-                          href: item.link,
-                          target: "_blank",
-                          rel: "noopener noreferrer"
-                        } : {};
 
-                        return (
-                          <CardWrapper
-                            key={index}
-                            {...linkProps}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className={`group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 relative overflow-hidden ${hasValidLink ? 'cursor-pointer' : 'cursor-default'}`}
-                          >
+                        const cardContent = (
+                          <>
                             {hasValidLink && (
                               <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
                                 <ExternalLink className="text-primary-500" size={20} />
@@ -325,7 +337,39 @@ export default function PublicationsSection({ content }: { content?: any }) {
                                 <span className="font-mono text-[10px] text-slate-400 truncate max-w-[120px]" title={item.doi}>DOI: {item.doi}</span>
                               )}
                             </div>
-                          </CardWrapper>
+                          </>
+                        );
+
+                        if (hasValidLink) {
+                          return (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                            >
+                              <a
+                                href={item.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 relative overflow-hidden cursor-pointer h-full"
+                              >
+                                {cardContent}
+                              </a>
+                            </motion.div>
+                          );
+                        }
+
+                        return (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl transition-all duration-300 relative overflow-hidden"
+                          >
+                            {cardContent}
+                          </motion.div>
                         );
                       })}
                     </div>
@@ -391,49 +435,52 @@ export default function PublicationsSection({ content }: { content?: any }) {
                   {!blogLoading && blogPosts.length > 0 && (
                     <div className="grid md:grid-cols-2 gap-5">
                       {blogPosts.map((post, index) => (
-                        <motion.a
+                        <motion.div
                           key={post.link}
-                          href={post.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-orange-200 hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 relative overflow-hidden"
                         >
-                          <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
-                            <ExternalLink className="text-orange-500" size={20} />
-                          </div>
-
-                          <div className="mb-6">
-                            <div className="inline-flex p-3 rounded-xl mb-4 transition-colors bg-orange-50 text-orange-600 group-hover:bg-orange-100">
-                              <Rss size={24} />
+                          <a
+                            href={post.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-orange-200 hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 relative overflow-hidden h-full"
+                          >
+                            <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
+                              <ExternalLink className="text-orange-500" size={20} />
                             </div>
-                            <h3 className="font-display font-bold text-slate-900 group-hover:text-orange-600 transition-colors text-lg leading-snug line-clamp-3">
-                              {post.title}
-                            </h3>
-                            {post.description && (
-                              <p className="text-sm text-slate-500 mt-2 line-clamp-2">
-                                {post.description}
-                              </p>
-                            )}
-                          </div>
 
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 border-t border-slate-50 pt-4 mt-auto">
-                            {post.pubDate && (
-                              <span className="flex items-center gap-1">
-                                <Calendar size={12} />
-                                {formatDate(post.pubDate)}
-                              </span>
-                            )}
-                            {blogSettings.showCategories !== false && post.categories?.length > 0 && (
-                              <span className="flex items-center gap-1">
-                                <Tag size={12} />
-                                {post.categories.slice(0, 2).join(', ')}
-                              </span>
-                            )}
-                          </div>
-                        </motion.a>
+                            <div className="mb-6">
+                              <div className="inline-flex p-3 rounded-xl mb-4 transition-colors bg-orange-50 text-orange-600 group-hover:bg-orange-100">
+                                <Rss size={24} />
+                              </div>
+                              <h3 className="font-display font-bold text-slate-900 group-hover:text-orange-600 transition-colors text-lg leading-snug line-clamp-3">
+                                {post.title}
+                              </h3>
+                              {post.description && (
+                                <p className="text-sm text-slate-500 mt-2 line-clamp-2">
+                                  {post.description}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 border-t border-slate-50 pt-4 mt-auto">
+                              {post.pubDate && (
+                                <span className="flex items-center gap-1">
+                                  <Calendar size={12} />
+                                  {formatDate(post.pubDate)}
+                                </span>
+                              )}
+                              {blogSettings.showCategories !== false && post.categories?.length > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <Tag size={12} />
+                                  {post.categories.slice(0, 2).join(', ')}
+                                </span>
+                              )}
+                            </div>
+                          </a>
+                        </motion.div>
                       ))}
                     </div>
                   )}
