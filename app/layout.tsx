@@ -7,6 +7,7 @@ import pool from '@/lib/db';
 import { StructuredData } from '@/components/StructuredData';
 import { GoogleAnalytics } from '@/lib/analytics';
 import BackgroundPattern from "./components/BackgroundPattern";
+import OfflineIndicator from "./components/OfflineIndicator";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -146,6 +147,9 @@ export default async function RootLayout({
         <GoogleAnalytics measurementId={gaId} />
         {/* Global Background Pattern */}
         <BackgroundPattern pattern={pattern} />
+
+        {/* Offline Connection Indicator */}
+        <OfflineIndicator />
 
         <StackProvider app={stackServerApp}>
           <StackTheme>
