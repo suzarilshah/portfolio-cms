@@ -1,16 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import {
-  Home,
-  ArrowLeft,
-  FileQuestion,
   LayoutDashboard,
-  Settings,
-  Award,
+  ArrowLeft,
+  Search,
   Briefcase,
   BookOpen,
+  Award,
   Users,
+  Settings,
 } from 'lucide-react';
 
 export default function AdminNotFound() {
@@ -25,87 +25,115 @@ export default function AdminNotFound() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-primary-50/20 flex items-center justify-center p-6">
-      <div className="max-w-lg w-full">
-        {/* Not Found Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-primary-600 to-blue-500 px-6 py-8 text-center">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur">
-              <FileQuestion className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-white mb-2">Page Not Found</h1>
-            <p className="text-white/80 text-sm">
-              This admin page doesn't exist or has been moved
-            </p>
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-24 relative overflow-hidden">
+      {/* Large background 404 - Very light and subtle */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+        <motion.span
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-[20rem] md:text-[28rem] lg:text-[36rem] font-display font-bold text-slate-100 leading-none tracking-tighter"
+        >
+          404
+        </motion.span>
+      </div>
+
+      {/* Content overlay */}
+      <div className="relative z-10 max-w-2xl mx-auto text-center">
+        {/* Icon */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-6"
+        >
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center">
+            <Search className="w-8 h-8 text-slate-400" />
           </div>
+        </motion.div>
 
-          {/* Content */}
-          <div className="p-6">
-            {/* 404 visual */}
-            <div className="text-center mb-6">
-              <span className="text-6xl font-display font-bold text-slate-200">
-                404
-              </span>
-            </div>
+        {/* Message */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">
+            Admin page not found
+          </h1>
+          <p className="text-slate-500 text-lg mb-8 max-w-md mx-auto leading-relaxed">
+            This admin page doesn't exist or has been moved.
+          </p>
+        </motion.div>
 
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-              <Link
-                href="/admin"
-                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                Go to Dashboard
-              </Link>
-              <button
-                onClick={() => window.history.back()}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Go Back
-              </button>
-            </div>
+        {/* Primary actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="flex flex-wrap items-center justify-center gap-4 mb-12"
+        >
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-medium rounded-full hover:bg-slate-800 hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Go to Dashboard
+          </Link>
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-medium rounded-full hover:border-slate-300 hover:text-slate-900 hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Go Back
+          </button>
+        </motion.div>
 
-            {/* Quick links to admin sections */}
-            <div className="border-t border-slate-100 pt-4">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                Available Sections
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {adminSections.map((section) => {
-                  const Icon = section.icon;
-                  return (
-                    <Link
-                      key={section.href}
-                      href={section.href}
-                      className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors group"
-                    >
-                      <Icon className="w-4 h-4 text-slate-400 group-hover:text-primary-600 transition-colors" />
-                      <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">
-                        {section.label}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
+        {/* Admin sections */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-4">
+            Admin Sections
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {adminSections.map((section, index) => {
+              const Icon = section.icon;
+              return (
+                <motion.div
+                  key={section.href}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 + index * 0.1 }}
+                >
+                  <Link
+                    href={section.href}
+                    className="group flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all duration-300"
+                  >
+                    <Icon className="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                    <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">
+                      {section.label}
+                    </span>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
+        </motion.div>
 
-          {/* Footer */}
-          <div className="bg-slate-50 px-6 py-4 border-t border-slate-100">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>Need help? Check the documentation.</span>
-              <Link
-                href="/"
-                className="flex items-center gap-1 hover:text-primary-600 transition-colors"
-              >
-                <Home className="w-3 h-3" />
-                Public site
-              </Link>
-            </div>
-          </div>
-        </div>
+        {/* Footer note */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="mt-12 text-sm text-slate-400"
+        >
+          <Link href="/" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+            Return to public site
+          </Link>
+        </motion.p>
       </div>
     </div>
   );

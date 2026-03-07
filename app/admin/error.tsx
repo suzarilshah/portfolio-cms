@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, RefreshCw, Home, ArrowLeft, Bug, Settings, HelpCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { AlertCircle, RefreshCw, LayoutDashboard, ArrowLeft, ChevronDown } from 'lucide-react';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -14,11 +15,9 @@ export default function AdminError({ error, reset }: ErrorProps) {
   const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
-    // Log admin errors with more context
     console.error('Admin Panel Error:', {
       message: error.message,
       digest: error.digest,
-      stack: error.stack,
       url: typeof window !== 'undefined' ? window.location.href : 'unknown',
       timestamp: new Date().toISOString(),
       section: 'admin',
@@ -27,140 +26,130 @@ export default function AdminError({ error, reset }: ErrorProps) {
 
   const handleRetry = async () => {
     setRetrying(true);
-    // Small delay for UX
     await new Promise(resolve => setTimeout(resolve, 500));
     reset();
-    setRetrying(false);
   };
 
-  // Common admin issues and solutions
-  const troubleshootingTips = [
-    { issue: 'Session expired', solution: 'Try signing out and back in' },
-    { issue: 'Database connection', solution: 'Wait a moment and retry' },
-    { issue: 'Permission denied', solution: 'Verify you have admin access' },
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-red-50/20 flex items-center justify-center p-6">
-      <div className="max-w-lg w-full">
-        {/* Error Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-red-100 overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-red-500 to-orange-500 px-6 py-8 text-center">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur">
-              <AlertTriangle className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-white mb-2">Admin Panel Error</h1>
-            <p className="text-white/80 text-sm">
-              Something went wrong in the admin panel
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-24 relative overflow-hidden">
+      {/* Large background text - Very light and subtle */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+        <motion.span
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-[16rem] md:text-[22rem] lg:text-[28rem] font-display font-bold text-slate-100 leading-none tracking-tighter"
+        >
+          500
+        </motion.span>
+      </div>
+
+      {/* Content overlay */}
+      <div className="relative z-10 max-w-lg mx-auto text-center">
+        {/* Icon */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-6"
+        >
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-red-50 flex items-center justify-center">
+            <AlertCircle className="w-8 h-8 text-red-400" />
+          </div>
+        </motion.div>
+
+        {/* Message */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">
+            Admin Error
+          </h1>
+          <p className="text-slate-500 text-lg mb-2 max-w-md mx-auto leading-relaxed">
+            Something went wrong in the admin panel.
+          </p>
+          {error.digest && (
+            <p className="text-xs text-slate-400 font-mono mb-8">
+              Error ID: {error.digest}
             </p>
-          </div>
+          )}
+        </motion.div>
 
-          {/* Content */}
-          <div className="p-6">
-            {/* Error info */}
-            <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
-              <p className="text-sm text-red-800 font-medium mb-1">Error occurred:</p>
-              <p className="text-sm text-red-600 font-mono break-words">
-                {error.message || 'An unexpected error occurred'}
-              </p>
-              {error.digest && (
-                <p className="text-xs text-red-400 mt-2 font-mono">
-                  ID: {error.digest}
-                </p>
-              )}
-            </div>
+        {/* Primary actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="flex flex-wrap items-center justify-center gap-4 mb-8"
+        >
+          <button
+            onClick={handleRetry}
+            disabled={retrying}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-medium rounded-full hover:bg-slate-800 disabled:opacity-50 hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <RefreshCw className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`} />
+            {retrying ? 'Retrying...' : 'Try Again'}
+          </button>
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-medium rounded-full hover:border-slate-300 hover:text-slate-900 hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </Link>
+        </motion.div>
 
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-              <button
-                onClick={handleRetry}
-                disabled={retrying}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
-              >
-                <RefreshCw className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`} />
-                {retrying ? 'Retrying...' : 'Try Again'}
-              </button>
-              <Link
-                href="/admin"
-                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
-              >
-                <Home className="w-4 h-4" />
-                Dashboard
-              </Link>
-            </div>
+        {/* Error details toggle */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-600 transition-colors mb-4"
+          >
+            Technical details
+            <ChevronDown className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
+          </button>
 
-            {/* Troubleshooting */}
-            <div className="border-t border-slate-100 pt-4">
-              <button
-                onClick={() => setShowDetails(!showDetails)}
-                className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-3"
-              >
-                <HelpCircle className="w-4 h-4" />
-                {showDetails ? 'Hide troubleshooting' : 'Troubleshooting tips'}
-              </button>
+          {showDetails && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="bg-slate-50 rounded-xl p-4 text-left overflow-hidden"
+            >
+              <p className="text-xs text-slate-400 mb-2 font-mono uppercase">Error Message:</p>
+              <pre className="text-sm text-slate-600 font-mono whitespace-pre-wrap break-words">
+                {error.message || 'Unknown error'}
+              </pre>
+            </motion.div>
+          )}
+        </motion.div>
 
-              {showDetails && (
-                <div className="space-y-3">
-                  <div className="bg-slate-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                      Common Solutions
-                    </p>
-                    <ul className="space-y-2">
-                      {troubleshootingTips.map((tip, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm">
-                          <span className="text-slate-400">•</span>
-                          <span>
-                            <span className="text-slate-700 font-medium">{tip.issue}:</span>{' '}
-                            <span className="text-slate-500">{tip.solution}</span>
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Stack trace for debugging */}
-                  <button
-                    onClick={() => {
-                      const el = document.getElementById('stack-trace');
-                      if (el) el.classList.toggle('hidden');
-                    }}
-                    className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-600"
-                  >
-                    <Bug className="w-3 h-3" />
-                    Toggle stack trace
-                  </button>
-                  <pre
-                    id="stack-trace"
-                    className="hidden text-xs bg-slate-900 text-slate-300 p-3 rounded-lg overflow-auto max-h-32 font-mono"
-                  >
-                    {error.stack || 'No stack trace available'}
-                  </pre>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="bg-slate-50 px-6 py-4 border-t border-slate-100">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <button
-                onClick={() => window.history.back()}
-                className="flex items-center gap-1 hover:text-slate-700 transition-colors"
-              >
-                <ArrowLeft className="w-3 h-3" />
-                Go back
-              </button>
-              <Link
-                href="/admin/settings"
-                className="flex items-center gap-1 hover:text-slate-700 transition-colors"
-              >
-                <Settings className="w-3 h-3" />
-                Settings
-              </Link>
-            </div>
-          </div>
-        </div>
+        {/* Footer actions */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-8 flex items-center justify-center gap-6 text-sm text-slate-400"
+        >
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex items-center gap-1 hover:text-slate-600 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Go back
+          </button>
+          <Link
+            href="/"
+            className="hover:text-slate-600 transition-colors"
+          >
+            Public site
+          </Link>
+        </motion.div>
       </div>
     </div>
   );
