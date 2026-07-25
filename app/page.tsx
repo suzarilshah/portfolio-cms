@@ -26,6 +26,8 @@ async function getData() {
     favicon_url: null,
     accent_color: 'primary',
     resume_url: null,
+    background_svg_color: 'blue',
+    background_overlay_opacity: 30,
   };
 
   const defaultOrder = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'awards', 'publications', 'community', 'contact'];
@@ -73,6 +75,8 @@ async function getData() {
       favicon_url: s.favicon_url || defaultSettings.favicon_url,
       accent_color: s.accent_color || defaultSettings.accent_color,
       resume_url: s.resume_url || defaultSettings.resume_url,
+      background_svg_color: s.background_svg_color || defaultSettings.background_svg_color,
+      background_overlay_opacity: s.background_overlay_opacity ?? defaultSettings.background_overlay_opacity,
     };
 
     return { 
@@ -112,7 +116,10 @@ export default async function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden selection:bg-primary-100 selection:text-primary-900">
       {/* Global Grid Background with Parallax */}
-      <GridBackground />
+      <GridBackground
+        svgColor={settings.background_svg_color}
+        overlayOpacity={settings.background_overlay_opacity}
+      />
 
       {/* Navigation */}
       <Navigation settings={settings} />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Image as ImageIcon, User, Globe, Palette, Upload, FileText, Search } from 'lucide-react';
+import { Save, Loader2, Image as ImageIcon, User, Globe, Palette, Upload, FileText, Search, Grid3X3, Layers } from 'lucide-react';
 
 export default function SettingsForm() {
   const [settings, setSettings] = useState({
@@ -16,7 +16,10 @@ export default function SettingsForm() {
     seo_description: '',
     seo_keywords: '',
     seo_og_image: '',
-    background_pattern: 'dots'
+    background_pattern: 'dots',
+    // New background settings
+    background_svg_color: 'blue',
+    background_overlay_opacity: 50,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -391,13 +394,13 @@ export default function SettingsForm() {
                             onClick={() => setSettings({...settings, background_pattern: pattern.value})}
                             className={`relative h-24 rounded-lg border overflow-hidden transition-all group ${settings.background_pattern === pattern.value ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200 hover:border-slate-300'}`}
                         >
-                            <div 
-                                className="absolute inset-0" 
-                                style={{ 
+                            <div
+                                className="absolute inset-0"
+                                style={{
                                     backgroundImage: pattern.preview !== 'none' ? pattern.preview : 'none',
                                     backgroundSize: pattern.value === 'dots' ? '24px 24px' : 'auto',
                                     backgroundColor: '#f8fafc'
-                                }} 
+                                }}
                             />
                             <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-2 border-t border-slate-100 text-xs font-medium text-slate-700 text-center">
                                 {pattern.label}
@@ -409,6 +412,69 @@ export default function SettingsForm() {
                             )}
                         </button>
                     ))}
+                </div>
+            </div>
+        </div>
+      </div>
+
+      {/* Background SVG Settings */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
+            <Grid3X3 size={18} className="text-cyan-600" />
+            <h3 className="font-semibold text-slate-900">Background Grid Effect</h3>
+        </div>
+        <div className="p-6 space-y-6">
+            {/* SVG Grid Color */}
+            <div className="space-y-3">
+                <label className="block text-sm font-medium text-slate-700">Grid Pattern Color</label>
+                <p className="text-xs text-slate-500">Choose the color for the animated grid background pattern.</p>
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                    {[
+                        { value: 'blue', label: 'Blue', hue: 210, color: 'bg-blue-500' },
+                        { value: 'lime', label: 'Lime', hue: 75, color: 'bg-lime-400' },
+                        { value: 'cyan', label: 'Cyan', hue: 180, color: 'bg-cyan-400' },
+                        { value: 'purple', label: 'Purple', hue: 270, color: 'bg-purple-500' },
+                        { value: 'rose', label: 'Rose', hue: 350, color: 'bg-rose-500' },
+                        { value: 'emerald', label: 'Emerald', hue: 150, color: 'bg-emerald-500' },
+                        { value: 'orange', label: 'Orange', hue: 30, color: 'bg-orange-500' },
+                        { value: 'amber', label: 'Amber', hue: 45, color: 'bg-amber-400' },
+                        { value: 'indigo', label: 'Indigo', hue: 240, color: 'bg-indigo-500' },
+                        { value: 'teal', label: 'Teal', hue: 170, color: 'bg-teal-500' },
+                        { value: 'pink', label: 'Pink', hue: 330, color: 'bg-pink-500' },
+                        { value: 'slate', label: 'Slate', hue: 215, color: 'bg-slate-500' },
+                    ].map((option) => (
+                        <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => setSettings({...settings, background_svg_color: option.value})}
+                            className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-all ${settings.background_svg_color === option.value ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}
+                        >
+                            <div className={`w-8 h-8 rounded-full ${option.color} shadow-sm`} />
+                            <span className="text-xs font-medium text-slate-700">{option.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* White Overlay Opacity */}
+            <div className="space-y-3 border-t border-slate-100 pt-6">
+                <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-slate-700">White Overlay Opacity</label>
+                    <span className="text-sm font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">{settings.background_overlay_opacity}%</span>
+                </div>
+                <p className="text-xs text-slate-500">Lower values make the grid more visible and vibrant. Higher values make it more subtle.</p>
+                <input
+                    type="range"
+                    min="0"
+                    max="80"
+                    step="5"
+                    value={settings.background_overlay_opacity}
+                    onChange={(e) => setSettings({...settings, background_overlay_opacity: parseInt(e.target.value)})}
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between text-xs text-slate-400">
+                    <span>More Vibrant</span>
+                    <span>More Subtle</span>
                 </div>
             </div>
         </div>

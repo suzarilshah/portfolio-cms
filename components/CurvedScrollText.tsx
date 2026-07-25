@@ -39,20 +39,22 @@ export default function CurvedScrollText({
 
   // SVG viewBox scales with container
   const viewBoxWidth = Math.max(containerWidth * 1.5, 2000);
-  const viewBoxHeight = 500;
+  const viewBoxHeight = 400;
 
-  // Normal: Text sits at bottom, curves UP (arch), flattens on scroll
-  // Inverted (smile): Text sits at top, curves DOWN (smile shape), flattens on scroll
-  const baselineY = inverted ? 150 : 400;
-  const curveStartY = inverted ? 400 : 100; // Control point starts curved
-  const curveEndY = baselineY; // Control point ends flat (same as baseline)
+  // Normal (arch up): control point starts high (small Y), flattens to baseline (larger Y)
+  // Inverted (smile): control point starts low (large Y), flattens to baseline (smaller Y)
+  // For arch: M 0,200 Q midX,50 endX,200 -> starts arched up, flattens to Y=200
+  // For smile: M 0,200 Q midX,350 endX,200 -> starts smiling down, flattens to Y=200
+  const baselineY = 200;
+  const curveStartY = inverted ? 350 : 50;
+  const curveEndY = baselineY;
 
   // Curve control points
   const startX = 0;
   const endX = viewBoxWidth;
   const midX = viewBoxWidth / 2;
 
-  // Interpolate control point Y (arch/smile flattens as you scroll)
+  // Interpolate control point Y (curve flattens as you scroll into view)
   const curveControlY = useTransform(scrollYProgress, [0, 0.6], [curveStartY, curveEndY]);
 
   // Dynamic SVG Path - Quadratic Bezier curve
@@ -70,7 +72,7 @@ export default function CurvedScrollText({
   return (
     <div
       ref={containerRef}
-      className={`w-full min-h-[180px] py-4 flex items-center justify-center overflow-hidden ${className}`}
+      className={`w-full min-h-[120px] md:min-h-[180px] py-2 md:py-4 flex items-center justify-center overflow-hidden ${className}`}
     >
       <motion.svg
         width="100%"

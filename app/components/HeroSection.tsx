@@ -39,7 +39,7 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
 
   return (
     <section id="home" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 pt-20">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 pt-16 sm:pt-20">
         <div className="flex flex-col max-w-5xl mx-auto">
           
           {/* Executive Status Line */}
@@ -47,10 +47,10 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-3 mb-8"
+            className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8"
           >
-            <div className="h-[1px] w-12 bg-primary-500" />
-            <span className="font-mono text-sm font-bold tracking-widest text-primary-600 uppercase">
+            <div className="h-[1px] w-8 sm:w-12 bg-primary-500" />
+            <span className="font-mono text-xs sm:text-sm font-bold tracking-widest text-primary-600 uppercase">
               {subheadline}
             </span>
           </motion.div>
@@ -60,12 +60,12 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-8"
+            className="mb-6 sm:mb-8"
           >
-            <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-slate-900 leading-[1.1]">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-slate-900 leading-[1.1]">
               {headline}
             </h1>
-            <div className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-primary-600 leading-[1.1] mt-2 min-h-[1.2em]">
+            <div className="font-display text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-primary-600 leading-[1.1] mt-2 min-h-[1.2em]">
               <TypingEffect
                 phrases={typingPhrases}
                 typingSpeed={80}
@@ -76,48 +76,48 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
           </motion.div>
 
           {/* Professional Summary */}
-          <div className="grid md:grid-cols-12 gap-8 md:gap-12 items-start border-t border-slate-100 pt-8 md:pt-12">
-            <motion.div 
+          <div className="grid md:grid-cols-12 gap-6 md:gap-12 items-start border-t border-slate-100 pt-6 md:pt-12">
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               className="md:col-span-7"
             >
-              <p className="text-lg sm:text-xl md:text-2xl text-slate-600 leading-relaxed font-light">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-light">
                 {description}
               </p>
             </motion.div>
 
             {/* Call to Action */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="md:col-span-5 flex flex-col gap-4 w-full"
+              className="md:col-span-5 flex flex-col gap-3 sm:gap-4 w-full"
             >
-              <a 
-                href="#contact" 
-                className="group inline-flex items-center justify-between px-8 py-4 bg-slate-900 text-white rounded-full hover:bg-primary-600 transition-all duration-300 shadow-lg hover:shadow-primary-500/25 hover:scale-105"
+              <a
+                href="#contact"
+                className="group inline-flex items-center justify-between px-6 sm:px-8 py-3 sm:py-4 bg-slate-900 text-white rounded-full hover:bg-primary-600 transition-all duration-300 shadow-lg hover:shadow-primary-500/25 hover:scale-105"
               >
-                <span className="font-medium text-lg">Schedule Consultation</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <span className="font-medium text-base sm:text-lg">Schedule Consultation</span>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </a>
-              
+
               {resumeUrl ? (
                 <button
                   onClick={() => setShowEmailModal(true)}
-                  className="group inline-flex items-center justify-between px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-full hover:border-primary-200 hover:bg-slate-50 transition-all duration-300 hover:scale-105 w-full"
+                  className="group inline-flex items-center justify-between px-6 sm:px-8 py-3 sm:py-4 bg-white border border-slate-200 text-slate-900 rounded-full hover:border-primary-200 hover:bg-slate-50 transition-all duration-300 hover:scale-105 w-full"
                 >
-                  <span className="font-medium text-lg">Download Resume</span>
-                  <Download className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                  <span className="font-medium text-base sm:text-lg">Download Resume</span>
+                  <Download className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-y-1 transition-transform" />
                 </button>
               ) : (
-                <a 
-                  href="#experience" 
-                  className="group inline-flex items-center justify-between px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-full hover:border-primary-200 hover:bg-slate-50 transition-all duration-300 hover:scale-105"
+                <a
+                  href="#experience"
+                  className="group inline-flex items-center justify-between px-6 sm:px-8 py-3 sm:py-4 bg-white border border-slate-200 text-slate-900 rounded-full hover:border-primary-200 hover:bg-slate-50 transition-all duration-300 hover:scale-105"
                 >
-                  <span className="font-medium text-lg">View Expertise</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="font-medium text-base sm:text-lg">View Expertise</span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </a>
               )}
             </motion.div>

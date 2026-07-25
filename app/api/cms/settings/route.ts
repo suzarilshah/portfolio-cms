@@ -29,6 +29,10 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     const seo_keywords = body.seo_keywords ? String(body.seo_keywords).substring(0, 300) : '';
     const seo_og_image = body.seo_og_image ? String(body.seo_og_image).substring(0, 500) : '';
     const background_pattern = body.background_pattern ? String(body.background_pattern).substring(0, 50) : 'dots';
+    const background_svg_color = body.background_svg_color ? String(body.background_svg_color).substring(0, 20) : 'blue';
+    const background_overlay_opacity = typeof body.background_overlay_opacity === 'number'
+      ? Math.max(0, Math.min(80, body.background_overlay_opacity))
+      : 30;
 
     // Ensure expected columns exist (self-heal if migrations haven't run)
     try {
@@ -42,7 +46,9 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
         ADD COLUMN IF NOT EXISTS seo_description TEXT,
         ADD COLUMN IF NOT EXISTS seo_keywords TEXT,
         ADD COLUMN IF NOT EXISTS seo_og_image TEXT,
-        ADD COLUMN IF NOT EXISTS background_pattern TEXT DEFAULT 'dots';
+        ADD COLUMN IF NOT EXISTS background_pattern TEXT DEFAULT 'dots',
+        ADD COLUMN IF NOT EXISTS background_svg_color TEXT DEFAULT 'blue',
+        ADD COLUMN IF NOT EXISTS background_overlay_opacity INTEGER DEFAULT 30;
       `);
     } catch (e) {
       // ignore
@@ -62,13 +68,15 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
            seo_keywords = $10,
            seo_og_image = $11,
            background_pattern = $12,
+           background_svg_color = $13,
+           background_overlay_opacity = $14,
            updated_at = NOW()
-       WHERE id = $13 RETURNING *`,
+       WHERE id = $15 RETURNING *`,
       [
         logo_text, logo_highlight, accent_color, logo_url,
         profile_photo_url, favicon_url, resume_url,
         seo_title, seo_description, seo_keywords, seo_og_image,
-        background_pattern, 1
+        background_pattern, background_svg_color, background_overlay_opacity, 1
       ]
     );
 
