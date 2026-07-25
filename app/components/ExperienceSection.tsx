@@ -113,7 +113,7 @@ function WorkExperienceCard({ exp, index, isLast }: { exp: ExperienceItem; index
       </div>
 
       {/* Timeline Spine Column */}
-      <div className="hidden md:flex justify-center relative min-h-[120px]">
+      <div className="hidden md:flex justify-center relative min-h-[100px]">
         {!isLast && (
           <div className="absolute top-4 bottom-0 w-px bg-gradient-to-b from-slate-200 via-slate-200 to-slate-200 group-hover:from-primary-200 group-hover:via-primary-200 group-hover:to-primary-100 transition-colors duration-500" />
         )}
@@ -129,7 +129,7 @@ function WorkExperienceCard({ exp, index, isLast }: { exp: ExperienceItem; index
       </div>
 
       {/* Content Card Column */}
-      <div className="pb-12 pl-12 md:pl-0 pt-0 md:pt-0 relative">
+      <div className="pb-8 pl-10 md:pl-0 pt-0 md:pt-0 relative">
         {!isLast && (
           <div className="md:hidden absolute left-[1.85rem] top-4 bottom-0 w-px bg-slate-200" />
         )}
@@ -177,10 +177,10 @@ function PMExperienceCard({ exp, index }: { exp: ExperienceItem; index: number }
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="group relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-primary-200 transition-all duration-300 overflow-hidden"
+      className="group relative bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-primary-200 transition-all duration-300 overflow-hidden"
     >
       {/* Header */}
-      <div className="p-6 pb-4">
+      <div className="p-5 pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
@@ -207,33 +207,33 @@ function PMExperienceCard({ exp, index }: { exp: ExperienceItem; index: number }
       </div>
 
       {/* PM-Specific Metrics */}
-      <div className="px-6 pb-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="px-5 pb-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {exp.team_size && (
-            <div className="bg-slate-50 rounded-lg p-3 text-center">
-              <Users size={16} className="mx-auto text-primary-500 mb-1" />
-              <p className="text-xs text-slate-500">Team Size</p>
-              <p className="font-bold text-slate-900">{exp.team_size}</p>
+            <div className="bg-slate-50 rounded-lg p-2.5 text-center">
+              <Users size={14} className="mx-auto text-primary-500 mb-0.5" />
+              <p className="text-[10px] text-slate-500">Team</p>
+              <p className="font-bold text-slate-900 text-sm">{exp.team_size}</p>
             </div>
           )}
           {exp.budget && (
-            <div className="bg-slate-50 rounded-lg p-3 text-center">
-              <TrendingUp size={16} className="mx-auto text-primary-500 mb-1" />
-              <p className="text-xs text-slate-500">Budget</p>
-              <p className="font-bold text-slate-900">{exp.budget}</p>
+            <div className="bg-slate-50 rounded-lg p-2.5 text-center">
+              <TrendingUp size={14} className="mx-auto text-primary-500 mb-0.5" />
+              <p className="text-[10px] text-slate-500">Budget</p>
+              <p className="font-bold text-slate-900 text-sm">{exp.budget}</p>
             </div>
           )}
           {exp.methodologies && exp.methodologies.length > 0 && (
-            <div className="bg-slate-50 rounded-lg p-3 text-center">
-              <Layers size={16} className="mx-auto text-primary-500 mb-1" />
-              <p className="text-xs text-slate-500">Methodology</p>
+            <div className="bg-slate-50 rounded-lg p-2.5 text-center">
+              <Layers size={14} className="mx-auto text-primary-500 mb-0.5" />
+              <p className="text-[10px] text-slate-500">Method</p>
               <p className="font-bold text-slate-900 text-sm">{exp.methodologies[0]}</p>
             </div>
           )}
           {exp.tools && exp.tools.length > 0 && (
-            <div className="bg-slate-50 rounded-lg p-3 text-center">
-              <Code size={16} className="mx-auto text-primary-500 mb-1" />
-              <p className="text-xs text-slate-500">Tools</p>
+            <div className="bg-slate-50 rounded-lg p-2.5 text-center">
+              <Code size={14} className="mx-auto text-primary-500 mb-0.5" />
+              <p className="text-[10px] text-slate-500">Tools</p>
               <p className="font-bold text-slate-900 text-sm">{exp.tools.length}+</p>
             </div>
           )}
@@ -250,7 +250,7 @@ function PMExperienceCard({ exp, index }: { exp: ExperienceItem; index: number }
             transition={{ duration: 0.3 }}
             className="overflow-hidden border-t border-slate-100"
           >
-            <div className="p-6 pt-4 bg-slate-50/50">
+            <div className="p-5 pt-3 bg-slate-50/50">
               {/* Key Achievements */}
               {exp.key_achievements && exp.key_achievements.length > 0 && (
                 <div className="mb-4">
@@ -288,7 +288,7 @@ function PMExperienceCard({ exp, index }: { exp: ExperienceItem; index: number }
       </AnimatePresence>
 
       {/* Tags & Expand Button */}
-      <div className="px-6 pb-6 pt-2 flex items-center justify-between">
+      <div className="px-5 pb-4 pt-1 flex items-center justify-between">
         <div className="flex flex-wrap gap-2">
           {(exp.tags || []).slice(0, 3).map((tag: string) => (
             <span key={tag} className="px-3 py-1 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-full">
@@ -308,7 +308,7 @@ function PMExperienceCard({ exp, index }: { exp: ExperienceItem; index: number }
   );
 }
 
-// Tab Button Component
+// Tab Button Component - more compact
 function TabButton({
   active,
   onClick,
@@ -325,15 +325,15 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`relative flex items-center gap-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 ${
+      className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
         active
-          ? 'bg-slate-900 text-white shadow-lg'
+          ? 'bg-slate-900 text-white shadow-md'
           : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
       }`}
     >
-      <Icon size={20} className={active ? 'text-primary-400' : 'text-slate-400'} />
+      <Icon size={16} className={active ? 'text-primary-400' : 'text-slate-400'} />
       <span>{label}</span>
-      <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${
+      <span className={`ml-1 px-1.5 py-0.5 rounded text-xs font-bold ${
         active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
       }`}>
         {count}
@@ -361,45 +361,44 @@ export default function ExperienceSection({ content, settings }: { content?: any
   const resumeUrl = settings?.resume_url || '/resume.pdf';
 
   return (
-    <section id="experience" className="relative min-h-screen py-24 overflow-hidden">
-      {/* Parallax Background */}
-      {showParallax && <ParallaxBackground />}
+    <section id="experience" className="relative py-16 md:py-20 overflow-hidden bg-slate-50/30">
+      {/* Parallax Background - more subtle */}
+      {showParallax && <ParallaxBackground className="opacity-50" />}
 
-      {/* Curved Text - Background decoration */}
+      {/* Curved Text - Background decoration - more compact */}
       {showCurvedText && (
-        <div className="absolute top-20 left-0 right-0 pointer-events-none opacity-60">
-          <CurvedScrollText text={curvedText} repeatCount={curvedTextRepeat} />
+        <div className="absolute top-0 left-0 right-0 pointer-events-none opacity-40 h-[150px] overflow-hidden">
+          <CurvedScrollText text={curvedText} repeatCount={curvedTextRepeat} className="!min-h-[150px] !py-0" />
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
-        {/* Section Header with Typing Effect */}
-        <div className="text-center mb-16">
+      <div className="max-w-5xl mx-auto px-6 relative z-10">
+        {/* Section Header with Typing Effect - more compact */}
+        <div className="text-center mb-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-6"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 rounded-full text-sm font-semibold mb-6">
-              <Clock size={14} />
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary-600 rounded-full text-xs font-semibold mb-4">
+              <Clock size={12} />
               Career Journey
             </span>
 
-            <h2 className="font-display text-4xl md:text-6xl font-bold text-slate-900 mb-4 tracking-tight">
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-slate-900 mb-3 tracking-tight">
               {content?.title || 'Experience'}
             </h2>
 
             {/* Typing Effect Subtitle */}
             {showTypingEffect && (
-              <div className="h-10 flex items-center justify-center">
-                <span className="text-xl md:text-2xl text-slate-500 font-medium">
+              <div className="h-8 flex items-center justify-center">
+                <span className="text-lg md:text-xl text-slate-500 font-medium">
                   <TypingEffect phrases={typingPhrases} />
                 </span>
               </div>
             )}
 
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto mt-4 leading-relaxed">
+            <p className="text-base text-slate-600 max-w-xl mx-auto mt-3 leading-relaxed">
               {content?.subtitle || "A track record of engineering excellence and leadership in high-stakes environments."}
             </p>
           </motion.div>
@@ -411,7 +410,7 @@ export default function ExperienceSection({ content, settings }: { content?: any
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
             onClick={() => setShowEmailModal(true)}
-            className="group inline-flex items-center gap-3 px-6 py-3 rounded-full bg-slate-900 text-white font-medium hover:bg-primary-600 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+            className="group inline-flex items-center gap-2 px-5 py-2.5 mt-4 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-primary-600 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
           >
             <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
             Download Resume
@@ -423,7 +422,7 @@ export default function ExperienceSection({ content, settings }: { content?: any
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+          className="flex flex-col sm:flex-row gap-3 justify-center mb-8"
         >
           <TabButton
             active={activeTab === 'work'}
@@ -497,10 +496,10 @@ export default function ExperienceSection({ content, settings }: { content?: any
 
               {/* Empty State for PM */}
               {pmExperience.length === 0 && (
-                <div className="text-center py-16 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                  <Target size={48} className="mx-auto text-slate-300 mb-4" />
-                  <h3 className="text-lg font-bold text-slate-600 mb-2">No Project Management Experience Added</h3>
-                  <p className="text-slate-500">Add your PM roles in the admin panel</p>
+                <div className="text-center py-10 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                  <Target size={36} className="mx-auto text-slate-300 mb-3" />
+                  <h3 className="text-base font-bold text-slate-600 mb-1">No Project Management Experience Added</h3>
+                  <p className="text-sm text-slate-500">Add your PM roles in the admin panel</p>
                 </div>
               )}
             </motion.div>

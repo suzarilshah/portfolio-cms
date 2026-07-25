@@ -63,7 +63,7 @@ export default function CurvedScrollText({
   return (
     <div
       ref={containerRef}
-      className={`w-full min-h-[300px] py-10 flex items-center justify-center overflow-hidden ${className}`}
+      className={`w-full min-h-[180px] py-4 flex items-center justify-center overflow-hidden ${className}`}
     >
       <motion.svg
         width="100%"
