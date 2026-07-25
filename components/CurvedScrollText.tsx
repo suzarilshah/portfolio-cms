@@ -39,14 +39,14 @@ export default function CurvedScrollText({
 
   // SVG viewBox scales with container
   const viewBoxWidth = Math.max(containerWidth * 1.5, 2000);
-  const viewBoxHeight = 400;
+  const viewBoxHeight = 500;
 
   // Normal (arch up): control point starts high (small Y), flattens to baseline (larger Y)
   // Inverted (smile): control point starts low (large Y), flattens to baseline (smaller Y)
-  // For arch: M 0,200 Q midX,50 endX,200 -> starts arched up, flattens to Y=200
-  // For smile: M 0,200 Q midX,350 endX,200 -> starts smiling down, flattens to Y=200
-  const baselineY = 200;
-  const curveStartY = inverted ? 350 : 50;
+  // For arch: M 0,250 Q midX,50 endX,250 -> starts arched up, flattens to Y=250
+  // For smile: M 0,250 Q midX,450 endX,250 -> starts smiling down, flattens to Y=250
+  const baselineY = 250;
+  const curveStartY = inverted ? 450 : 50;
   const curveEndY = baselineY;
 
   // Curve control points
@@ -72,7 +72,7 @@ export default function CurvedScrollText({
   return (
     <div
       ref={containerRef}
-      className={`w-full min-h-[120px] md:min-h-[180px] py-2 md:py-4 flex items-center justify-center overflow-hidden ${className}`}
+      className={`w-full min-h-[150px] md:min-h-[220px] py-4 md:py-8 flex items-center justify-center overflow-visible ${className}`}
     >
       <motion.svg
         width="100%"

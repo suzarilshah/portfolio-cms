@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Download } from 'lucide-react';
 import EmailCaptureModal from '@/components/EmailCaptureModal';
 import TypingEffect from '@/components/TypingEffect';
-import CurvedScrollText from '@/components/CurvedScrollText';
 
 interface HeroContent {
   headline?: string;
@@ -33,7 +32,6 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
   const subheadline = content?.subheadline || "Microsoft MVP • Docker Captain • Platform Engineering Leader";
   const description = content?.description || "Muhammad Suzaril Shah - Senior IT Systems Engineer at Swift specializing in Azure Cloud Architecture, Kubernetes orchestration, DevOps automation, and IoT cloud solutions. Microsoft MVP & Docker Captain driving digital transformation across Southeast Asia.";
   const typingPhrases = content?.typing_phrases || defaultTypingPhrases;
-  const curvedText = content?.curved_text || "SHAH";
   const resumeUrl = settings?.resume_url;
   const [showEmailModal, setShowEmailModal] = useState(false);
 
@@ -142,11 +140,6 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
           />
         </div>
       </motion.div>
-
-      {/* Curved Text at Bottom of Hero */}
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-20">
-        <CurvedScrollText text={curvedText} repeatCount={4} />
-      </div>
 
       {/* Email Capture Modal */}
       <EmailCaptureModal
