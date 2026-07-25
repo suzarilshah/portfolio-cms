@@ -365,10 +365,10 @@ export default function ExperienceSection({ content, settings }: { content?: any
       {/* Parallax Background - more subtle */}
       {showParallax && <ParallaxBackground className="opacity-50" />}
 
-      {/* Curved Text - Background decoration - more compact */}
+      {/* Curved Text - Background decoration */}
       {showCurvedText && (
-        <div className="absolute top-0 left-0 right-0 pointer-events-none opacity-40 h-[150px] overflow-hidden">
-          <CurvedScrollText text={curvedText} repeatCount={curvedTextRepeat} className="!min-h-[150px] !py-0" />
+        <div className="absolute top-8 left-0 right-0 pointer-events-none">
+          <CurvedScrollText text={curvedText} repeatCount={curvedTextRepeat} />
         </div>
       )}
 

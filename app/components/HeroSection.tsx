@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Download } from 'lucide-react';
 import EmailCaptureModal from '@/components/EmailCaptureModal';
+import TypingEffect from '@/components/TypingEffect';
 
 interface HeroContent {
   headline?: string;
   subheadline?: string;
   description?: string;
+  typing_phrases?: string[];
 }
 
 interface Settings {
@@ -16,10 +18,19 @@ interface Settings {
   [key: string]: any;
 }
 
+const defaultTypingPhrases = [
+  "Azure Cloud Architect",
+  "DevOps Advocate",
+  "Platform Engineering Leader",
+  "Microsoft MVP",
+  "Docker Captain"
+];
+
 export default function HeroSection({ content, settings }: { content?: HeroContent; settings?: Settings }) {
-  const headline = content?.headline || "Azure Cloud Architect & DevOps Advocate";
+  const headline = content?.headline || "Building the Future of";
   const subheadline = content?.subheadline || "Microsoft MVP • Docker Captain • Platform Engineering Leader";
   const description = content?.description || "Muhammad Suzaril Shah - Senior IT Systems Engineer at Swift specializing in Azure Cloud Architecture, Kubernetes orchestration, DevOps automation, and IoT cloud solutions. Microsoft MVP & Docker Captain driving digital transformation across Southeast Asia.";
+  const typingPhrases = content?.typing_phrases || defaultTypingPhrases;
   const resumeUrl = settings?.resume_url;
   const [showEmailModal, setShowEmailModal] = useState(false);
 
@@ -45,15 +56,25 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
             </span>
           </motion.div>
 
-          {/* Main Headline - Impact Driven */}
-          <motion.h1
+          {/* Main Headline with Typing Effect */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight text-slate-900 mb-8 leading-[0.95]"
+            className="mb-8"
           >
-            {headline}
-          </motion.h1>
+            <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-slate-900 leading-[1.1]">
+              {headline}
+            </h1>
+            <div className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-primary-600 leading-[1.1] mt-2 min-h-[1.2em]">
+              <TypingEffect
+                phrases={typingPhrases}
+                typingSpeed={80}
+                deletingSpeed={40}
+                pauseDuration={2500}
+              />
+            </div>
+          </motion.div>
 
           {/* Professional Summary */}
           <div className="grid md:grid-cols-12 gap-8 md:gap-12 items-start border-t border-slate-100 pt-8 md:pt-12">
