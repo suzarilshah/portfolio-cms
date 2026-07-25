@@ -86,9 +86,9 @@ export default function CurvedScrollText({
         <defs>
           {/* Gradient for text fill - more visible */}
           <linearGradient id="text-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgb(var(--p-300))" stopOpacity="0.3" />
-            <stop offset="50%" stopColor="rgb(var(--p-400))" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="rgb(var(--p-300))" stopOpacity="0.3" />
+            <stop offset="0%" stopColor="rgb(var(--p-400))" stopOpacity="0.5" />
+            <stop offset="50%" stopColor="rgb(var(--p-500))" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="rgb(var(--p-400))" stopOpacity="0.5" />
           </linearGradient>
 
           {/* The animated curve path */}
@@ -106,10 +106,10 @@ export default function CurvedScrollText({
             fontFamily: 'var(--font-display), Inter, system-ui, sans-serif',
             fontWeight: 900,
             letterSpacing: '-0.04em',
-            filter: 'blur(6px)',
+            filter: 'blur(8px)',
           }}
-          fill="rgb(var(--p-400))"
-          fillOpacity="0.35"
+          fill="rgb(var(--p-500))"
+          fillOpacity="0.5"
         >
           <textPath
             href="#curve-path"
@@ -148,9 +148,9 @@ export default function CurvedScrollText({
             letterSpacing: '-0.04em',
           }}
           fill="none"
-          stroke="rgb(var(--p-400))"
-          strokeWidth="1.5"
-          strokeOpacity="0.4"
+          stroke="rgb(var(--p-500))"
+          strokeWidth="2"
+          strokeOpacity="0.6"
         >
           <textPath
             href="#curve-path"

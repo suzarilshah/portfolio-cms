@@ -165,9 +165,9 @@ function WorkExperienceCard({ exp, index, isLast }: { exp: ExperienceItem; index
   );
 }
 
-// PM Experience Card - More detailed with extra fields
+// PM Experience Card - More detailed with extra fields (expanded by default)
 function PMExperienceCard({ exp, index }: { exp: ExperienceItem; index: number }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   return (
     <motion.div

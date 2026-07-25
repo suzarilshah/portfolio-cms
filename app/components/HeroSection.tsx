@@ -144,7 +144,7 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
       </motion.div>
 
       {/* Curved Text at Bottom of Hero */}
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-20">
         <CurvedScrollText text={curvedText} repeatCount={4} />
       </div>
 

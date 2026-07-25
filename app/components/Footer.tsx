@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="relative bg-white border-t border-slate-100 overflow-hidden">
       {/* Inverted Curved Text - Above Footer */}
-      <div className="pointer-events-none -mt-8 md:-mt-16">
+      <div className="pointer-events-none -mt-8 md:-mt-16 relative z-20">
         <CurvedScrollText text="SHAH" repeatCount={4} inverted />
       </div>
 
