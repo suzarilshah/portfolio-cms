@@ -7,7 +7,7 @@ interface CurvedScrollTextProps {
   text?: string;
   repeatCount?: number;
   className?: string;
-  inverted?: boolean; // Curve goes down instead of up
+  inverted?: boolean; // Smile curve (curve down like a smile, flatten on scroll)
 }
 
 export default function CurvedScrollText({
@@ -34,25 +34,26 @@ export default function CurvedScrollText({
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start end', 'end center'],
+    offset: ['start end', 'end start'],
   });
 
   // SVG viewBox scales with container
   const viewBoxWidth = Math.max(containerWidth * 1.5, 2000);
-  const viewBoxHeight = 600;
+  const viewBoxHeight = 500;
 
-  // For normal: curve starts arched up (control point low Y) and flattens
-  // For inverted: curve starts arched down (control point high Y) and flattens
-  const baselineY = inverted ? 100 : 500;
-  const curveStartY = inverted ? 500 : 100;
+  // Normal: Text sits at bottom, curves UP (arch), flattens on scroll
+  // Inverted (smile): Text sits at top, curves DOWN (smile shape), flattens on scroll
+  const baselineY = inverted ? 150 : 400;
+  const curveStartY = inverted ? 400 : 100; // Control point starts curved
+  const curveEndY = baselineY; // Control point ends flat (same as baseline)
 
   // Curve control points
   const startX = 0;
   const endX = viewBoxWidth;
   const midX = viewBoxWidth / 2;
 
-  // Interpolate control point Y (arch flattens as you scroll)
-  const curveControlY = useTransform(scrollYProgress, [0, 1], [curveStartY, baselineY]);
+  // Interpolate control point Y (arch/smile flattens as you scroll)
+  const curveControlY = useTransform(scrollYProgress, [0, 0.6], [curveStartY, curveEndY]);
 
   // Dynamic SVG Path - Quadratic Bezier curve
   const pathD = useTransform(

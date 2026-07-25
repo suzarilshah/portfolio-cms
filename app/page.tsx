@@ -11,6 +11,7 @@ import PublicationsSection from './components/PublicationsSection';
 import CommunitySection from './components/CommunitySection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
+import GridBackground from '@/components/GridBackground';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable caching completely
@@ -110,20 +111,17 @@ export default async function Home() {
 
   return (
     <main className="relative min-h-screen overflow-hidden selection:bg-primary-100 selection:text-primary-900">
-      {/* Stunning Background Elements */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-purple-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-pink-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
-      <div className="fixed inset-0 grid-pattern opacity-[0.3] pointer-events-none -z-30" />
-      
+      {/* Global Grid Background with Parallax */}
+      <GridBackground />
+
       {/* Navigation */}
       <Navigation settings={settings} />
-      
+
       {/* Main content */}
       <div className="relative z-10">
         {renderOrder.map((key: string) => SectionComponents[key] || null)}
       </div>
-      
+
       {/* Footer */}
       <Footer />
     </main>

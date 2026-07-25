@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import EmailCaptureModal from '@/components/EmailCaptureModal';
 import TypingEffect from '@/components/TypingEffect';
-import ParallaxBackground from '@/components/ParallaxBackground';
 
 // Default data structures
 const defaultWorkExperience = [
@@ -351,17 +350,12 @@ export default function ExperienceSection({ content, settings }: { content?: any
   const pmExperience = content?.project_management || defaultPMExperience;
   const typingPhrases = content?.typing_phrases || defaultTypingPhrases;
   const showTypingEffect = content?.show_typing_effect !== false;
-  const showParallax = content?.show_parallax_background !== false;
 
   const displayedWork = showAll ? workExperience : workExperience.slice(0, 2);
   const resumeUrl = settings?.resume_url || '/resume.pdf';
 
   return (
-    <section id="experience" className="relative py-16 md:py-20 overflow-hidden bg-slate-50/30">
-      {/* Parallax Background - more subtle */}
-      {showParallax && <ParallaxBackground className="opacity-50" />}
-
-
+    <section id="experience" className="relative py-16 md:py-20 overflow-hidden">
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* Section Header with Typing Effect - more compact */}
         <div className="text-center mb-10">
