@@ -12,7 +12,6 @@ import CommunitySection from './components/CommunitySection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 import GridBackground from '@/components/GridBackground';
-import CurvedScrollText from '@/components/CurvedScrollText';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable caching completely
@@ -128,14 +127,6 @@ export default async function Home() {
       {/* Main content */}
       <div className="relative z-10">
         {renderOrder.map((key: string) => SectionComponents[key] || null)}
-      </div>
-
-      {/* Curved Text at Bottom of Page - Above Footer */}
-      <div className="relative z-20 overflow-visible -mb-8 md:-mb-16">
-        <CurvedScrollText
-          text={sectionData.hero?.curved_text || "SHAH"}
-          repeatCount={4}
-        />
       </div>
 
       {/* Footer */}
