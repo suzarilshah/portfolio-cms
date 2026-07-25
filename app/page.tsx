@@ -131,7 +131,7 @@ export default async function Home() {
       </div>
 
       {/* Curved Text at Bottom of Page - Above Footer */}
-      <div className="relative z-20 overflow-visible">
+      <div className="relative z-20 overflow-visible -mb-8 md:-mb-16">
         <CurvedScrollText
           text={sectionData.hero?.curved_text || "SHAH"}
           repeatCount={4}

@@ -2,7 +2,7 @@
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-slate-100">
+    <footer className="relative border-t border-slate-100 -mt-4 md:-mt-8 pt-12 md:pt-20">
       {/* Footer Content */}
       <div className="relative z-10 py-6 md:py-10">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
