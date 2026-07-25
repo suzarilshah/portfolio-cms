@@ -179,6 +179,19 @@
 }
 
 @layer components {
+  /* Typing cursor animation */
+  @keyframes typing-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .typing-cursor::after {
+    content: '|';
+    animation: typing-cursor 0.8s step-end infinite;
+    margin-left: 2px;
+    @apply text-primary-500;
+  }
+
   /* Professional gradient background */
   .gradient-mesh {
     background: linear-gradient(135deg, #f8fafc 0%, #ffffff 25%, #f1f5f9 50%, #ffffff 75%, #f8fafc 100%);
