@@ -7,12 +7,14 @@ interface CurvedScrollTextProps {
   text?: string;
   repeatCount?: number;
   className?: string;
+  inverted?: boolean; // Curve goes down instead of up
 }
 
 export default function CurvedScrollText({
   text = 'SHAH',
   repeatCount = 3,
-  className = ''
+  className = '',
+  inverted = false
 }: CurvedScrollTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(1400);
@@ -37,8 +39,12 @@ export default function CurvedScrollText({
 
   // SVG viewBox scales with container
   const viewBoxWidth = Math.max(containerWidth * 1.5, 2000);
-  const viewBoxHeight = 800;
-  const baselineY = 600;
+  const viewBoxHeight = 600;
+
+  // For normal: curve starts arched up (control point low Y) and flattens
+  // For inverted: curve starts arched down (control point high Y) and flattens
+  const baselineY = inverted ? 100 : 500;
+  const curveStartY = inverted ? 500 : 100;
 
   // Curve control points
   const startX = 0;
@@ -46,7 +52,7 @@ export default function CurvedScrollText({
   const midX = viewBoxWidth / 2;
 
   // Interpolate control point Y (arch flattens as you scroll)
-  const curveControlY = useTransform(scrollYProgress, [0, 1], [200, baselineY]);
+  const curveControlY = useTransform(scrollYProgress, [0, 1], [curveStartY, baselineY]);
 
   // Dynamic SVG Path - Quadratic Bezier curve
   const pathD = useTransform(

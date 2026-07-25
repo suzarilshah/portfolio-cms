@@ -10,7 +10,6 @@ import {
 import EmailCaptureModal from '@/components/EmailCaptureModal';
 import TypingEffect from '@/components/TypingEffect';
 import ParallaxBackground from '@/components/ParallaxBackground';
-import CurvedScrollText from '@/components/CurvedScrollText';
 
 // Default data structures
 const defaultWorkExperience = [
@@ -351,10 +350,7 @@ export default function ExperienceSection({ content, settings }: { content?: any
   const workExperience = content?.work_experience || content?.jobs || defaultWorkExperience;
   const pmExperience = content?.project_management || defaultPMExperience;
   const typingPhrases = content?.typing_phrases || defaultTypingPhrases;
-  const curvedText = content?.curved_text || 'SHAH';
-  const curvedTextRepeat = content?.curved_text_repeat || 3;
   const showTypingEffect = content?.show_typing_effect !== false;
-  const showCurvedText = content?.show_curved_text !== false;
   const showParallax = content?.show_parallax_background !== false;
 
   const displayedWork = showAll ? workExperience : workExperience.slice(0, 2);
@@ -365,12 +361,6 @@ export default function ExperienceSection({ content, settings }: { content?: any
       {/* Parallax Background - more subtle */}
       {showParallax && <ParallaxBackground className="opacity-50" />}
 
-      {/* Curved Text - Background decoration */}
-      {showCurvedText && (
-        <div className="absolute top-8 left-0 right-0 pointer-events-none">
-          <CurvedScrollText text={curvedText} repeatCount={curvedTextRepeat} />
-        </div>
-      )}
 
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* Section Header with Typing Effect - more compact */}

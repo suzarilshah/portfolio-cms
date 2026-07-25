@@ -1,16 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Download } from 'lucide-react';
 import EmailCaptureModal from '@/components/EmailCaptureModal';
 import TypingEffect from '@/components/TypingEffect';
+import CurvedScrollText from '@/components/CurvedScrollText';
 
 interface HeroContent {
   headline?: string;
   subheadline?: string;
   description?: string;
   typing_phrases?: string[];
+  curved_text?: string;
 }
 
 interface Settings {
@@ -31,14 +33,72 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
   const subheadline = content?.subheadline || "Microsoft MVP • Docker Captain • Platform Engineering Leader";
   const description = content?.description || "Muhammad Suzaril Shah - Senior IT Systems Engineer at Swift specializing in Azure Cloud Architecture, Kubernetes orchestration, DevOps automation, and IoT cloud solutions. Microsoft MVP & Docker Captain driving digital transformation across Southeast Asia.";
   const typingPhrases = content?.typing_phrases || defaultTypingPhrases;
+  const curvedText = content?.curved_text || "SHAH";
   const resumeUrl = settings?.resume_url;
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Mouse parallax for background
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 20;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+      setMousePosition({ x, y });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-50/40 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 -z-10" />
+    <section id="home" className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-gradient-to-b from-white via-slate-50/50 to-white">
+      {/* Parallax Grid Background - airail.uk style */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Grid Pattern with mouse parallax */}
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            x: mousePosition.x * 0.3,
+            y: mousePosition.y * 0.3,
+          }}
+        >
+          <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.4 }}>
+            <defs>
+              <pattern id="hero-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+                <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgb(var(--p-300))" strokeWidth="0.5" opacity="0.5" />
+                <rect x="0" y="0" width="15" height="15" fill="rgb(var(--p-200))" opacity="0.08" />
+                <rect x="30" y="30" width="15" height="15" fill="rgb(var(--p-200))" opacity="0.06" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-grid)" />
+          </svg>
+        </motion.div>
+
+        {/* Floating Orbs with parallax */}
+        <motion.div
+          className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full blur-3xl"
+          style={{
+            x: mousePosition.x * 0.5,
+            y: mousePosition.y * 0.5,
+            backgroundColor: 'rgb(var(--p-200) / 0.25)',
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 -left-32 w-[400px] h-[400px] rounded-full blur-3xl"
+          style={{
+            x: mousePosition.x * -0.3,
+            y: mousePosition.y * -0.3,
+            backgroundColor: 'rgb(var(--p-100) / 0.3)',
+          }}
+        />
+        <motion.div
+          className="absolute -bottom-20 right-1/4 w-[350px] h-[350px] rounded-full blur-3xl"
+          style={{
+            x: mousePosition.x * 0.2,
+            y: mousePosition.y * 0.2,
+            backgroundColor: 'rgba(168, 85, 247, 0.08)',
+          }}
+        />
+      </div>
       
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 pt-20">
         <div className="flex flex-col max-w-5xl mx-auto">
@@ -132,7 +192,7 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="absolute bottom-12 right-12 hidden md:flex items-center gap-4"
+        className="absolute bottom-32 right-12 hidden md:flex items-center gap-4 z-10"
       >
         <span className="font-mono text-xs tracking-widest text-slate-400 uppercase rotate-90 origin-right translate-x-2">Scroll</span>
         <div className="h-16 w-[1px] bg-slate-200 overflow-hidden">
@@ -143,6 +203,11 @@ export default function HeroSection({ content, settings }: { content?: HeroConte
           />
         </div>
       </motion.div>
+
+      {/* Curved Text at Bottom of Hero */}
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+        <CurvedScrollText text={curvedText} repeatCount={4} />
+      </div>
 
       {/* Email Capture Modal */}
       <EmailCaptureModal
