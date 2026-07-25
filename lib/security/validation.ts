@@ -439,6 +439,103 @@ export class SecurityValidator {
         };
       }
 
+      // Handle Hero Section fields
+      if (content.headline) {
+        if (typeof content.headline !== 'string' || content.headline.length > 200) {
+          errors.push('Headline must be a string with max 200 characters');
+        } else {
+          sanitized.headline = this.sanitizeHtml(content.headline.trim());
+        }
+      }
+
+      if (content.subheadline) {
+        if (typeof content.subheadline !== 'string' || content.subheadline.length > 300) {
+          errors.push('Subheadline must be a string with max 300 characters');
+        } else {
+          sanitized.subheadline = this.sanitizeHtml(content.subheadline.trim());
+        }
+      }
+
+      if (content.typing_phrases && Array.isArray(content.typing_phrases)) {
+        sanitized.typing_phrases = content.typing_phrases
+          .filter((item: any) => typeof item === 'string' && item.length <= 100)
+          .map((item: string) => this.sanitizeHtml(item.trim()))
+          .slice(0, 20); // Max 20 phrases
+      }
+
+      if (content.curved_text) {
+        if (typeof content.curved_text !== 'string' || content.curved_text.length > 50) {
+          errors.push('Curved text must be a string with max 50 characters');
+        } else {
+          sanitized.curved_text = this.sanitizeHtml(content.curved_text.trim());
+        }
+      }
+
+      // Handle Work Experience array (for experience section)
+      if (content.work_experience && Array.isArray(content.work_experience)) {
+        sanitized.work_experience = content.work_experience.slice(0, 20).map((job: any) => {
+          const sanitizedJob: any = {};
+          if (job.company) sanitizedJob.company = this.sanitizeHtml((job.company as string).trim().substring(0, 200));
+          if (job.role) sanitizedJob.role = this.sanitizeHtml((job.role as string).trim().substring(0, 200));
+          if (job.period) sanitizedJob.period = this.sanitizeHtml((job.period as string).trim().substring(0, 100));
+          if (job.location) sanitizedJob.location = this.sanitizeHtml((job.location as string).trim().substring(0, 100));
+          if (job.description) sanitizedJob.description = this.sanitizeHtml((job.description as string).trim().substring(0, 1000));
+          if (job.type) sanitizedJob.type = this.sanitizeHtml((job.type as string).trim().substring(0, 50));
+          if (job.tags && Array.isArray(job.tags)) {
+            sanitizedJob.tags = job.tags
+              .filter((tag: any) => typeof tag === 'string' && tag.length <= 50)
+              .map((tag: string) => this.sanitizeHtml(tag.trim()))
+              .slice(0, 10);
+          }
+          return sanitizedJob;
+        });
+      }
+
+      // Handle Project Management array (for experience section)
+      if (content.project_management && Array.isArray(content.project_management)) {
+        sanitized.project_management = content.project_management.slice(0, 20).map((pm: any) => {
+          const sanitizedPM: any = {};
+          if (pm.company) sanitizedPM.company = this.sanitizeHtml((pm.company as string).trim().substring(0, 200));
+          if (pm.role) sanitizedPM.role = this.sanitizeHtml((pm.role as string).trim().substring(0, 200));
+          if (pm.period) sanitizedPM.period = this.sanitizeHtml((pm.period as string).trim().substring(0, 100));
+          if (pm.location) sanitizedPM.location = this.sanitizeHtml((pm.location as string).trim().substring(0, 100));
+          if (pm.description) sanitizedPM.description = this.sanitizeHtml((pm.description as string).trim().substring(0, 1000));
+          if (pm.type) sanitizedPM.type = this.sanitizeHtml((pm.type as string).trim().substring(0, 50));
+          if (pm.team_size) sanitizedPM.team_size = this.sanitizeHtml((pm.team_size as string).trim().substring(0, 50));
+          if (pm.budget) sanitizedPM.budget = this.sanitizeHtml((pm.budget as string).trim().substring(0, 50));
+          if (pm.methodologies && Array.isArray(pm.methodologies)) {
+            sanitizedPM.methodologies = pm.methodologies
+              .filter((m: any) => typeof m === 'string' && m.length <= 50)
+              .map((m: string) => this.sanitizeHtml(m.trim()))
+              .slice(0, 10);
+          }
+          if (pm.tools && Array.isArray(pm.tools)) {
+            sanitizedPM.tools = pm.tools
+              .filter((t: any) => typeof t === 'string' && t.length <= 50)
+              .map((t: string) => this.sanitizeHtml(t.trim()))
+              .slice(0, 20);
+          }
+          if (pm.key_achievements && Array.isArray(pm.key_achievements)) {
+            sanitizedPM.key_achievements = pm.key_achievements
+              .filter((a: any) => typeof a === 'string' && a.length <= 200)
+              .map((a: string) => this.sanitizeHtml(a.trim()))
+              .slice(0, 10);
+          }
+          if (pm.tags && Array.isArray(pm.tags)) {
+            sanitizedPM.tags = pm.tags
+              .filter((tag: any) => typeof tag === 'string' && tag.length <= 50)
+              .map((tag: string) => this.sanitizeHtml(tag.trim()))
+              .slice(0, 10);
+          }
+          return sanitizedPM;
+        });
+      }
+
+      // Handle Experience section typing phrases
+      if (content.show_typing_effect !== undefined) {
+        sanitized.show_typing_effect = Boolean(content.show_typing_effect);
+      }
+
     } else {
       errors.push('Content must be a valid object');
     }
