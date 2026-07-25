@@ -540,9 +540,38 @@ export class SecurityValidator {
         });
       }
 
-      // Handle Experience section typing phrases
+      // Handle Experience section visual toggles
       if (content.show_typing_effect !== undefined) {
         sanitized.show_typing_effect = Boolean(content.show_typing_effect);
+      }
+      if (content.show_curved_text !== undefined) {
+        sanitized.show_curved_text = Boolean(content.show_curved_text);
+      }
+      if (content.show_parallax_background !== undefined) {
+        sanitized.show_parallax_background = Boolean(content.show_parallax_background);
+      }
+      if (content.curved_text_repeat !== undefined) {
+        sanitized.curved_text_repeat = Math.min(Math.max(parseInt(content.curved_text_repeat) || 3, 1), 5);
+      }
+
+      // Handle Contact section fields
+      if (content.bookingUrl) {
+        sanitized.bookingUrl = this.sanitizeHtml(content.bookingUrl.trim().substring(0, 500));
+      }
+      if (content.email) {
+        sanitized.email = this.sanitizeHtml(content.email.trim().substring(0, 200));
+      }
+      if (content.linkedin) {
+        sanitized.linkedin = this.sanitizeHtml(content.linkedin.trim().substring(0, 500));
+      }
+      if (content.github) {
+        sanitized.github = this.sanitizeHtml(content.github.trim().substring(0, 500));
+      }
+      if (content.twitter) {
+        sanitized.twitter = this.sanitizeHtml(content.twitter.trim().substring(0, 500));
+      }
+      if (content.website) {
+        sanitized.website = this.sanitizeHtml(content.website.trim().substring(0, 500));
       }
 
     } else {
