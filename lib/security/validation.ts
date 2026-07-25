@@ -341,6 +341,15 @@ export class SecurityValidator {
         });
       }
 
+      // Handle About section fields
+      if (content.bio) {
+        if (typeof content.bio !== 'string' || content.bio.length > 5000) {
+          errors.push('Bio must be a string with max 5000 characters');
+        } else {
+          sanitized.bio = this.sanitizeHtml(content.bio.trim());
+        }
+      }
+
       // Handle skills array (for about section)
       if (content.skills && Array.isArray(content.skills)) {
         sanitized.skills = content.skills
