@@ -12,12 +12,12 @@ For the admin panel to work correctly in production, the following environment v
    ```
    - Get this from your Neon database dashboard
 
-2. **Appwrite Configuration**
+2. **Vercel Blob Configuration**
    ```
-   APPWRITE_ENDPOINT=https://sgp.cloud.appwrite.io/v1
-   APPWRITE_PROJECT_ID=your_project_id
-   APPWRITE_API_KEY=your_api_key
+    BLOB_READ_WRITE_TOKEN=your_blob_store_read_write_token
    ```
+
+    Connect the public `portfolio-assets` Blob store to `portfolio-cms` for Production, Preview, and Development. Keep the token server-only. Authenticated browser uploads transfer bytes directly to Blob, supporting files up to 15MB (project thumbnails: 5MB).
 
 3. **Stack Auth Configuration** (Critical for admin panel)
    ```

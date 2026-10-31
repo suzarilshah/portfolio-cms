@@ -85,10 +85,8 @@ const sanitized = validation.sanitized!;
 # Database Configuration
 DATABASE_URL=postgresql://user:password@host:5432/database
 
-# Appwrite Configuration
-APPWRITE_ENDPOINT=https://sgp.cloud.appwrite.io/v1
-APPWRITE_PROJECT_ID=your_project_id
-APPWRITE_API_KEY=your_api_key
+# Vercel Blob Configuration (server-only)
+BLOB_READ_WRITE_TOKEN=your_blob_store_read_write_token
 
 # Stack Auth Configuration
 NEXT_PUBLIC_STACK_PROJECT_ID=your_stack_project_id
@@ -120,11 +118,13 @@ export const uploadRateLimiter = new InMemoryRateLimiter(60 * 1000, 20);
 - [ ] Security monitoring enabled
 - [ ] Regular security updates applied
 
-### Appwrite Security
-- Secure API key management
-- Bucket permissions configured
-- File type restrictions enforced
-- Access control lists implemented
+### Vercel Blob Security
+- Keep the read-write token in server-side environment variables
+- Require Stack Auth before issuing short-lived client upload tokens
+- Restrict upload paths, content types, file sizes, and overwrites
+- Verify thumbnail ownership and Blob metadata before saving its URL
+- Verify upload completion callbacks with the Blob signature
+- Public storage is for publicly accessible portfolio assets and résumé documents
 
 ## 🔍 Security Testing
 
@@ -210,7 +210,7 @@ npm audit fix
 
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Next.js Security Best Practices](https://nextjs.org/docs/advanced-features/security)
-- [Appwrite Security Guide](https://appwrite.io/docs/security)
+- [Vercel Blob Documentation](https://vercel.com/docs/vercel-blob)
 - [Stack Auth Documentation](https://docs.stack-auth.com/)
 
 ---

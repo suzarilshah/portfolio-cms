@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackServerApp } from "../stack";
 import './globals.css';
@@ -9,17 +9,18 @@ import { GoogleAnalytics } from '@/lib/analytics';
 import BackgroundPattern from "./components/BackgroundPattern";
 import OfflineIndicator from "./components/OfflineIndicator";
 
-const inter = Inter({
-  subsets: ['latin'],
+const inter = localFont({
+  src: '../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2',
+  weight: '100 900',
   variable: '--font-inter',
   display: 'swap',
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
+const jetbrainsMono = localFont({
+  src: '../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2',
   variable: '--font-jetbrains',
   display: 'swap',
-  weight: ["400", "600", "700"]
+  weight: '100 800',
 });
 
 async function getSettings() {
@@ -67,7 +68,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ];
   
   // Default OpenGraph Image or fallback
-  const ogImage = settings.seo_og_image || 'https://www.suzarilshah.uk/og-image.jpg'; 
+  const ogImage = settings.seo_og_image || 'https://www.suzarilshah.uk/opengraph-image';
 
   return {
     metadataBase: new URL('https://www.suzarilshah.uk'),
@@ -143,7 +144,7 @@ export default async function RootLayout({
     <html lang="en" className="scroll-smooth" data-accent={accent} suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased relative min-h-screen`} suppressHydrationWarning>
         {/* SEO Structured Data & Analytics (client-safe in body) */}
-        <StructuredData type="all" />
+        <StructuredData type="all" profilePhotoUrl={settings.profile_photo_url} />
         <GoogleAnalytics measurementId={gaId} />
         {/* Global Background Pattern */}
         <BackgroundPattern pattern={pattern} />

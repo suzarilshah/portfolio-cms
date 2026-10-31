@@ -1,5 +1,7 @@
 # Project Showcase Enhancement Implementation Plan
 
+> Historical plan, superseded for storage by [the Vercel migration](../storage-migration.md). The application now uses Vercel Blob; the legacy storage examples below are not current deployment instructions.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Add URL snapshot capture and thumbnail upload functionality to Project Showcase section with enterprise-grade $100B portfolio design system
@@ -892,4 +894,3 @@ git push origin main
 2. Set up SCREENSHOT_API_KEY environment variable
 3. Configure Appwrite bucket for thumbnail storage
 4. Verify Vercel deployment after push
-

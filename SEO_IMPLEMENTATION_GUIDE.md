@@ -204,7 +204,7 @@ All structured data is implemented in `/components/StructuredData.tsx`:
 
 2. **Upload OG Image**
    - Upload to `/public/og-image.jpg`
-   - Or use Appwrite storage and update database:
+   - Or upload through Admin → Settings to Vercel Blob and update the database:
      ```sql
      UPDATE site_settings
      SET seo_og_image = 'https://your-image-url.jpg'

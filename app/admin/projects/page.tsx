@@ -1,4 +1,5 @@
 'use client';
+import { uploadPortfolioFile } from '@/lib/upload-client';
 
 import { useState, useEffect } from 'react';
 import { Save, Loader2, Plus, Trash2, Edit2, ExternalLink, Code, Cloud, Zap, Server, Globe, History, RotateCcw, Camera, Upload, Image, Settings } from 'lucide-react';
@@ -462,20 +463,13 @@ export default function ProjectsAdminPage() {
                                             }
                                             setUploadLoading(true);
                                             try {
-                                                const uploadFormData = new FormData();
-                                                uploadFormData.append('file', file);
-                                                uploadFormData.append('project_id', editingId.toString());
-                                                const res = await fetch('/api/cms/projects/upload', {
-                                                    method: 'POST',
-                                                    body: uploadFormData
-                                                });
-                                                const data = await res.json();
-                                                if (data.thumbnail_url) {
-                                                    setFormData({ ...formData, thumbnail_url: data.thumbnail_url });
+                                                const data = await uploadPortfolioFile(file, editingId);
+                                                if (data.url) {
+                                                    setFormData({ ...formData, thumbnail_url: data.url });
                                                     alert('Thumbnail uploaded successfully!');
                                                 }
                                             } catch (e) {
-                                                alert('Failed to upload thumbnail');
+                                                alert(e instanceof Error ? e.message : 'Failed to upload thumbnail');
                                             } finally {
                                                 setUploadLoading(false);
                                             }

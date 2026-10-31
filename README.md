@@ -47,11 +47,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 15 (App Router)
+- **CMS Database**: Neon PostgreSQL
+- **Admin Authentication**: Stack Auth
+- **File Storage**: Public Vercel Blob, with authenticated direct uploads
+- **Hosting**: Vercel `portfolio-cms` in the Yayasan Insan Prihatin team
 - **Styling**: Tailwind CSS with custom design system
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
-- **Typography**: Google Fonts (Syne, Outfit, JetBrains Mono, Fraunces)
+- **Typography**: Self-hosted Inter and JetBrains Mono variable fonts
 - **Language**: TypeScript
 
 ## 🎯 Key Sections

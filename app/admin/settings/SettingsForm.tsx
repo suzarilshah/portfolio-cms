@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { uploadPortfolioFile } from '@/lib/upload-client';
 import { Save, Loader2, Image as ImageIcon, User, Globe, Palette, Upload, FileText, Search, Grid3X3, Layers } from 'lucide-react';
 
 export default function SettingsForm() {
@@ -61,23 +62,11 @@ export default function SettingsForm() {
     if (!e.target.files || e.target.files.length === 0) return;
     
     const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
 
     try {
         setUploadingField(field);
         
-        const res = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || 'Upload failed');
-        }
-        
-        const data = await res.json();
+        const data = await uploadPortfolioFile(file);
         if (data.url) {
             const updated = { ...settings, [field]: data.url };
             setSettings(updated);

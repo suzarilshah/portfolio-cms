@@ -352,7 +352,7 @@ export default function ExperienceSection({ content, settings }: { content?: any
   const showTypingEffect = content?.show_typing_effect !== false;
 
   const displayedWork = showAll ? workExperience : workExperience.slice(0, 2);
-  const resumeUrl = settings?.resume_url || '/resume.pdf';
+  const resumeUrl = settings?.resume_url;
 
   return (
     <section id="experience" className="relative py-16 md:py-20 overflow-hidden">
@@ -388,7 +388,7 @@ export default function ExperienceSection({ content, settings }: { content?: any
           </motion.div>
 
           {/* Download Resume Button */}
-          <motion.button
+          {resumeUrl && <motion.button
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -398,7 +398,7 @@ export default function ExperienceSection({ content, settings }: { content?: any
           >
             <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
             Download Resume
-          </motion.button>
+          </motion.button>}
         </div>
 
         {/* Tab Navigation */}

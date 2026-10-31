@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['suzarilshah.github.io', 'sgp.cloud.appwrite.io', 'images.credly.com', 'via.placeholder.com'],
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
+      { protocol: 'https', hostname: 'suzarilshah.github.io' },
+      { protocol: 'https', hostname: 'images.credly.com' },
+      { protocol: 'https', hostname: 'via.placeholder.com' },
+    ],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -9,7 +14,6 @@ const nextConfig = {
   // Security configurations
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
   transpilePackages: ['@stackframe/stack'],
   // Compiler optimizations
   compiler: {

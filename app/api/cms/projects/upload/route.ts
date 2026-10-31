@@ -1,65 +1,41 @@
 import { NextResponse } from 'next/server';
+import { head } from '@vercel/blob';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
 import { secureDb } from '@/lib/security/database';
-import { Client, Storage, ID } from 'node-appwrite';
+import { getUploadPolicy } from '@/lib/storage-policy';
 
-export const POST = createSecureAPIHandler(async (request: Request) => {
+export const runtime = 'nodejs';
+
+export const POST = createSecureAPIHandler(async (request) => {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const projectId = formData.get('project_id') as string;
-
-    if (!file || !projectId) {
-      return NextResponse.json({ error: 'Missing file or project_id' }, { status: 400 });
+    const { project_id, url } = await request.json();
+    const projectId = Number(project_id);
+    if (!Number.isSafeInteger(projectId) || projectId <= 0 || typeof url !== 'string') {
+      return NextResponse.json({ error: 'Invalid project_id or URL' }, { status: 400 });
     }
 
-    if (!/^\d+$/.test(projectId)) {
-      return NextResponse.json({ error: 'Invalid project_id' }, { status: 400 });
+    const parsedUrl = new URL(url);
+    const pathname = decodeURIComponent(parsedUrl.pathname.slice(1));
+    const policy = getUploadPolicy(pathname);
+    if (policy.projectId !== projectId) {
+      return NextResponse.json({ error: 'Thumbnail does not belong to this project' }, { status: 400 });
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'File must be an image' }, { status: 400 });
+    // Lookup by pathname in our configured store, never trust a client-supplied host.
+    const blob = await head(pathname);
+    if (blob.url !== url || !policy.allowedContentTypes.includes(blob.contentType) || blob.size > policy.maximumSizeInBytes) {
+      return NextResponse.json({ error: 'Invalid thumbnail' }, { status: 400 });
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
-    }
-
-    // Initialize Appwrite client
-    const client = new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
-      .setKey(process.env.APPWRITE_API_KEY!);
-
-    // Initialize Storage
-    const storage = new Storage(client);
-
-    // Upload to Appwrite Storage with public read permissions
-    const response = await storage.createFile(
-      process.env.APPWRITE_BUCKET_ID_ASSETS!,
-      ID.unique(),
-      file,
-      ["read(\"any\")"] // Make file publicly readable
-    );
-
-    // Get file view URL (with project ID query param for Appwrite)
-    const fileUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${process.env.APPWRITE_BUCKET_ID_ASSETS}/files/${response.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}`;
-
-    // Persist thumbnail to DB immediately so the public site reflects changes without requiring an extra "Save"
     const updated = await secureDb.query(
-      `UPDATE projects SET thumbnail_url = $1, updated_at = NOW() WHERE id = $2 RETURNING id`,
-      [fileUrl, Number(projectId)]
+      'UPDATE projects SET thumbnail_url = $1, updated_at = NOW() WHERE id = $2 RETURNING id',
+      [blob.url, projectId]
     );
+    if (!updated.length) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
 
-    if (!updated || updated.length === 0) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({ thumbnail_url: fileUrl, success: true });
+    return NextResponse.json({ thumbnail_url: blob.url, success: true });
   } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
+    console.error('Thumbnail save failed:', error);
+    return NextResponse.json({ error: 'Failed to save thumbnail' }, { status: 400 });
   }
-}, { requireAuth: true, requireCSRF: true, validateContentType: false });
+}, { requireAuth: true, requireCSRF: true });

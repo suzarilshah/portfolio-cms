@@ -14,9 +14,10 @@ function sanitizeString(str: any): string {
 
 interface StructuredDataProps {
   type?: 'person' | 'professional-service' | 'all'
+  profilePhotoUrl?: string
 }
 
-export function StructuredData({ type = 'all' }: StructuredDataProps) {
+export function StructuredData({ type = 'all', profilePhotoUrl }: StructuredDataProps) {
   const baseUrl = 'https://www.suzarilshah.uk'
 
   // Person Schema - Professional Profile
@@ -25,7 +26,7 @@ export function StructuredData({ type = 'all' }: StructuredDataProps) {
     '@type': 'Person',
     name: 'Muhammad Suzaril Shah',
     url: baseUrl,
-    image: `${baseUrl}/images/profile.jpg`,
+    image: profilePhotoUrl || undefined,
     jobTitle: 'Senior IT Systems & Customer Engineer',
     description: 'Microsoft MVP, Docker Captain, and Cloud Engineering Technologist specializing in Azure, Kubernetes, DevOps, and IoT solutions. Senior IT Systems Engineer at Swift with expertise in cloud architecture, infrastructure automation, and platform engineering.',
     email: 'shah@suzarilshah.uk',

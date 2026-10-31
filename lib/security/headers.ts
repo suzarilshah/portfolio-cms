@@ -17,11 +17,11 @@ export class SecurityHeadersBuilder {
   withCSP(): this {
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sgp.cloud.appwrite.io https://cdn.credly.com https://*.stack.inc https://*.stack-auth.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.credly.com https://*.stack.inc https://*.stack-auth.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.stack.inc https://*.stack-auth.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://sgp.cloud.appwrite.io https://ep-orange-fire-a85s6psf-pooler.eastus2.azure.neon.tech https://*.stack.inc https://*.stack-auth.com https://sessionize.com https://*.sessionize.com",
+      "connect-src 'self' https://*.blob.vercel-storage.com https://*.vercel-storage.com https://ep-orange-fire-a85s6psf-pooler.eastus2.azure.neon.tech https://*.stack.inc https://*.stack-auth.com https://sessionize.com https://*.sessionize.com",
       "frame-src 'self' https://*.stack.inc https://*.stack-auth.com https://www.credly.com",
       "object-src 'none'",
       "base-uri 'self'",

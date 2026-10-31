@@ -1,0 +1,9 @@
+.git
+node_modules
+.next
+.env*.local
+Export
+Exported
+.migration
+.playwright-mcp
+*.tsbuildinfo
