@@ -1,0 +1,51 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # One PR per ecosystem slice rather than one per package. Ungrouped, a
+    # transitive advisory fan-out opens a dozen PRs that each go stale the
+    # moment the lockfile moves.
+    groups:
+      next:
+        patterns:
+          - next
+          - eslint-config-next
+          - '@next/*'
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      production-minor-patch:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+    # Major bumps of the framework and the auth/storage SDKs change runtime
+    # behaviour; raise those deliberately, not on a schedule.
+    ignore:
+      - dependency-name: next
+        update-types: [version-update:semver-major]
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+      - dependency-name: '@stackframe/stack'
+        update-types: [version-update:semver-major]
+      - dependency-name: '@vercel/blob'
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
