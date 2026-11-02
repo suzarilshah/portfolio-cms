@@ -36,6 +36,9 @@ updates:
     ignore:
       - dependency-name: next
         update-types: [version-update:semver-major]
+      # Must track next's major, or lint runs against the wrong rule set.
+      - dependency-name: eslint-config-next
+        update-types: [version-update:semver-major]
       - dependency-name: react
         update-types: [version-update:semver-major]
       - dependency-name: react-dom
