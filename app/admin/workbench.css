@@ -20,8 +20,10 @@
   --line-soft: #191d23;
 
   --text: #e7eaee;
-  --dim: #99a1ac;
-  --faint: #626b76;
+  --dim: #a7afba;
+  /* 6.3:1 on --bg. The labels and counts using this are 10-11px, so anything
+     dimmer fails WCAG AA for small text no matter how good it looks. */
+  --faint: #8b94a0;
 
   --accent: rgb(var(--p-400));
   --accent-dim: rgb(var(--p-400) / 0.14);

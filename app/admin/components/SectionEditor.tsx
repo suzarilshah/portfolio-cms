@@ -181,6 +181,9 @@ export default function SectionEditor<T>({
     }
   };
 
+  // Until the row arrives, `is_visible` is undefined — which must not read as
+  // "visible", or the editor briefly asserts the opposite of the truth.
+  const known = row.is_visible !== undefined;
   const visible = row.is_visible !== false;
 
   return (
@@ -222,14 +225,18 @@ export default function SectionEditor<T>({
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[4px] border border-[var(--line)] bg-[var(--surface)] px-4 py-3">
         <div className="flex items-center gap-3">
           <Toggle
-            checked={visible}
+            checked={known && visible}
             onChange={handleToggleVisibility}
-            disabled={loading || togglingVisibility}
+            disabled={!known || togglingVisibility}
             label={`${visible ? 'Hide' : 'Show'} the ${title} section`}
           />
           <div className="flex items-center gap-2">
             <span className="text-[13px] text-[var(--text)]">
-              {visible ? 'Visible on the live site' : 'Hidden from the live site'}
+              {!known
+                ? 'Checking visibility…'
+                : visible
+                  ? 'Visible on the live site'
+                  : 'Hidden from the live site'}
             </span>
             {togglingVisibility && (
               <Loader2 size={12} className="animate-spin text-[var(--faint)]" />
