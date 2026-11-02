@@ -53,9 +53,12 @@ async function getOverview(): Promise<Overview> {
 
 function Stat({ label, value, href }: { label: string; value: string | number; href?: string }) {
   const inner = (
-    <div className="rounded-[4px] border border-[var(--line)] bg-[var(--surface)] px-4 py-3.5 transition-colors hover:border-[#2c333b]">
+    <div className="studio-card h-full px-5 py-4 transition-shadow hover:shadow-[var(--lift-lg)]">
       <Label>{label}</Label>
-      <p className="wb-num mt-2 text-[22px] leading-none text-[var(--text)]">{value}</p>
+      {/* Tabular numerals without .studio-meta, whose 11px would win here. */}
+      <p className="mt-2.5 font-mono text-[26px] leading-[1.1] tracking-[-0.02em] tabular-nums">
+        {value}
+      </p>
     </div>
   );
   return href ? <Link href={href}>{inner}</Link> : inner;
@@ -115,7 +118,7 @@ export default async function AdminDashboard() {
         description="Everything the public page is currently rendering, and anything that needs a decision."
         actions={
           <Link href="/" target="_blank" rel="noreferrer">
-            <button className="wb-btn wb-btn-default">
+            <button className="studio-btn studio-btn-default">
               View live site
               <ArrowUpRight size={14} />
             </button>
@@ -148,7 +151,7 @@ export default async function AdminDashboard() {
                   />
                   <span className="text-[13px] text-[var(--dim)]">{text}</span>
                 </div>
-                <Link href={href} className="wb-btn wb-btn-default shrink-0">
+                <Link href={href} className="studio-btn studio-btn-default shrink-0">
                   {cta}
                 </Link>
               </li>
@@ -161,7 +164,7 @@ export default async function AdminDashboard() {
         title="The page"
         description="Top to bottom, exactly as a visitor meets it."
         actions={
-          <Link href="/admin/sections" className="wb-btn wb-btn-ghost">
+          <Link href="/admin/sections" className="studio-btn studio-btn-ghost">
             Reorder
           </Link>
         }
@@ -179,7 +182,7 @@ export default async function AdminDashboard() {
 
             const row = (
               <div className="flex items-center gap-3 px-5 py-3">
-                <span className="wb-num w-[18px] text-[10px] text-[var(--faint)]">
+                <span className="studio-meta w-[18px] text-[10px] text-[var(--faint)]">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -243,7 +246,7 @@ export default async function AdminDashboard() {
       )}
 
       {hidden.length > 0 && (
-        <p className="wb-meta">
+        <p className="studio-meta">
           {hidden.length} section{hidden.length === 1 ? "" : "s"} hidden:{" "}
           {hidden.map((s) => SECTION_EDITORS[s.section_key]?.label ?? s.section_key).join(", ")}.
         </p>

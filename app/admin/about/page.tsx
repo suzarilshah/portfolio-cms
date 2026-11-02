@@ -31,7 +31,7 @@ export default function AboutPage() {
             <textarea 
               value={content.bio} 
               onChange={(e) => onChange({ ...content, bio: e.target.value })}
-              className="wb-input"
+              className="studio-input"
             />
           </div>
 
@@ -44,7 +44,7 @@ export default function AboutPage() {
                 ...content, 
                 skills: e.target.value.split(',').map(s => s.trim()).filter(Boolean) 
               })}
-              className="wb-input"
+              className="studio-input"
               placeholder="React, Node.js, TypeScript..."
             />
             <div className="flex flex-wrap gap-2 mt-2">

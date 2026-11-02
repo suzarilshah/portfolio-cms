@@ -11,17 +11,17 @@ export function cn(...inputs: ClassValue[]) {
 
 /* -- Type ---------------------------------------------------------------- */
 
-export function Label({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn('wb-label', className)}>{children}</span>;
+export function Meta({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <span className={cn('studio-meta', className)}>{children}</span>;
 }
 
-export function Meta({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn('wb-meta', className)}>{children}</span>;
+export function Label({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <span className={cn('studio-label', className)}>{children}</span>;
 }
 
 /* -- Surfaces ------------------------------------------------------------ */
 
-export function Panel({
+export function Card({
   title,
   description,
   actions,
@@ -37,22 +37,25 @@ export function Panel({
   bodyClassName?: string;
 }) {
   return (
-    <section className={cn('wb-panel', className)}>
+    <section className={cn('studio-card', className)}>
       {(title || actions) && (
-        <header className="flex items-start justify-between gap-4 px-5 py-3.5 border-b border-[var(--line)]">
+        <header className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--line-soft)] px-5 py-4 sm:px-6">
           <div className="min-w-0">
-            {title && <h2 className="text-[13px] font-semibold text-[var(--text)]">{title}</h2>}
+            {title && <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{title}</h2>}
             {description && (
-              <p className="mt-1 text-[12px] leading-relaxed text-[var(--faint)]">{description}</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-[var(--muted)]">{description}</p>
             )}
           </div>
-          {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+          {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
         </header>
       )}
-      <div className={cn('p-5', bodyClassName)}>{children}</div>
+      <div className={cn('p-5 sm:p-6', bodyClassName)}>{children}</div>
     </section>
   );
 }
+
+/** Transitional alias: screens not yet rebuilt still import Panel. */
+export const Panel = Card;
 
 export function PageHeader({
   eyebrow,
@@ -66,15 +69,17 @@ export function PageHeader({
   actions?: React.ReactNode;
 }) {
   return (
-    <header className="flex flex-col gap-4 border-b border-[var(--line)] pb-5 md:flex-row md:items-end md:justify-between">
+    <header className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
       <div className="min-w-0">
-        {eyebrow && <div className="mb-2">{eyebrow}</div>}
-        <h1 className="text-[22px] font-semibold tracking-[-0.01em] text-[var(--text)]">{title}</h1>
+        {eyebrow && <div className="mb-2.5">{eyebrow}</div>}
+        <h1 className="studio-display">{title}</h1>
         {description && (
-          <p className="mt-1.5 max-w-2xl text-[13px] leading-relaxed text-[var(--dim)]">{description}</p>
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--muted)]">
+            {description}
+          </p>
         )}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
     </header>
   );
 }
@@ -82,7 +87,7 @@ export function PageHeader({
 /* -- Controls ------------------------------------------------------------ */
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'default' | 'ghost' | 'danger';
+  variant?: 'primary' | 'accent' | 'default' | 'ghost' | 'danger';
   loading?: boolean;
 };
 
@@ -94,10 +99,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       disabled={disabled || loading}
-      className={cn('wb-btn', `wb-btn-${variant}`, className)}
+      className={cn('studio-btn', `studio-btn-${variant}`, className)}
       {...rest}
     >
-      {loading && <Loader2 size={14} className="animate-spin" />}
+      {loading && <Loader2 size={15} className="animate-spin" />}
       {children}
     </button>
   );
@@ -105,7 +110,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 
 export const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   function Input({ className, ...rest }, ref) {
-    return <input ref={ref} className={cn('wb-input', className)} {...rest} />;
+    return <input ref={ref} className={cn('studio-input', className)} {...rest} />;
   }
 );
 
@@ -113,7 +118,7 @@ export const Textarea = forwardRef<
   HTMLTextAreaElement,
   React.TextareaHTMLAttributes<HTMLTextAreaElement>
 >(function Textarea({ className, ...rest }, ref) {
-  return <textarea ref={ref} className={cn('wb-input', className)} {...rest} />;
+  return <textarea ref={ref} className={cn('studio-input', className)} {...rest} />;
 });
 
 export function Field({
@@ -134,7 +139,7 @@ export function Field({
       <label htmlFor={htmlFor} className="block">
         <Label>{label}</Label>
       </label>
-      {hint && <p className="text-[12px] leading-relaxed text-[var(--faint)]">{hint}</p>}
+      {hint && <p className="-mt-1 text-[13px] leading-relaxed text-[var(--faint)]">{hint}</p>}
       {children}
     </div>
   );
@@ -160,26 +165,22 @@ export function Toggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        'relative h-[18px] w-[32px] shrink-0 rounded-full border transition-colors disabled:opacity-40',
-        checked
-          ? 'border-[var(--accent-line)] bg-[var(--accent)]'
-          : 'border-[var(--line)] bg-[var(--raised)]'
+        // 44px touch target on the outer hit area, visual switch inside.
+        'relative inline-flex h-[26px] w-[44px] shrink-0 items-center rounded-full transition-colors disabled:opacity-40',
+        checked ? 'bg-[var(--ink-deep)]' : 'bg-[#d8d6d2]'
       )}
     >
       <span
         className={cn(
-          'absolute top-1/2 h-[12px] w-[12px] -translate-y-1/2 rounded-full transition-all',
-          checked ? 'left-[17px] bg-[#06080b]' : 'left-[2px] bg-[var(--faint)]'
+          'absolute h-[20px] w-[20px] rounded-full bg-white shadow-sm transition-all',
+          checked ? 'left-[21px]' : 'left-[3px]'
         )}
       />
     </button>
   );
 }
 
-/* -- Tag input -----------------------------------------------------------
- * Enter commits, Backspace on an empty field removes the last entry. Used
- * anywhere the content model is "an ordered list of short strings".
- */
+/* -- Tag input ----------------------------------------------------------- */
 
 export function TagInput({
   values,
@@ -197,31 +198,28 @@ export function TagInput({
 
   const commit = (raw: string) => {
     const value = raw.trim();
-    if (!value || full || values.includes(value)) {
-      setDraft('');
-      return;
-    }
+    if (!value || full || values.includes(value)) return setDraft('');
     onChange([...values, value]);
     setDraft('');
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {values.length > 0 && (
-        <ul className="flex flex-wrap gap-1.5">
+        <ul className="flex flex-wrap gap-2">
           {values.map((value, index) => (
             <li
               key={`${value}-${index}`}
-              className="group flex items-center gap-1.5 rounded-[3px] border border-[var(--line)] bg-[var(--raised)] py-1 pl-2.5 pr-1 text-[12px] text-[var(--text)]"
+              className="flex items-center gap-1.5 rounded-full bg-[var(--sunken)] py-1.5 pl-3.5 pr-1.5 text-[13px]"
             >
               {value}
               <button
                 type="button"
                 aria-label={`Remove ${value}`}
                 onClick={() => onChange(values.filter((_, i) => i !== index))}
-                className="rounded-[2px] p-0.5 text-[var(--faint)] transition-colors hover:text-[var(--danger)]"
+                className="grid h-5 w-5 place-items-center rounded-full text-[var(--faint)] transition-colors hover:bg-white hover:text-[var(--danger)]"
               >
-                <X size={11} />
+                <X size={12} />
               </button>
             </li>
           ))}
@@ -243,7 +241,8 @@ export function TagInput({
           }}
         />
         <Button type="button" onClick={() => commit(draft)} disabled={!draft.trim() || full}>
-          <Plus size={14} />
+          <Plus size={15} />
+          <span className="sr-only sm:not-sr-only">Add</span>
         </Button>
       </div>
     </div>
@@ -255,11 +254,11 @@ export function TagInput({
 type Tone = 'neutral' | 'ok' | 'warn' | 'danger' | 'accent';
 
 const TONE: Record<Tone, string> = {
-  neutral: 'border-[var(--line)] text-[var(--faint)]',
-  ok: 'border-[#3fb97f4d] text-[var(--ok)]',
-  warn: 'border-[#e0a33e4d] text-[var(--warn)]',
-  danger: 'border-[#f2555a4d] text-[var(--danger)]',
-  accent: 'border-[var(--accent-line)] text-[var(--accent)]',
+  neutral: 'bg-[var(--sunken)] text-[var(--muted)]',
+  ok: 'bg-[#0f7b52]/10 text-[var(--ok)]',
+  warn: 'bg-[#a26a12]/10 text-[var(--warn)]',
+  danger: 'bg-[#b4252c]/10 text-[var(--danger)]',
+  accent: 'bg-[var(--accent-soft)] text-[var(--accent)]',
 };
 
 export function Pill({
@@ -271,17 +270,7 @@ export function Pill({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <span
-      className={cn(
-        'wb-label inline-flex items-center gap-1.5 rounded-[3px] border px-1.5 py-[3px]',
-        TONE[tone],
-        className
-      )}
-    >
-      {children}
-    </span>
-  );
+  return <span className={cn('studio-pill', TONE[tone], className)}>{children}</span>;
 }
 
 export function Dot({ tone = 'neutral' }: { tone?: Tone }) {
@@ -292,7 +281,7 @@ export function Dot({ tone = 'neutral' }: { tone?: Tone }) {
     danger: 'bg-[var(--danger)]',
     accent: 'bg-[var(--accent)]',
   };
-  return <span className={cn('h-[5px] w-[5px] shrink-0 rounded-full', bg[tone])} />;
+  return <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', bg[tone])} />;
 }
 
 export function EmptyState({
@@ -307,12 +296,12 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 border border-dashed border-[var(--line)] rounded-[4px] px-6 py-12 text-center">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-[var(--r-card)] bg-[var(--sunken)] px-6 py-14 text-center">
       {icon && <div className="text-[var(--faint)]">{icon}</div>}
       <div>
-        <p className="text-[13px] font-medium text-[var(--dim)]">{title}</p>
+        <p className="text-[15px] font-medium">{title}</p>
         {description && (
-          <p className="mx-auto mt-1 max-w-sm text-[12px] leading-relaxed text-[var(--faint)]">
+          <p className="mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed text-[var(--muted)]">
             {description}
           </p>
         )}
@@ -323,9 +312,8 @@ export function EmptyState({
 }
 
 /* -- Save bar ------------------------------------------------------------
- * Pinned to the bottom of the editor column. It is the single place an editor
- * reports state, so "did that save?" is never a guess: it shows dirty, in
- * flight, the actual error text on failure, and when the last save landed.
+ * The single place an editor reports state, so "did that save?" is never a
+ * guess. On mobile it is a floating pill above the bottom nav.
  */
 
 export type SaveState =
@@ -349,17 +337,17 @@ export function SaveBar({
   const saving = state.status === 'saving';
 
   return (
-    <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-[var(--line)] bg-[var(--bg)]/95 px-4 py-3 backdrop-blur-none md:-mx-8 md:px-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="pointer-events-none sticky bottom-4 z-30 mt-6 flex justify-center px-2 pb-20 md:pb-0">
+      <div className="studio-card pointer-events-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-3 px-4 py-3 shadow-[var(--lift-lg)]">
         <div className="flex min-w-0 items-center gap-2.5">
           {state.status === 'error' ? (
             <>
               <Dot tone="danger" />
-              <span className="text-[12px] text-[var(--danger)]">{state.message}</span>
+              <span className="text-[13px] text-[var(--danger)]">{state.message}</span>
             </>
           ) : saving ? (
             <>
-              <Loader2 size={12} className="animate-spin text-[var(--faint)]" />
+              <Loader2 size={13} className="animate-spin text-[var(--faint)]" />
               <Meta>Publishing…</Meta>
             </>
           ) : dirty ? (
@@ -371,7 +359,8 @@ export function SaveBar({
             <>
               <Dot tone="ok" />
               <Meta>
-                Published {state.savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                Published{' '}
+                {state.savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </Meta>
             </>
           ) : (

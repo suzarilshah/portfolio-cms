@@ -298,7 +298,7 @@ export default function PublicationsPage() {
                 type="text"
                 value={content.title}
                 onChange={(e) => onChange({ ...content, title: e.target.value })}
-                className="wb-input"
+                className="studio-input"
               />
             </div>
             <div className="space-y-2">
@@ -307,7 +307,7 @@ export default function PublicationsPage() {
                 type="text"
                 value={content.description}
                 onChange={(e) => onChange({ ...content, description: e.target.value })}
-                className="wb-input"
+                className="studio-input"
               />
             </div>
           </div>
@@ -370,7 +370,7 @@ export default function PublicationsPage() {
                                     newItems[index].title = e.target.value;
                                     onChange({ ...content, articles: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="md:col-span-3 space-y-1">
@@ -383,7 +383,7 @@ export default function PublicationsPage() {
                                     newItems[index].publisher = e.target.value;
                                     onChange({ ...content, articles: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="md:col-span-3 space-y-1">
@@ -396,7 +396,7 @@ export default function PublicationsPage() {
                                     newItems[index].date = e.target.value;
                                     onChange({ ...content, articles: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="md:col-span-12 space-y-1">
@@ -409,7 +409,7 @@ export default function PublicationsPage() {
                                     newItems[index].link = e.target.value;
                                     onChange({ ...content, articles: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>
@@ -477,7 +477,7 @@ export default function PublicationsPage() {
                                     newItems[index].title = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="md:col-span-3 space-y-1">
@@ -490,7 +490,7 @@ export default function PublicationsPage() {
                                     newItems[index].publisher = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="md:col-span-3 space-y-1">
@@ -503,7 +503,7 @@ export default function PublicationsPage() {
                                     newItems[index].date = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="md:col-span-6 space-y-1">
@@ -516,7 +516,7 @@ export default function PublicationsPage() {
                                     newItems[index].link = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="md:col-span-6 space-y-1">
@@ -529,7 +529,7 @@ export default function PublicationsPage() {
                                     newItems[index].doi = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>

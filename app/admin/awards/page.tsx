@@ -85,7 +85,7 @@ export default function AwardsPage() {
                 type="text" 
                 value={content.title} 
                 onChange={(e) => onChange({ ...content, title: e.target.value })}
-                className="wb-input"
+                className="studio-input"
               />
             </div>
             <div className="space-y-2">
@@ -94,7 +94,7 @@ export default function AwardsPage() {
                 type="text" 
                 value={content.subtitle} 
                 onChange={(e) => onChange({ ...content, subtitle: e.target.value })}
-                className="wb-input"
+                className="studio-input"
               />
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function AwardsPage() {
                                     newItems[index].title = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -189,7 +189,7 @@ export default function AwardsPage() {
                                     newItems[index].issuer = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -203,7 +203,7 @@ export default function AwardsPage() {
                                         newItems[index].year = e.target.value;
                                         onChange({ ...content, items: newItems });
                                     }}
-                                    className="wb-input"
+                                    className="studio-input"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -215,7 +215,7 @@ export default function AwardsPage() {
                                             newItems[index].icon = e.target.value;
                                             onChange({ ...content, items: newItems });
                                         }}
-                                        className="wb-input"
+                                        className="studio-input"
                                     >
                                         <option value="trophy">Trophy</option>
                                         <option value="award">Award</option>
@@ -235,7 +235,7 @@ export default function AwardsPage() {
                                     newItems[index].link = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>
@@ -250,7 +250,7 @@ export default function AwardsPage() {
                                     newItems[index].description = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>

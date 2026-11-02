@@ -5,7 +5,7 @@ import { isAdminEmail } from "@/lib/security/admin";
 import pool from "@/lib/db";
 import AdminNav from "./components/AdminNav";
 import type { SectionRow } from "./sections";
-import "./workbench.css";
+import "./studio.css";
 
 export const dynamic = "force-dynamic";
 
@@ -34,14 +34,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // cannot drift apart.
   if (!isAdminEmail(user.primaryEmail)) {
     return (
-      <div className="wb flex min-h-screen items-center justify-center p-6">
-        <div className="wb-panel max-w-sm p-6 text-center">
-          <p className="wb-label text-[var(--danger)]">Access denied</p>
-          <h1 className="mt-3 text-[15px] font-semibold">This CMS is restricted to the site owner.</h1>
-          <p className="mt-2 text-[13px] leading-relaxed text-[var(--dim)]">
+      <div className="studio flex min-h-screen items-center justify-center p-6">
+        <div className="studio-card max-w-sm p-7 text-center">
+          <p className="studio-meta text-[var(--danger)]">Access denied</p>
+          <h1 className="mt-3 text-[17px] font-semibold tracking-[-0.01em]">
+            This CMS is restricted to the site owner.
+          </h1>
+          <p className="mt-2 text-[14px] leading-relaxed text-[var(--muted)]">
             You are signed in, but this address is not on the admin allowlist.
           </p>
-          <p className="wb-meta mt-4 border-t border-[var(--line)] pt-3">{user.primaryEmail}</p>
+          <p className="studio-meta mt-5 border-t border-[var(--line-soft)] pt-4">
+            {user.primaryEmail}
+          </p>
         </div>
       </div>
     );
@@ -57,10 +61,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <StackProvider app={stackServerApp}>
       <StackTheme>
-        <div className="wb min-h-screen">
+        <div className="studio min-h-screen">
           <AdminNav user={clientUser} sections={sections} />
-          <main className="pt-14 md:ml-[248px] md:pt-0">
-            <div className="mx-auto max-w-4xl px-4 py-8 md:px-8 md:py-10">{children}</div>
+          {/* Bottom padding clears the mobile nav bar; the left offset clears
+              the desktop rail plus its inset. */}
+          <main className="md:ml-[268px]">
+            <div className="mx-auto max-w-5xl px-4 pb-28 pt-6 sm:px-6 md:pb-10 md:pr-6 md:pt-8">
+              {children}
+            </div>
           </main>
         </div>
       </StackTheme>

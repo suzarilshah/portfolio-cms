@@ -216,7 +216,7 @@ export default function ProjectsAdminPage() {
                                     type="text" 
                                     value={content.title} 
                                     onChange={(e) => onChange({ ...content, title: e.target.value })}
-                                    className="wb-input"
+                                    className="studio-input"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -224,7 +224,7 @@ export default function ProjectsAdminPage() {
                                 <textarea 
                                     value={content.description} 
                                     onChange={(e) => onChange({ ...content, description: e.target.value })}
-                                    className="wb-input"
+                                    className="studio-input"
                                 />
                             </div>
                         </div>

@@ -207,7 +207,7 @@ export default function CommunityPage() {
                                     newEvents[index].title = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -220,7 +220,7 @@ export default function CommunityPage() {
                                     newEvents[index].role = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -233,7 +233,7 @@ export default function CommunityPage() {
                                     newEvents[index].venue = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>
@@ -249,7 +249,7 @@ export default function CommunityPage() {
                                         newEvents[index].date = e.target.value;
                                         onChange({ ...content, communityEvents: newEvents });
                                     }}
-                                    className="wb-input"
+                                    className="studio-input"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -261,7 +261,7 @@ export default function CommunityPage() {
                                         newEvents[index].type = e.target.value;
                                         onChange({ ...content, communityEvents: newEvents });
                                     }}
-                                    className="wb-input"
+                                    className="studio-input"
                                     >
                                         <option value="upcoming">Upcoming</option>
                                         <option value="recent">Recent</option>
@@ -277,7 +277,7 @@ export default function CommunityPage() {
                                     newEvents[index].topic = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -290,7 +290,7 @@ export default function CommunityPage() {
                                     newEvents[index].link = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 placeholder="https://..."
                                 />
                             </div>
@@ -345,7 +345,7 @@ export default function CommunityPage() {
                                     newItems[index].title = e.target.value;
                                     onChange({ ...content, mlsaInvolvements: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -358,7 +358,7 @@ export default function CommunityPage() {
                                     newItems[index].date = e.target.value;
                                     onChange({ ...content, mlsaInvolvements: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>
@@ -372,7 +372,7 @@ export default function CommunityPage() {
                                     newItems[index].type = e.target.value;
                                     onChange({ ...content, mlsaInvolvements: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 >
                                     <option value="badge">Badge</option>
                                     <option value="content">Content</option>
@@ -391,7 +391,7 @@ export default function CommunityPage() {
                                     newItems[index].link = e.target.value;
                                     onChange({ ...content, mlsaInvolvements: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>
@@ -444,7 +444,7 @@ export default function CommunityPage() {
                                 newEvents[index].title = e.target.value;
                                 onChange({ ...content, pastEvents: newEvents });
                             }}
-                            className="wb-input"
+                            className="studio-input"
                             />
                         </div>
                         <div className="space-y-1">
@@ -457,7 +457,7 @@ export default function CommunityPage() {
                                 newEvents[index].date = e.target.value;
                                 onChange({ ...content, pastEvents: newEvents });
                             }}
-                            className="wb-input"
+                            className="studio-input"
                             />
                         </div>
                     </div>

@@ -245,7 +245,7 @@ export default function SectionEditor<T>({
         </div>
         <div className="flex items-center gap-2">
           <Label>Position</Label>
-          <Meta className="wb-num">{row.sort_order ?? '—'}</Meta>
+          <Meta className="studio-meta">{row.sort_order ?? '—'}</Meta>
         </div>
       </div>
 
@@ -320,7 +320,7 @@ export default function SectionEditor<T>({
                         </div>
                         <button
                           onClick={() => handleRestore(item.id)}
-                          className="wb-label mt-2 flex w-full items-center justify-center gap-1.5 rounded-[3px] border border-[var(--line)] py-1.5 transition-colors hover:border-[var(--accent-line)] hover:text-[var(--accent)]"
+                          className="studio-label mt-2 flex w-full items-center justify-center gap-1.5 rounded-[3px] border border-[var(--line)] py-1.5 transition-colors hover:border-[var(--accent-line)] hover:text-[var(--accent)]"
                         >
                           <RotateCcw size={11} />
                           Load into editor

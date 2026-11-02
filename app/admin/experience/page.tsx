@@ -103,7 +103,7 @@ function TagInput({
         onBlur={handleBlur}
         onPaste={handlePaste}
         placeholder={tags.length === 0 ? placeholder : "Add another..."}
-        className="wb-input"
+        className="studio-input"
       />
     </div>
   );
@@ -226,20 +226,20 @@ function WorkJobCard({ job, index, jobs, onChange, dragHandleProps }: {
         <div className="space-y-4">
           <div className="space-y-1">
             <label className="text-xs font-medium text-[var(--faint)]">Company</label>
-            <input type="text" value={job.company} onChange={(e) => updateJob('company', e.target.value)} className="wb-input" />
+            <input type="text" value={job.company} onChange={(e) => updateJob('company', e.target.value)} className="studio-input" />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-medium text-[var(--faint)]">Role</label>
-            <input type="text" value={job.role} onChange={(e) => updateJob('role', e.target.value)} className="wb-input" />
+            <input type="text" value={job.role} onChange={(e) => updateJob('role', e.target.value)} className="studio-input" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-medium text-[var(--faint)]">Period</label>
-              <input type="text" value={job.period} onChange={(e) => updateJob('period', e.target.value)} className="wb-input" />
+              <input type="text" value={job.period} onChange={(e) => updateJob('period', e.target.value)} className="studio-input" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-[var(--faint)]">Location</label>
-              <input type="text" value={job.location} onChange={(e) => updateJob('location', e.target.value)} className="wb-input" />
+              <input type="text" value={job.location} onChange={(e) => updateJob('location', e.target.value)} className="studio-input" />
             </div>
           </div>
         </div>
@@ -247,7 +247,7 @@ function WorkJobCard({ job, index, jobs, onChange, dragHandleProps }: {
         <div className="space-y-4">
           <div className="space-y-1">
             <label className="text-xs font-medium text-[var(--faint)]">Description</label>
-            <textarea value={job.description} onChange={(e) => updateJob('description', e.target.value)} className="wb-input" />
+            <textarea value={job.description} onChange={(e) => updateJob('description', e.target.value)} className="studio-input" />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-medium text-[var(--faint)]">Tags</label>
@@ -316,26 +316,26 @@ function PMJobCard({ job, index, jobs, onChange, dragHandleProps }: {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-xs font-medium text-[var(--faint)]">Company / Organization</label>
-            <input type="text" value={job.company} onChange={(e) => updateJob('company', e.target.value)} className="wb-input" />
+            <input type="text" value={job.company} onChange={(e) => updateJob('company', e.target.value)} className="studio-input" />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-medium text-[var(--faint)]">Role / Title</label>
-            <input type="text" value={job.role} onChange={(e) => updateJob('role', e.target.value)} className="wb-input" />
+            <input type="text" value={job.role} onChange={(e) => updateJob('role', e.target.value)} className="studio-input" />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-medium text-[var(--faint)]">Period</label>
-            <input type="text" value={job.period} onChange={(e) => updateJob('period', e.target.value)} className="wb-input" />
+            <input type="text" value={job.period} onChange={(e) => updateJob('period', e.target.value)} className="studio-input" />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-medium text-[var(--faint)]">Location</label>
-            <input type="text" value={job.location} onChange={(e) => updateJob('location', e.target.value)} className="wb-input" />
+            <input type="text" value={job.location} onChange={(e) => updateJob('location', e.target.value)} className="studio-input" />
           </div>
         </div>
 
         {/* Description */}
         <div className="space-y-1">
           <label className="text-xs font-medium text-[var(--faint)]">Description</label>
-          <textarea value={job.description} onChange={(e) => updateJob('description', e.target.value)} className="wb-input" />
+          <textarea value={job.description} onChange={(e) => updateJob('description', e.target.value)} className="studio-input" />
         </div>
 
         {/* PM-Specific Fields */}
@@ -349,13 +349,13 @@ function PMJobCard({ job, index, jobs, onChange, dragHandleProps }: {
               <label className="text-xs font-medium text-[var(--faint)] flex items-center gap-1">
                 <Users size={10} /> Team Size
               </label>
-              <input type="text" value={job.team_size || ''} onChange={(e) => updateJob('team_size', e.target.value)} placeholder="e.g. 10-15" className="wb-input" />
+              <input type="text" value={job.team_size || ''} onChange={(e) => updateJob('team_size', e.target.value)} placeholder="e.g. 10-15" className="studio-input" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-[var(--faint)] flex items-center gap-1">
                 <TrendingUp size={10} /> Budget
               </label>
-              <input type="text" value={job.budget || ''} onChange={(e) => updateJob('budget', e.target.value)} placeholder="e.g. $500K+" className="wb-input" />
+              <input type="text" value={job.budget || ''} onChange={(e) => updateJob('budget', e.target.value)} placeholder="e.g. $500K+" className="studio-input" />
             </div>
           </div>
 
@@ -471,7 +471,7 @@ export default function ExperiencePage() {
                     type="text"
                     value={normalizedContent.title}
                     onChange={(e) => onChange({ ...normalizedContent, title: e.target.value })}
-                    className="wb-input"
+                    className="studio-input"
                   />
                 </div>
                 <div className="space-y-2">
@@ -480,7 +480,7 @@ export default function ExperiencePage() {
                     type="text"
                     value={normalizedContent.subtitle}
                     onChange={(e) => onChange({ ...normalizedContent, subtitle: e.target.value })}
-                    className="wb-input"
+                    className="studio-input"
                   />
                 </div>
               </div>
@@ -556,7 +556,7 @@ export default function ExperiencePage() {
                       type="text"
                       value={normalizedContent.curved_text}
                       onChange={(e) => onChange({ ...normalizedContent, curved_text: e.target.value })}
-                      className="wb-input"
+                      className="studio-input"
                     />
                   </div>
                   <div className="space-y-2">
@@ -567,7 +567,7 @@ export default function ExperiencePage() {
                       max={5}
                       value={normalizedContent.curved_text_repeat}
                       onChange={(e) => onChange({ ...normalizedContent, curved_text_repeat: parseInt(e.target.value) || 3 })}
-                      className="wb-input"
+                      className="studio-input"
                     />
                   </div>
                 </div>

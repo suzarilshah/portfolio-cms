@@ -95,7 +95,7 @@ export default function SectionsReorderPage() {
         description="Drag to set the order a visitor meets each section in. Hiding one removes it from the page without deleting anything."
         actions={
           <Link href="/" target="_blank" rel="noreferrer">
-            <button className="wb-btn wb-btn-ghost">
+            <button className="studio-btn studio-btn-ghost">
               View live
               <ArrowUpRight size={14} />
             </button>
@@ -150,7 +150,7 @@ export default function SectionsReorderPage() {
                                 <GripVertical size={15} />
                               </span>
 
-                              <span className="wb-num w-[18px] text-[10px] text-[var(--faint)]">
+                              <span className="studio-meta w-[18px] text-[10px] text-[var(--faint)]">
                                 {String(index + 1).padStart(2, '0')}
                               </span>
 
@@ -170,7 +170,7 @@ export default function SectionsReorderPage() {
                               {editor && (
                                 <Link
                                   href={editor.href}
-                                  className="wb-btn wb-btn-ghost hidden px-2 sm:inline-flex"
+                                  className="studio-btn studio-btn-ghost hidden px-2 sm:inline-flex"
                                 >
                                   Edit
                                 </Link>

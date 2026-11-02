@@ -42,7 +42,7 @@ function CategoryCard({
       <div className="flex items-center gap-2 border-b border-[var(--line)] px-3 py-2.5">
         <GripVertical size={14} className="shrink-0 text-[var(--faint)]" />
         <Icon className="h-4 w-4 shrink-0 text-[var(--accent)]" />
-        <span className="wb-num text-[10px] text-[var(--faint)]">
+        <span className="studio-meta text-[10px] text-[var(--faint)]">
           {String(index + 1).padStart(2, '0')}
         </span>
         <span className="flex-1 truncate text-[13px]">{category.title || 'Untitled category'}</span>
@@ -201,7 +201,7 @@ export default function SkillsPage() {
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Label>Categories</Label>
-                  <Meta className="wb-num">{categories.length}/12</Meta>
+                  <Meta className="studio-meta">{categories.length}/12</Meta>
                 </div>
                 <Button
                   disabled={categories.length >= 12}

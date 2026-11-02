@@ -1,0 +1,272 @@
+/*
+ * Studio — the admin surface.
+ *
+ * Tokens are derived from blog.suzarilshah.uk rather than invented: warm
+ * off-white canvas, white cards, a floating dark pill for navigation, large
+ * confident display type, mono reserved for metadata pills.
+ *
+ * Scoped to .studio. The accent reads from --p-* in globals.css so the CMS
+ * follows whatever accent the site is set to.
+ */
+
+.studio {
+  --canvas: #fafaf9;
+  --card: #ffffff;
+  --sunken: #f4f4f2;
+  --ink-deep: #0c0d0e;
+
+  --line: #e7e5e2;
+  --line-soft: #f0efed;
+
+  --text: #16181c;
+  --muted: #5e636b;
+  --faint: #8a9099;
+  --on-dark: #f6f6f5;
+  --on-dark-muted: #a8acb3;
+
+  --accent: rgb(var(--p-600));
+  --accent-soft: rgb(var(--p-600) / 0.08);
+  --accent-line: rgb(var(--p-600) / 0.28);
+
+  --ok: #0f7b52;
+  --warn: #a26a12;
+  --danger: #b4252c;
+
+  --r-card: 16px;
+  --r-field: 10px;
+  --r-pill: 999px;
+
+  --lift: 0 1px 2px rgb(16 18 22 / 0.04), 0 8px 24px -8px rgb(16 18 22 / 0.10);
+  --lift-lg: 0 2px 4px rgb(16 18 22 / 0.04), 0 24px 48px -16px rgb(16 18 22 / 0.16);
+
+  /* Transitional aliases. The editor screens still reference the previous
+     token names; these keep them legible on the light canvas until each
+     screen is rebuilt in phases 2-4, at which point they go. */
+  --surface: var(--card);
+  --raised: var(--sunken);
+  --hover: #ecebe8;
+  --dim: var(--muted);
+
+  background: var(--canvas);
+  color: var(--text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Type ------------------------------------------------------------------- */
+
+.studio-display {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+/* Mono, letterspaced, small. Dates, counts, status — the blog's
+   "Aug 29, 2026 • Article" treatment. Never body copy. */
+.studio-meta {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.studio-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+/* Surfaces --------------------------------------------------------------- */
+
+.studio-card {
+  background: var(--card);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift);
+}
+
+.studio-sheet {
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: var(--lift-lg);
+}
+
+/* Fields ----------------------------------------------------------------- */
+
+.studio-input {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
+  padding: 11px 13px;
+  font-size: 15px;
+  color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.studio-input::placeholder {
+  color: var(--faint);
+}
+
+.studio-input:hover:not(:focus) {
+  border-color: #d6d3cf;
+}
+
+.studio-input:focus {
+  outline: none;
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.studio-input:disabled {
+  background: var(--sunken);
+  color: var(--faint);
+  cursor: not-allowed;
+}
+
+textarea.studio-input {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.65;
+}
+
+/* Buttons ---------------------------------------------------------------- */
+
+.studio-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--r-pill);
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease,
+    box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.studio-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.studio-btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.studio-btn-primary {
+  background: var(--ink-deep);
+  color: var(--on-dark);
+}
+
+.studio-btn-primary:not(:disabled):hover {
+  box-shadow: var(--lift);
+  background: #1d1f23;
+}
+
+.studio-btn-accent {
+  background: var(--accent);
+  color: #fff;
+}
+
+.studio-btn-accent:not(:disabled):hover {
+  filter: brightness(1.08);
+  box-shadow: var(--lift);
+}
+
+.studio-btn-default {
+  background: var(--card);
+  border-color: var(--line);
+  color: var(--text);
+}
+
+.studio-btn-default:not(:disabled):hover {
+  border-color: #d6d3cf;
+  box-shadow: var(--lift);
+}
+
+.studio-btn-ghost {
+  background: transparent;
+  color: var(--muted);
+}
+
+.studio-btn-ghost:not(:disabled):hover {
+  background: var(--sunken);
+  color: var(--text);
+}
+
+.studio-btn-danger {
+  background: transparent;
+  border-color: rgb(180 37 44 / 0.25);
+  color: var(--danger);
+}
+
+.studio-btn-danger:not(:disabled):hover {
+  background: rgb(180 37 44 / 0.06);
+  border-color: rgb(180 37 44 / 0.5);
+}
+
+.studio-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+/* Navigation — the floating dark pill ------------------------------------ */
+
+.studio-rail {
+  background: var(--ink-deep);
+  border-radius: 20px;
+  color: var(--on-dark-muted);
+}
+
+.studio-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 13px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  color: var(--on-dark-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.studio-nav-item:hover {
+  background: rgb(255 255 255 / 0.07);
+  color: var(--on-dark);
+}
+
+.studio-nav-item[data-active='true'] {
+  background: var(--on-dark);
+  color: var(--ink-deep);
+  font-weight: 500;
+}
+
+/* Pills ------------------------------------------------------------------ */
+
+.studio-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--r-pill);
+  padding: 4px 10px;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  background: var(--sunken);
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio *,
+  .studio *::before,
+  .studio *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

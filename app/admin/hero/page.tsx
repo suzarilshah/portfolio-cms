@@ -83,7 +83,7 @@ function PhrasesInput({
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a phrase and press Enter..."
-          className="wb-input"
+          className="studio-input"
         />
         <button
           type="button"
@@ -123,7 +123,7 @@ export default function HeroPage() {
                 type="text"
                 value={normalizedContent.headline}
                 onChange={(e) => onChange({ ...normalizedContent, headline: e.target.value })}
-                className="wb-input"
+                className="studio-input"
               />
             </div>
 
@@ -155,7 +155,7 @@ export default function HeroPage() {
                 type="text"
                 value={normalizedContent.subheadline}
                 onChange={(e) => onChange({ ...normalizedContent, subheadline: e.target.value })}
-                className="wb-input"
+                className="studio-input"
               />
             </div>
 
@@ -165,7 +165,7 @@ export default function HeroPage() {
               <textarea
                 value={normalizedContent.description}
                 onChange={(e) => onChange({ ...normalizedContent, description: e.target.value })}
-                className="wb-input"
+                className="studio-input"
               />
             </div>
 
@@ -177,7 +177,7 @@ export default function HeroPage() {
                 type="text"
                 value={normalizedContent.curved_text}
                 onChange={(e) => onChange({ ...normalizedContent, curved_text: e.target.value })}
-                className="wb-input"
+                className="studio-input"
                 placeholder="SHAH"
               />
               <p className="text-xs text-[var(--faint)]">Preview: {(normalizedContent.curved_text || 'SHAH').repeat(3)}</p>

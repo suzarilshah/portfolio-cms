@@ -58,7 +58,7 @@ export default function EducationPage() {
               type="text" 
               value={content.title} 
               onChange={(e) => onChange({ ...content, title: e.target.value })}
-              className="wb-input"
+              className="studio-input"
             />
           </div>
 
@@ -105,7 +105,7 @@ export default function EducationPage() {
                                     newItems[index].degree = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -118,7 +118,7 @@ export default function EducationPage() {
                                     newItems[index].institution = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -131,7 +131,7 @@ export default function EducationPage() {
                                     newItems[index].period = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>
@@ -146,7 +146,7 @@ export default function EducationPage() {
                                     newItems[index].specialization = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -158,7 +158,7 @@ export default function EducationPage() {
                                     newItems[index].details = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="wb-input"
+                                className="studio-input"
                                 />
                             </div>
                         </div>

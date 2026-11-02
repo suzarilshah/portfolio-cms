@@ -41,7 +41,7 @@ export default function ContactPage() {
                         type="text" 
                         value={content.bookingUrl} 
                         onChange={(e) => onChange({ ...content, bookingUrl: e.target.value })}
-                        className="wb-input"
+                        className="studio-input"
                     />
                 </div>
                 <div className="space-y-2">
@@ -50,7 +50,7 @@ export default function ContactPage() {
                         type="email" 
                         value={content.email} 
                         onChange={(e) => onChange({ ...content, email: e.target.value })}
-                        className="wb-input"
+                        className="studio-input"
                     />
                 </div>
             </div>
@@ -65,7 +65,7 @@ export default function ContactPage() {
                         type="text" 
                         value={content.linkedin} 
                         onChange={(e) => onChange({ ...content, linkedin: e.target.value })}
-                        className="wb-input"
+                        className="studio-input"
                     />
                 </div>
                 <div className="space-y-2">
@@ -74,7 +74,7 @@ export default function ContactPage() {
                         type="text" 
                         value={content.github} 
                         onChange={(e) => onChange({ ...content, github: e.target.value })}
-                        className="wb-input"
+                        className="studio-input"
                     />
                 </div>
                 <div className="space-y-2">
@@ -83,7 +83,7 @@ export default function ContactPage() {
                         type="text" 
                         value={content.twitter} 
                         onChange={(e) => onChange({ ...content, twitter: e.target.value })}
-                        className="wb-input"
+                        className="studio-input"
                     />
                 </div>
                 <div className="space-y-2">
@@ -92,7 +92,7 @@ export default function ContactPage() {
                         type="text" 
                         value={content.website} 
                         onChange={(e) => onChange({ ...content, website: e.target.value })}
-                        className="wb-input"
+                        className="studio-input"
                     />
                 </div>
             </div>
