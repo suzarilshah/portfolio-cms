@@ -134,24 +134,24 @@ export default function BadgeManager() {
       <Script src="//cdn.credly.com/assets/utilities/embed.js" strategy="lazyOnload" />
       
       {/* Hero / Add Section */}
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 text-white shadow-2xl overflow-hidden relative">
+      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[4px] p-8 text-white overflow-hidden relative">
         <div className="absolute top-0 right-0 p-12 opacity-10">
             <Award size={200} />
         </div>
         
         <div className="relative z-10 max-w-2xl">
             <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-yellow-500/20 rounded-lg text-yellow-400">
+                <div className="p-2 bg-transparent0/20 rounded-[4px] text-[var(--warn)]">
                     <Award size={24} />
                 </div>
                 <h2 className="text-2xl font-bold">Verified Credentials</h2>
             </div>
             
-            <p className="text-slate-300 mb-8 text-lg">
+            <p className="text-[var(--faint)] mb-8 text-lg">
                 Showcase your professional certifications. Enter a Credly Badge ID to instantly verify and add it to your portfolio.
             </p>
 
-            <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20 flex flex-col md:flex-row gap-2">
+            <div className="bg-[var(--surface)] p-2 rounded-[4px] border border-white/20 flex flex-col md:flex-row gap-2">
                 <input 
                     type="text" 
                     placeholder="Enter Credly Badge ID (e.g. 12345-abcde...)" 
@@ -163,7 +163,7 @@ export default function BadgeManager() {
                 <button 
                     onClick={addBadge}
                     disabled={!newBadgeId || saving}
-                    className="bg-white text-slate-900 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition-colors flex items-center gap-2 disabled:opacity-50"
+                    className="bg-[var(--surface)] text-[var(--text)] px-6 py-3 rounded-[4px] font-bold hover:bg-[var(--raised)] transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                     {saving ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />}
                     Add Credential
@@ -172,7 +172,7 @@ export default function BadgeManager() {
             
             {/* Live Preview Hint */}
             {newBadgeId && (
-                <div className="mt-4 flex items-center gap-2 text-sm text-blue-300 bg-blue-900/30 w-fit px-3 py-1 rounded-full border border-blue-500/30">
+                <div className="mt-4 flex items-center gap-2 text-sm text-[var(--accent)] bg-[var(--raised)] w-fit px-3 py-1 rounded-full border border-[var(--accent-line)]/30">
                     <ExternalLink size={14} />
                     <span>Preview available below after adding</span>
                 </div>
@@ -182,10 +182,10 @@ export default function BadgeManager() {
 
       {/* Toolbar: view toggle and saving indicator */}
       <div className="flex items-center justify-between">
-        <div className="inline-flex rounded-lg border border-slate-200 overflow-hidden">
+        <div className="inline-flex rounded-[4px] border border-[var(--line)] overflow-hidden">
           <button
             type="button"
-            className={`px-3 py-2 text-sm flex items-center gap-2 ${listView ? 'bg-slate-900 text-white' : 'bg-white text-slate-700'}`}
+            className={`px-3 py-2 text-sm flex items-center gap-2 ${listView ? 'bg-[var(--accent)] text-[#06080b]' : 'bg-[var(--surface)] text-[var(--dim)]'}`}
             onClick={() => setListView(true)}
             aria-label="List View"
           >
@@ -193,20 +193,20 @@ export default function BadgeManager() {
           </button>
           <button
             type="button"
-            className={`px-3 py-2 text-sm flex items-center gap-2 ${!listView ? 'bg-slate-900 text-white' : 'bg-white text-slate-700'}`}
+            className={`px-3 py-2 text-sm flex items-center gap-2 ${!listView ? 'bg-[var(--accent)] text-[#06080b]' : 'bg-[var(--surface)] text-[var(--dim)]'}`}
             onClick={() => setListView(false)}
             aria-label="Grid View"
           >
             <Grid3X3 size={16} /> Grid
           </button>
         </div>
-        <div className="text-sm text-slate-500 flex items-center gap-2">
+        <div className="text-sm text-[var(--faint)] flex items-center gap-2">
           {savingOrder ? (
             <>
               <Loader2 size={14} className="animate-spin" /> Saving order...
             </>
           ) : (
-            <span className="text-slate-400 flex items-center gap-2">
+            <span className="text-[var(--faint)] flex items-center gap-2">
               <GripVertical size={14} /> Click and drag badges to reorder • Auto-saved
             </span>
           )}
@@ -215,7 +215,7 @@ export default function BadgeManager() {
 
       {/* Badges Grid */}
       {loading ? (
-          <div className="text-center py-12 text-slate-400">Loading credentials...</div>
+          <div className="text-center py-12 text-[var(--faint)]">Loading credentials...</div>
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="badges" direction={listView ? "vertical" : "horizontal"}>
@@ -231,28 +231,28 @@ export default function BadgeManager() {
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className={`group bg-white rounded-xl border-2 shadow-sm overflow-hidden transition-all duration-300 ${
+                        className={`group bg-[var(--surface)] rounded-[4px] border-2  overflow-hidden transition-all duration-300 ${
                           snapshot.isDragging 
-                            ? 'border-primary-400 shadow-2xl scale-105 rotate-2 z-50' 
-                            : 'border-slate-200 hover:shadow-xl hover:border-primary-200'
+                            ? 'border-primary-400  scale-105 rotate-2 z-50' 
+                            : 'border-[var(--line)]  hover:border-[#2c333b]'
                         } ${listView ? 'flex flex-row' : ''}`}
                       >
-                        <div className={`p-4 ${listView ? 'w-56 border-r' : ''} border-b border-slate-100 bg-slate-50/50 flex ${listView ? 'flex-col items-start gap-3' : 'justify-between items-center'} shrink-0`}>
+                        <div className={`p-4 ${listView ? 'w-56 border-r' : ''} border-b border-[var(--line)] bg-[var(--raised)] flex ${listView ? 'flex-col items-start gap-3' : 'justify-between items-center'} shrink-0`}>
                           <div 
                             {...provided.dragHandleProps}
-                            className={`flex items-center gap-2 text-slate-400 hover:text-primary-600 transition-colors cursor-grab active:cursor-grabbing ${!listView ? 'w-full justify-center' : ''}`}
+                            className={`flex items-center gap-2 text-[var(--faint)] hover:text-primary-600 transition-colors cursor-grab active:cursor-grabbing ${!listView ? 'w-full justify-center' : ''}`}
                           >
                             <GripVertical size={20} className={snapshot.isDragging ? 'text-primary-600' : ''} />
                             {listView && <span className="text-xs font-mono uppercase tracking-wider font-semibold">Drag to Reorder</span>}
                           </div>
                           <div className={`flex ${listView ? 'flex-col' : 'flex-row items-center justify-between w-full mt-2'}`}>
                             <div className="flex flex-col">
-                              <span className="text-sm font-semibold text-slate-900 line-clamp-2">{badge.title || 'Untitled Badge'}</span>
-                              {badge.issuer && <span className="text-xs text-slate-500 mt-1">{badge.issuer}</span>}
+                              <span className="text-sm font-semibold text-[var(--text)] line-clamp-2">{badge.title || 'Untitled Badge'}</span>
+                              {badge.issuer && <span className="text-xs text-[var(--faint)] mt-1">{badge.issuer}</span>}
                             </div>
                             <button 
                               onClick={() => deleteBadge(badge.id)}
-                              className="ml-auto text-slate-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50"
+                              className="ml-auto text-[var(--faint)] hover:text-[var(--danger)] transition-colors p-2 rounded-[4px] hover:bg-transparent"
                               aria-label={`Delete ${badge.title || badge.badge_id}`}
                             >
                               <Trash2 size={18} />
@@ -260,10 +260,10 @@ export default function BadgeManager() {
                           </div>
                         </div>
 
-                        <div className={`p-6 flex ${listView ? 'flex-row items-center gap-6' : 'flex-col'} justify-center bg-white relative min-h-[200px] grow`}>
+                        <div className={`p-6 flex ${listView ? 'flex-row items-center gap-6' : 'flex-col'} justify-center bg-[var(--surface)] relative min-h-[200px] grow`}>
                           {/* Verification Badge */}
                           <div className="absolute top-4 right-4 z-10">
-                            <div className="bg-green-50 text-green-600 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-green-100">
+                            <div className="bg-[var(--raised)] text-[var(--ok)] px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-[var(--line)]">
                               <CheckCircle2 size={12} /> Verified
                             </div>
                           </div>
@@ -278,12 +278,12 @@ export default function BadgeManager() {
                                 onError={() => setImageError(prev => ({ ...prev, [badge.id]: true }))}
                               />
                               {badge.title && (
-                                <h4 className="font-bold text-slate-900 text-sm mb-1 line-clamp-2 px-2">
+                                <h4 className="font-bold text-[var(--text)] text-sm mb-1 line-clamp-2 px-2">
                                   {badge.title}
                                 </h4>
                               )}
                               {badge.issuer && (
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-[var(--faint)]">
                                   {badge.issuer}
                                 </p>
                               )}
@@ -301,8 +301,8 @@ export default function BadgeManager() {
                         </div>
                         
                         {!listView && (
-                          <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
-                            <span className="text-xs font-medium text-slate-600">{badge.title || badge.badge_id}</span>
+                          <div className="p-3 bg-[var(--raised)] border-t border-[var(--line)] text-center">
+                            <span className="text-xs font-medium text-[var(--dim)]">{badge.title || badge.badge_id}</span>
                           </div>
                         )}
                       </div>
@@ -317,12 +317,12 @@ export default function BadgeManager() {
       )}
       
       {badges.length === 0 && !loading && (
-        <div className="text-center py-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-            <div className="inline-flex p-4 bg-slate-100 rounded-full mb-4">
-                <Award size={32} className="text-slate-400" />
+        <div className="text-center py-24 bg-[var(--raised)] rounded-[4px] border-2 border-dashed border-[var(--line)]">
+            <div className="inline-flex p-4 bg-[var(--raised)] rounded-full mb-4">
+                <Award size={32} className="text-[var(--faint)]" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900">No credentials yet</h3>
-            <p className="text-slate-500">Add your first badge above to start building your portfolio.</p>
+            <h3 className="text-lg font-semibold text-[var(--text)]">No credentials yet</h3>
+            <p className="text-[var(--faint)]">Add your first badge above to start building your portfolio.</p>
         </div>
       )}
     </div>

@@ -48,6 +48,36 @@ Components live in two directories, and the split is load-bearing for imports:
 - `components/` — reusable widgets (`ProjectsShowcase`, `SkillsMatrix`,
   `StructuredData`, backgrounds)
 
+### Admin ("Workbench")
+
+`/admin` is a dark, dense editing surface scoped entirely by the `.wb` class in
+`app/admin/workbench.css`. Nothing in that file may leak into the public page,
+which stays light. Its accent reuses `--p-*` from `globals.css`, so the CMS
+wears whatever accent the site is currently set to.
+
+The organising idea is **the page is the nav**: `app/admin/layout.tsx` reads
+`content_sections` and renders the live page's render order down the sidebar,
+with visibility and last-edited state. Reading the nav top to bottom is reading
+the site top to bottom.
+
+`app/admin/sections.ts` is the single registry mapping a `content_sections` row
+to the screen that edits it. It must stay in sync with `SectionComponents` in
+`app/page.tsx` — a key in one and not the other is a dead end, which is exactly
+how a Blog editor once wrote a section nothing rendered. The dashboard and the
+order screen both surface that mismatch as a "No editor" state rather than
+failing silently.
+
+Build editor UI from `app/admin/components/ui.tsx` (`Panel`, `Field`, `Button`,
+`Toggle`, `TagInput`, `Pill`, `SaveBar`). House rules: one accent, hairline
+borders, 4px radii, mono for labels and counts, no gradients, no backdrop blur,
+no coloured shadows. Depth comes from surface steps, not glow.
+
+Most section screens are a thin `renderForm` passed to
+`app/admin/components/SectionEditor.tsx`, which owns loading, dirty tracking,
+save, errors, visibility and history. **It checks `res.ok`** — an earlier
+version reported "published successfully" on rejected writes. Anything
+rendering a save button should use `SaveBar` so unsaved state is never a guess.
+
 ### Data access
 
 Two clients against the same database, by design:
@@ -99,7 +129,9 @@ Read this before touching anything under `lib/security/`.
 
 Input validation is `lib/security/validation.ts` (`SecurityValidator`). Adding a
 field to a section or project means adding it there too, or the write is
-silently dropped from the sanitized payload.
+silently dropped from the sanitized payload. Closed sets — the Skills section's
+`icon` and `color`, for instance — are validated against the same lists the
+renderer looks up, and fall back rather than erroring.
 
 ## Conventions
 

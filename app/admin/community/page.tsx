@@ -165,8 +165,8 @@ export default function CommunityPage() {
           
           {/* Community Events Section */}
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-              <h3 className="text-lg font-bold text-slate-900">Community Events</h3>
+            <div className="flex justify-between items-center border-b border-[var(--line)] pb-4">
+              <h3 className="text-lg font-bold text-[var(--text)]">Community Events</h3>
               <button 
                 onClick={() => onChange({
                   ...content,
@@ -175,7 +175,7 @@ export default function CommunityPage() {
                     ...(content.communityEvents || [])
                   ]
                 })}
-                className="text-sm bg-slate-900 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-slate-800 transition-colors flex items-center gap-2"
+                className="text-sm bg-[var(--accent)] text-[#06080b] px-3 py-1.5 rounded-[4px] font-medium hover:bg-[var(--accent)] transition-colors flex items-center gap-2"
               >
                 <Plus size={16} /> Add Event
               </button>
@@ -183,14 +183,14 @@ export default function CommunityPage() {
 
             <div className="grid gap-4">
                 {(content.communityEvents || []).map((event, index) => (
-                <div key={index} className="bg-white border border-slate-200 rounded-xl p-6 relative group hover:border-blue-200 transition-colors">
+                <div key={index} className="bg-[var(--surface)] border border-[var(--line)] rounded-[4px] p-6 relative group hover:border-[var(--line)] transition-colors">
                     <button 
                     onClick={() => {
                         const newEvents = [...(content.communityEvents || [])];
                         newEvents.splice(index, 1);
                         onChange({ ...content, communityEvents: newEvents });
                     }}
-                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500"
+                    className="absolute top-4 right-4 text-[var(--faint)] hover:text-[var(--danger)]"
                     >
                     <Trash2 size={18} />
                     </button>
@@ -198,7 +198,7 @@ export default function CommunityPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-8">
                         <div className="space-y-3">
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Event Name</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Event Name</label>
                                 <input 
                                 type="text" 
                                 value={event.title} 
@@ -207,11 +207,11 @@ export default function CommunityPage() {
                                     newEvents[index].title = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm font-bold"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Role</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Role</label>
                                 <input 
                                 type="text" 
                                 value={event.role} 
@@ -220,11 +220,11 @@ export default function CommunityPage() {
                                     newEvents[index].role = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Venue</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Venue</label>
                                 <input 
                                 type="text" 
                                 value={event.venue} 
@@ -233,14 +233,14 @@ export default function CommunityPage() {
                                     newEvents[index].venue = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm"
+                                className="wb-input"
                                 />
                             </div>
                         </div>
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-xs font-medium text-slate-500">Date</label>
+                                    <label className="text-xs font-medium text-[var(--faint)]">Date</label>
                                     <input 
                                     type="text" 
                                     value={event.date} 
@@ -249,11 +249,11 @@ export default function CommunityPage() {
                                         newEvents[index].date = e.target.value;
                                         onChange({ ...content, communityEvents: newEvents });
                                     }}
-                                    className="w-full p-2 border border-slate-200 rounded-md text-sm font-mono"
+                                    className="wb-input"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-xs font-medium text-slate-500">Type</label>
+                                    <label className="text-xs font-medium text-[var(--faint)]">Type</label>
                                     <select 
                                     value={event.type} 
                                     onChange={(e) => {
@@ -261,7 +261,7 @@ export default function CommunityPage() {
                                         newEvents[index].type = e.target.value;
                                         onChange({ ...content, communityEvents: newEvents });
                                     }}
-                                    className="w-full p-2 border border-slate-200 rounded-md text-sm"
+                                    className="wb-input"
                                     >
                                         <option value="upcoming">Upcoming</option>
                                         <option value="recent">Recent</option>
@@ -269,7 +269,7 @@ export default function CommunityPage() {
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Topic / Description</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Topic / Description</label>
                                 <textarea 
                                 value={event.topic} 
                                 onChange={(e) => {
@@ -277,11 +277,11 @@ export default function CommunityPage() {
                                     newEvents[index].topic = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm h-20 resize-none"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Link (Optional)</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Link (Optional)</label>
                                 <input 
                                 type="text" 
                                 value={event.link || ''} 
@@ -290,7 +290,7 @@ export default function CommunityPage() {
                                     newEvents[index].link = e.target.value;
                                     onChange({ ...content, communityEvents: newEvents });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm text-slate-500"
+                                className="wb-input"
                                 placeholder="https://..."
                                 />
                             </div>
@@ -303,8 +303,8 @@ export default function CommunityPage() {
 
           {/* MLSA Involvements Section */}
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-              <h3 className="text-lg font-bold text-slate-900">MLSA Involvements</h3>
+            <div className="flex justify-between items-center border-b border-[var(--line)] pb-4">
+              <h3 className="text-lg font-bold text-[var(--text)]">MLSA Involvements</h3>
               <button 
                 onClick={() => onChange({
                   ...content,
@@ -313,7 +313,7 @@ export default function CommunityPage() {
                     ...(content.mlsaInvolvements || [])
                   ]
                 })}
-                className="text-sm bg-slate-900 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-slate-800 transition-colors flex items-center gap-2"
+                className="text-sm bg-[var(--accent)] text-[#06080b] px-3 py-1.5 rounded-[4px] font-medium hover:bg-[var(--accent)] transition-colors flex items-center gap-2"
               >
                 <Plus size={16} /> Add MLSA
               </button>
@@ -321,14 +321,14 @@ export default function CommunityPage() {
 
             <div className="grid gap-4">
                 {(content.mlsaInvolvements || []).map((item, index) => (
-                <div key={index} className="bg-white border border-slate-200 rounded-xl p-6 relative group hover:border-blue-200 transition-colors">
+                <div key={index} className="bg-[var(--surface)] border border-[var(--line)] rounded-[4px] p-6 relative group hover:border-[var(--line)] transition-colors">
                     <button 
                     onClick={() => {
                         const newItems = [...(content.mlsaInvolvements || [])];
                         newItems.splice(index, 1);
                         onChange({ ...content, mlsaInvolvements: newItems });
                     }}
-                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500"
+                    className="absolute top-4 right-4 text-[var(--faint)] hover:text-[var(--danger)]"
                     >
                     <Trash2 size={18} />
                     </button>
@@ -336,7 +336,7 @@ export default function CommunityPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-8">
                         <div className="space-y-3">
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Title</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Title</label>
                                 <input 
                                 type="text" 
                                 value={item.title} 
@@ -345,11 +345,11 @@ export default function CommunityPage() {
                                     newItems[index].title = e.target.value;
                                     onChange({ ...content, mlsaInvolvements: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm font-bold"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Date (Optional)</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Date (Optional)</label>
                                 <input 
                                 type="text" 
                                 value={item.date || ''} 
@@ -358,13 +358,13 @@ export default function CommunityPage() {
                                     newItems[index].date = e.target.value;
                                     onChange({ ...content, mlsaInvolvements: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm"
+                                className="wb-input"
                                 />
                             </div>
                         </div>
                         <div className="space-y-3">
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Type</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Type</label>
                                 <select 
                                 value={item.type} 
                                 onChange={(e) => {
@@ -372,7 +372,7 @@ export default function CommunityPage() {
                                     newItems[index].type = e.target.value;
                                     onChange({ ...content, mlsaInvolvements: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm"
+                                className="wb-input"
                                 >
                                     <option value="badge">Badge</option>
                                     <option value="content">Content</option>
@@ -382,7 +382,7 @@ export default function CommunityPage() {
                                 </select>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Link</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Link</label>
                                 <input 
                                 type="text" 
                                 value={item.link} 
@@ -391,7 +391,7 @@ export default function CommunityPage() {
                                     newItems[index].link = e.target.value;
                                     onChange({ ...content, mlsaInvolvements: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md text-sm text-slate-500"
+                                className="wb-input"
                                 />
                             </div>
                         </div>
@@ -403,8 +403,8 @@ export default function CommunityPage() {
 
           {/* Past Events Section */}
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-              <h3 className="text-lg font-bold text-slate-900">Past Events Archive</h3>
+            <div className="flex justify-between items-center border-b border-[var(--line)] pb-4">
+              <h3 className="text-lg font-bold text-[var(--text)]">Past Events Archive</h3>
               <button 
                 onClick={() => onChange({
                   ...content,
@@ -413,7 +413,7 @@ export default function CommunityPage() {
                     ...(content.pastEvents || [])
                   ]
                 })}
-                className="text-sm bg-slate-900 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-slate-800 transition-colors flex items-center gap-2"
+                className="text-sm bg-[var(--accent)] text-[#06080b] px-3 py-1.5 rounded-[4px] font-medium hover:bg-[var(--accent)] transition-colors flex items-center gap-2"
               >
                 <Plus size={16} /> Add Past Event
               </button>
@@ -421,21 +421,21 @@ export default function CommunityPage() {
 
             <div className="grid gap-4">
                 {(content.pastEvents || []).map((event, index) => (
-                <div key={index} className="bg-white border border-slate-200 rounded-xl p-4 relative group hover:border-blue-200 transition-colors flex items-center gap-4">
+                <div key={index} className="bg-[var(--surface)] border border-[var(--line)] rounded-[4px] p-4 relative group hover:border-[var(--line)] transition-colors flex items-center gap-4">
                     <button 
                     onClick={() => {
                         const newEvents = [...(content.pastEvents || [])];
                         newEvents.splice(index, 1);
                         onChange({ ...content, pastEvents: newEvents });
                     }}
-                    className="absolute top-1/2 -translate-y-1/2 right-4 text-slate-300 hover:text-red-500"
+                    className="absolute top-1/2 -translate-y-1/2 right-4 text-[var(--faint)] hover:text-[var(--danger)]"
                     >
                     <Trash2 size={18} />
                     </button>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow pr-12">
                         <div className="space-y-1">
-                            <label className="text-xs font-medium text-slate-500">Event Title</label>
+                            <label className="text-xs font-medium text-[var(--faint)]">Event Title</label>
                             <input 
                             type="text" 
                             value={event.title} 
@@ -444,11 +444,11 @@ export default function CommunityPage() {
                                 newEvents[index].title = e.target.value;
                                 onChange({ ...content, pastEvents: newEvents });
                             }}
-                            className="w-full p-2 border border-slate-200 rounded-md text-sm font-bold"
+                            className="wb-input"
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-medium text-slate-500">Date</label>
+                            <label className="text-xs font-medium text-[var(--faint)]">Date</label>
                             <input 
                             type="text" 
                             value={event.date} 
@@ -457,7 +457,7 @@ export default function CommunityPage() {
                                 newEvents[index].date = e.target.value;
                                 onChange({ ...content, pastEvents: newEvents });
                             }}
-                            className="w-full p-2 border border-slate-200 rounded-md text-sm"
+                            className="wb-input"
                             />
                         </div>
                     </div>

@@ -1,8 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Save, Loader2, AlertCircle, CheckCircle2, History, RotateCcw, Clock, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import {
+  ArrowUpRight,
+  Clock,
+  History,
+  Loader2,
+  RotateCcw,
+  X,
+} from 'lucide-react';
+import {
+  Button,
+  Dot,
+  EmptyState,
+  Label,
+  Meta,
+  Panel,
+  PageHeader,
+  Pill,
+  SaveBar,
+  Toggle,
+  type SaveState,
+} from './ui';
+
+interface SectionRow {
+  is_visible?: boolean | null;
+  sort_order?: number | null;
+}
 
 interface SectionEditorProps<T> {
   sectionKey: string;
@@ -12,210 +37,303 @@ interface SectionEditorProps<T> {
   renderForm: (content: T, onChange: (newContent: T) => void) => React.ReactNode;
 }
 
-export default function SectionEditor<T>({ 
-  sectionKey, 
-  title, 
-  description, 
+const stable = (value: unknown) => JSON.stringify(value);
+
+export default function SectionEditor<T>({
+  sectionKey,
+  title,
+  description,
   defaultContent,
-  renderForm 
+  renderForm,
 }: SectionEditorProps<T>) {
   const [content, setContent] = useState<T>(defaultContent);
+  // The last state known to be on the server. Dirty is a comparison against
+  // this, not a flag someone has to remember to set.
+  const [baseline, setBaseline] = useState<string>(stable(defaultContent));
+  const [row, setRow] = useState<SectionRow>({});
+
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  
-  // History State
+  const [save, setSave] = useState<SaveState>({ status: 'idle' });
+  const [togglingVisibility, setTogglingVisibility] = useState(false);
+
   const [showHistory, setShowHistory] = useState(false);
-  const [historyItems, setHistoryItems] = useState<{ id: number, created_at: string }[]>([]);
+  const [historyItems, setHistoryItems] = useState<{ id: number; created_at: string }[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
+  // defaultContent is a fresh object literal on every render in most callers,
+  // so it cannot be an effect dependency without looping.
+  const defaults = useRef(defaultContent);
+
+  const dirty = stable(content) !== baseline;
+
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
-    fetch(`/api/cms/sections?key=${sectionKey}`)
-      .then(res => res.json())
-      .then(data => {
-        const fetchedContent = data.content || {};
-        setContent({ ...defaultContent, ...fetchedContent });
+
+    fetch(`/api/cms/sections?key=${encodeURIComponent(sectionKey)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Could not load section (${res.status})`);
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        const merged = { ...defaults.current, ...(data?.content || {}) } as T;
+        setContent(merged);
+        setBaseline(stable(merged));
+        setRow({ is_visible: data?.is_visible, sort_order: data?.sort_order });
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error: Error) => {
+        if (cancelled) return;
+        setSave({ status: 'error', message: error.message });
         setLoading(false);
-        setFeedback({ type: 'error', message: 'Failed to load content.' });
       });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sectionKey]);
+
+  // Browser-level guard. The SaveBar states it, this enforces it.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
+
+  const loadHistory = useCallback(async () => {
+    setLoadingHistory(true);
+    try {
+      const res = await fetch(`/api/cms/history?key=${encodeURIComponent(sectionKey)}`);
+      const data = await res.json();
+      setHistoryItems(Array.isArray(data) ? data : []);
+    } catch {
+      setHistoryItems([]);
+    }
+    setLoadingHistory(false);
   }, [sectionKey]);
 
   const handleSave = async () => {
-    setSaving(true);
-    setFeedback(null);
+    setSave({ status: 'saving' });
     try {
-        await fetch('/api/cms/sections', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ section_key: sectionKey, content: content })
-        });
-        
-        setFeedback({ type: 'success', message: 'Changes published successfully.' });
-        setTimeout(() => setFeedback(null), 3000);
-        
-        // Refresh history if open
-        if (showHistory) loadHistory();
-    } catch (e) {
-        setFeedback({ type: 'error', message: 'Failed to save. Please try again.' });
+      const res = await fetch('/api/cms/sections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section_key: sectionKey, content }),
+      });
+
+      // The previous version reported success unconditionally, so a rejected
+      // write looked identical to a saved one.
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const detail = Array.isArray(body?.details) ? `: ${body.details.join(', ')}` : '';
+        throw new Error(`${body?.error || `Save failed (${res.status})`}${detail}`);
+      }
+
+      setBaseline(stable(content));
+      setSave({ status: 'idle', savedAt: new Date() });
+      if (showHistory) loadHistory();
+    } catch (error) {
+      setSave({ status: 'error', message: (error as Error).message });
     }
-    setSaving(false);
   };
 
-  const loadHistory = async () => {
-      setLoadingHistory(true);
-      try {
-          const res = await fetch(`/api/cms/history?key=${sectionKey}`);
-          const data = await res.json();
-          if (Array.isArray(data)) {
-              setHistoryItems(data);
-          }
-      } catch (e) {
-          console.error(e);
-      }
-      setLoadingHistory(false);
+  const handleToggleVisibility = async (next: boolean) => {
+    setTogglingVisibility(true);
+    const previous = row.is_visible;
+    setRow((current) => ({ ...current, is_visible: next }));
+
+    try {
+      const res = await fetch('/api/cms/sections/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sections: [
+            {
+              section_key: sectionKey,
+              sort_order: row.sort_order ?? 0,
+              is_visible: next,
+            },
+          ],
+        }),
+      });
+      if (!res.ok) throw new Error('Could not change visibility');
+    } catch (error) {
+      setRow((current) => ({ ...current, is_visible: previous }));
+      setSave({ status: 'error', message: (error as Error).message });
+    }
+    setTogglingVisibility(false);
   };
 
   const handleRestore = async (id: number) => {
-      if (!confirm('Are you sure you want to restore this version? Any unsaved changes will be lost.')) return;
-      
-      try {
-          const res = await fetch(`/api/cms/history?id=${id}`);
-          const data = await res.json();
-          if (data.content) {
-              // Merge with default to ensure schema
-              setContent({ ...defaultContent, ...data.content });
-              setShowHistory(false);
-              setFeedback({ type: 'success', message: 'Version restored. Click Publish to save changes live.' });
-          }
-      } catch (e) {
-          alert('Failed to restore version.');
+    if (!confirm('Load this version into the editor? Unsaved changes will be lost.')) return;
+    try {
+      const res = await fetch(`/api/cms/history?id=${id}`);
+      const data = await res.json();
+      if (data?.content) {
+        setContent({ ...defaults.current, ...data.content } as T);
+        setShowHistory(false);
+        setSave({ status: 'idle' });
       }
+    } catch {
+      setSave({ status: 'error', message: 'Could not restore that version.' });
+    }
   };
 
+  const visible = row.is_visible !== false;
+
   return (
-    <div className="space-y-6 relative">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="font-display text-3xl font-bold text-slate-900">{title}</h1>
-          <p className="text-slate-500 mt-2">{description}</p>
+    <div className="pb-2">
+      <PageHeader
+        eyebrow={
+          <div className="flex items-center gap-2">
+            <Label>Section</Label>
+            <Meta className="text-[var(--accent)]">{sectionKey}</Meta>
+          </div>
+        }
+        title={title}
+        description={description}
+        actions={
+          <>
+            <Button
+              variant={showHistory ? 'default' : 'ghost'}
+              onClick={() => {
+                const next = !showHistory;
+                setShowHistory(next);
+                if (next) loadHistory();
+              }}
+            >
+              <History size={14} />
+              History
+            </Button>
+            <Link href={`/#${sectionKey}`} target="_blank" rel="noreferrer">
+              <Button variant="ghost">
+                View live
+                <ArrowUpRight size={14} />
+              </Button>
+            </Link>
+          </>
+        }
+      />
+
+      {/* Visibility sits with the content it governs, rather than on a separate
+          reorder screen. */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[4px] border border-[var(--line)] bg-[var(--surface)] px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Toggle
+            checked={visible}
+            onChange={handleToggleVisibility}
+            disabled={loading || togglingVisibility}
+            label={`${visible ? 'Hide' : 'Show'} the ${title} section`}
+          />
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] text-[var(--text)]">
+              {visible ? 'Visible on the live site' : 'Hidden from the live site'}
+            </span>
+            {togglingVisibility && (
+              <Loader2 size={12} className="animate-spin text-[var(--faint)]" />
+            )}
+          </div>
         </div>
-        
-        <div className="flex gap-3">
-            <button
-                onClick={() => {
-                    setShowHistory(!showHistory);
-                    if (!showHistory) loadHistory();
-                }}
-                className={`px-4 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 border ${showHistory ? 'bg-slate-100 border-slate-300 text-slate-900' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
-            >
-                <History size={18} />
-                History
-            </button>
-            
-            <button 
-                onClick={handleSave}
-                disabled={saving || loading}
-                className="bg-slate-900 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed min-w-[160px]"
-            >
-                {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                {saving ? 'Publishing...' : 'Publish Changes'}
-            </button>
+        <div className="flex items-center gap-2">
+          <Label>Position</Label>
+          <Meta className="wb-num">{row.sort_order ?? '—'}</Meta>
         </div>
       </div>
 
-      <AnimatePresence>
-        {feedback && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className={`p-4 rounded-lg border flex items-center gap-3 ${feedback.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}
-          >
-            {feedback.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-            <span className="font-medium">{feedback.message}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="mt-5">
+        <Panel>
+          {loading ? (
+            <div className="flex items-center justify-center gap-2.5 py-16">
+              <Loader2 size={16} className="animate-spin text-[var(--faint)]" />
+              <Meta>Loading content…</Meta>
+            </div>
+          ) : (
+            renderForm(content, setContent)
+          )}
+        </Panel>
+      </div>
 
-      <div className="grid lg:grid-cols-[1fr_auto] gap-6 items-start relative">
-        {/* Main Editor */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[400px] relative z-10">
-            {loading && (
-            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-3">
-                <Loader2 size={32} className="animate-spin text-slate-400" />
-                <p className="text-slate-500 font-medium">Loading content...</p>
+      <SaveBar
+        dirty={dirty}
+        state={save}
+        onSave={handleSave}
+        onReset={() => {
+          setContent(JSON.parse(baseline) as T);
+          setSave({ status: 'idle' });
+        }}
+      />
+
+      {showHistory && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/50"
+            onClick={() => setShowHistory(false)}
+            aria-hidden
+          />
+          <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[340px] flex-col border-l border-[var(--line)] bg-[var(--surface)]">
+            <header className="flex items-center justify-between border-b border-[var(--line)] px-4 py-3.5">
+              <div className="flex items-center gap-2">
+                <History size={14} className="text-[var(--faint)]" />
+                <h2 className="text-[13px] font-semibold">Version history</h2>
+              </div>
+              <Button variant="ghost" onClick={() => setShowHistory(false)} aria-label="Close history">
+                <X size={14} />
+              </Button>
+            </header>
+
+            <div className="flex-1 overflow-y-auto p-3">
+              {loadingHistory ? (
+                <div className="flex items-center justify-center gap-2 py-12">
+                  <Loader2 size={14} className="animate-spin text-[var(--faint)]" />
+                  <Meta>Loading…</Meta>
                 </div>
-            </div>
-            )}
-
-            <div className="p-8">
-            {renderForm(content, setContent)}
-            </div>
-        </div>
-
-        {/* History Sidebar */}
-        <AnimatePresence>
-            {showHistory && (
-                <motion.div
-                    initial={{ opacity: 0, width: 0, x: 20 }}
-                    animate={{ opacity: 1, width: 320, x: 0 }}
-                    exit={{ opacity: 0, width: 0, x: 20 }}
-                    className="bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden flex flex-col h-[600px] sticky top-6"
-                >
-                    <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-                            <History size={16} /> Version History
-                        </h3>
-                        <button onClick={() => setShowHistory(false)} className="text-slate-400 hover:text-slate-600">
-                            <X size={16} />
+              ) : historyItems.length === 0 ? (
+                <EmptyState
+                  icon={<Clock size={18} />}
+                  title="No saved versions yet"
+                  description="Every publish writes a revision you can roll back to."
+                />
+              ) : (
+                <ul className="space-y-1.5">
+                  {historyItems.map((item, index) => {
+                    const at = new Date(item.created_at);
+                    return (
+                      <li
+                        key={item.id}
+                        className="group rounded-[4px] border border-[var(--line)] px-3 py-2.5 transition-colors hover:border-[var(--accent-line)]"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <Meta>
+                            {at.toLocaleDateString([], { day: '2-digit', month: 'short' })}{' '}
+                            {at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </Meta>
+                          {index === 0 && <Pill tone="ok">Current</Pill>}
+                        </div>
+                        <button
+                          onClick={() => handleRestore(item.id)}
+                          className="wb-label mt-2 flex w-full items-center justify-center gap-1.5 rounded-[3px] border border-[var(--line)] py-1.5 transition-colors hover:border-[var(--accent-line)] hover:text-[var(--accent)]"
+                        >
+                          <RotateCcw size={11} />
+                          Load into editor
                         </button>
-                    </div>
-                    
-                    <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                        {loadingHistory ? (
-                            <div className="p-8 text-center text-slate-400 flex flex-col items-center gap-2">
-                                <Loader2 size={20} className="animate-spin" />
-                                <span className="text-xs">Loading history...</span>
-                            </div>
-                        ) : historyItems.length === 0 ? (
-                            <div className="p-8 text-center text-slate-400 text-sm">
-                                No history available yet.
-                            </div>
-                        ) : (
-                            historyItems.map((item, index) => (
-                                <div key={item.id} className="p-3 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50/50 transition-colors group">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="flex items-center gap-2 text-slate-600 text-xs">
-                                            <Clock size={12} />
-                                            {new Date(item.created_at).toLocaleDateString()} 
-                                            <span className="text-slate-400">at</span>
-                                            {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </div>
-                                        {index === 0 && (
-                                            <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase tracking-wider">
-                                                Latest
-                                            </span>
-                                        )}
-                                    </div>
-                                    <button 
-                                        onClick={() => handleRestore(item.id)}
-                                        className="w-full mt-2 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-colors flex items-center justify-center gap-2 group-hover:border-blue-200"
-                                    >
-                                        <RotateCcw size={12} /> Restore this version
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-      </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            <footer className="border-t border-[var(--line)] px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Dot />
+                <Meta>Loading a version does not publish it.</Meta>
+              </div>
+            </footer>
+          </aside>
+        </>
+      )}
     </div>
   );
 }

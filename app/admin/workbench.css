@@ -1,0 +1,231 @@
+/*
+ * Workbench — the admin surface.
+ *
+ * Scoped to .wb so nothing here can leak into the public page, which stays
+ * light. The accent deliberately reuses --p-* from globals.css, so the CMS
+ * wears whatever accent colour the site is currently set to.
+ *
+ * Rules this file holds to: one accent, hairline borders, 4px radii, no
+ * gradients, no backdrop blur, no coloured shadows. Depth comes from surface
+ * steps and borders, not glow.
+ */
+
+.wb {
+  --bg: #0a0c0f;
+  --surface: #101317;
+  --raised: #171b21;
+  --hover: #1c2128;
+
+  --line: #23282f;
+  --line-soft: #191d23;
+
+  --text: #e7eaee;
+  --dim: #99a1ac;
+  --faint: #626b76;
+
+  --accent: rgb(var(--p-400));
+  --accent-dim: rgb(var(--p-400) / 0.14);
+  --accent-line: rgb(var(--p-400) / 0.35);
+
+  --ok: #3fb97f;
+  --warn: #e0a33e;
+  --danger: #f2555a;
+
+  --r: 4px;
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Monospaced, letterspaced microcopy. Used for every label, count and status
+   so that scanning the UI feels like reading an instrument, not a form. */
+.wb-label {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.wb-meta {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--faint);
+}
+
+.wb-num {
+  font-family: var(--font-jetbrains), monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inputs ------------------------------------------------------------------ */
+
+.wb-input {
+  width: 100%;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 9px 11px;
+  font-size: 14px;
+  color: var(--text);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.wb-input::placeholder {
+  color: var(--faint);
+}
+
+.wb-input:hover:not(:focus) {
+  border-color: #2c333b;
+}
+
+.wb-input:focus {
+  outline: none;
+  background: var(--hover);
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.wb-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+textarea.wb-input {
+  resize: vertical;
+  min-height: 84px;
+  line-height: 1.6;
+}
+
+/* Buttons ----------------------------------------------------------------- */
+
+.wb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: var(--r);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.wb-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.wb-btn-primary {
+  background: var(--accent);
+  color: #06080b;
+  font-weight: 600;
+}
+
+.wb-btn-primary:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+
+.wb-btn-default {
+  background: var(--raised);
+  border-color: var(--line);
+  color: var(--text);
+}
+
+.wb-btn-default:not(:disabled):hover {
+  background: var(--hover);
+  border-color: #2c333b;
+}
+
+.wb-btn-ghost {
+  background: transparent;
+  color: var(--dim);
+}
+
+.wb-btn-ghost:not(:disabled):hover {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.wb-btn-danger {
+  background: transparent;
+  border-color: rgb(242 85 90 / 0.3);
+  color: var(--danger);
+}
+
+.wb-btn-danger:not(:disabled):hover {
+  background: rgb(242 85 90 / 0.1);
+  border-color: rgb(242 85 90 / 0.55);
+}
+
+.wb-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* Surfaces ---------------------------------------------------------------- */
+
+.wb-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+
+/* Nav --------------------------------------------------------------------- */
+
+.wb-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: var(--r);
+  font-size: 13px;
+  color: var(--dim);
+  border-left: 2px solid transparent;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.wb-nav-item:hover {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.wb-nav-item[data-active='true'] {
+  background: var(--raised);
+  color: var(--text);
+  border-left-color: var(--accent);
+}
+
+/* Scrollbars — default macOS/Windows bars read as light grey blocks against
+   this surface, which breaks the whole illusion. */
+.wb ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.wb ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wb ::-webkit-scrollbar-thumb {
+  background: #262c34;
+  border-radius: 5px;
+  border: 3px solid var(--bg);
+}
+
+.wb ::-webkit-scrollbar-thumb:hover {
+  background: #343b45;
+}
+
+.wb :where(input, textarea, select):-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--raised) inset;
+}

@@ -162,17 +162,17 @@ function BlogPreview() {
   };
 
   return (
-    <div className="mt-6 bg-white rounded-xl border border-slate-200 p-6">
+    <div className="mt-6 bg-[var(--surface)] rounded-[4px] border border-[var(--line)] p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Rss size={20} className="text-orange-600" />
+          <h3 className="text-lg font-bold text-[var(--text)] flex items-center gap-2">
+            <Rss size={20} className="text-[var(--warn)]" />
             Blog Feed Preview
           </h3>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-[var(--faint)] mt-1">
             Posts from blog.suzarilshah.uk
             {lastFetched && (
-              <span className="ml-2 text-xs text-slate-400">
+              <span className="ml-2 text-xs text-[var(--faint)]">
                 Last updated: {lastFetched.toLocaleTimeString()}
               </span>
             )}
@@ -181,7 +181,7 @@ function BlogPreview() {
         <button
           onClick={fetchPosts}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--surface)] border border-[var(--line)] rounded-[4px] text-sm font-medium text-[var(--dim)] hover:bg-[var(--hover)] hover:border-[var(--line)] transition-colors disabled:opacity-50"
         >
           {loading ? (
             <Loader2 size={16} className="animate-spin" />
@@ -193,28 +193,28 @@ function BlogPreview() {
       </div>
 
       {loading && posts.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+        <div className="flex flex-col items-center justify-center py-12 text-[var(--faint)]">
           <Loader2 className="w-8 h-8 animate-spin mb-4" />
           <p>Fetching latest posts...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-          <p className="text-amber-800 text-sm">
+        <div className="bg-[var(--raised)] border border-[var(--line)] rounded-[4px] p-4 mb-4">
+          <p className="text-[var(--warn)] text-sm">
             <strong>Note:</strong> {error}. The blog tab will display a link to your blog instead.
           </p>
         </div>
       )}
 
       {!loading && posts.length === 0 && !error && (
-        <div className="text-center py-8 text-slate-500">
+        <div className="text-center py-8 text-[var(--faint)]">
           <p>No posts found. Make sure your blog has published content.</p>
           <a
             href="https://blog.suzarilshah.uk"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-4 text-blue-600 hover:underline"
+            className="inline-flex items-center gap-2 mt-4 text-[var(--accent)] hover:underline"
           >
             Visit blog.suzarilshah.uk
             <ExternalLink size={14} />
@@ -230,16 +230,16 @@ function BlogPreview() {
               href={post.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100 hover:border-orange-200 hover:bg-orange-50/50 transition-all group"
+              className="flex items-start gap-4 p-4 bg-[var(--raised)] rounded-[4px] border border-[var(--line)] hover:border-[var(--line)] hover:bg-orange-50/50 transition-all group"
             >
-              <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-[var(--raised)] rounded-[4px] flex items-center justify-center text-[var(--warn)] font-bold text-sm">
                 {index + 1}
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-slate-900 group-hover:text-orange-600 transition-colors truncate">
+                <h4 className="font-semibold text-[var(--text)] group-hover:text-[var(--warn)] transition-colors truncate">
                   {post.title}
                 </h4>
-                <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                <div className="flex items-center gap-3 mt-1 text-xs text-[var(--faint)]">
                   {post.pubDate && (
                     <span className="flex items-center gap-1">
                       <Calendar size={12} />
@@ -254,15 +254,15 @@ function BlogPreview() {
                   )}
                 </div>
               </div>
-              <ExternalLink size={16} className="text-slate-300 group-hover:text-orange-500 transition-colors flex-shrink-0" />
+              <ExternalLink size={16} className="text-[var(--faint)] group-hover:text-[var(--warn)] transition-colors flex-shrink-0" />
             </a>
           ))}
         </div>
       )}
 
       {posts.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-green-600 text-sm">
+        <div className="mt-4 pt-4 border-t border-[var(--line)] flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[var(--ok)] text-sm">
             <CheckCircle2 size={16} />
             <span>{posts.length} posts detected</span>
           </div>
@@ -270,7 +270,7 @@ function BlogPreview() {
             href="https://blog.suzarilshah.uk"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+            className="text-sm text-[var(--accent)] hover:underline flex items-center gap-1"
           >
             Open Blog
             <ExternalLink size={14} />
@@ -291,41 +291,41 @@ export default function PublicationsPage() {
       renderForm={(content, onChange) => (
         <div className="space-y-8">
           {/* Header Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-xl border border-slate-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[var(--raised)] p-6 rounded-[4px] border border-[var(--line)]">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-900">Section Title</label>
+              <label className="text-sm font-semibold text-[var(--text)]">Section Title</label>
               <input
                 type="text"
                 value={content.title}
                 onChange={(e) => onChange({ ...content, title: e.target.value })}
-                className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                className="wb-input"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-900">Description</label>
+              <label className="text-sm font-semibold text-[var(--text)]">Description</label>
               <input
                 type="text"
                 value={content.description}
                 onChange={(e) => onChange({ ...content, description: e.target.value })}
-                className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                className="wb-input"
               />
             </div>
           </div>
 
           {/* Articles List Accordion */}
-          <details className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" open>
-            <summary className="px-6 py-4 bg-slate-50/50 cursor-pointer flex items-center justify-between font-semibold text-slate-900 select-none hover:bg-slate-100 transition-colors">
+          <details className="group bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden" open>
+            <summary className="px-6 py-4 bg-[var(--raised)] cursor-pointer flex items-center justify-between font-semibold text-[var(--text)] select-none hover:bg-[var(--hover)] transition-colors">
                 <div className="flex items-center gap-3">
-                    <FileText className="text-blue-600" size={20} />
+                    <FileText className="text-[var(--accent)]" size={20} />
                     <span>Technical Articles</span>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold border border-blue-200">
+                    <span className="text-xs bg-[var(--raised)] text-[var(--accent)] px-2 py-0.5 rounded-full font-bold border border-[var(--line)]">
                         {content.articles?.length || 0}
                     </span>
                 </div>
-                <ChevronDown size={20} className="text-slate-400 transition-transform duration-300 group-open:rotate-180" />
+                <ChevronDown size={20} className="text-[var(--faint)] transition-transform duration-300 group-open:rotate-180" />
             </summary>
 
-            <div className="p-6 border-t border-slate-100 bg-slate-50/30">
+            <div className="p-6 border-t border-[var(--line)] bg-[var(--raised)]">
                 <div className="flex justify-end mb-4">
                     <button
                         onClick={() => onChange({
@@ -335,7 +335,7 @@ export default function PublicationsPage() {
                             ...(content.articles || [])
                         ]
                         })}
-                        className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm"
+                        className="text-sm bg-[var(--accent)] text-white px-4 py-2 rounded-[4px] font-medium hover:opacity-90 transition-colors flex items-center gap-2"
                     >
                         <Plus size={16} /> Add Article
                     </button>
@@ -343,26 +343,26 @@ export default function PublicationsPage() {
 
                 <div className="space-y-4">
                     {(!content.articles || content.articles.length === 0) && (
-                        <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
+                        <div className="text-center py-8 bg-[var(--raised)] rounded-[4px] border border-dashed border-[var(--line)] text-[var(--faint)] text-sm">
                             No articles listed.
                         </div>
                     )}
                     {content.articles?.map((item, index) => (
-                    <div key={index} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group hover:border-blue-200 transition-colors">
+                    <div key={index} className="bg-[var(--surface)] border border-[var(--line)] rounded-[4px] p-6 relative group hover:border-[var(--line)] transition-colors">
                         <button
                         onClick={() => {
                             const newItems = [...content.articles];
                             newItems.splice(index, 1);
                             onChange({ ...content, articles: newItems });
                         }}
-                        className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded"
+                        className="absolute top-4 right-4 text-[var(--faint)] hover:text-[var(--danger)] transition-colors p-1 hover:bg-[var(--raised)] rounded"
                         >
                         <Trash2 size={18} />
                         </button>
 
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 pr-8 items-start">
                             <div className="md:col-span-6 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Article Title</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Article Title</label>
                                 <textarea
                                 value={item.title}
                                 onChange={(e) => {
@@ -370,11 +370,11 @@ export default function PublicationsPage() {
                                     newItems[index].title = e.target.value;
                                     onChange({ ...content, articles: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm font-medium resize-none h-20"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="md:col-span-3 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Publisher</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Publisher</label>
                                 <input
                                 type="text"
                                 value={item.publisher}
@@ -383,11 +383,11 @@ export default function PublicationsPage() {
                                     newItems[index].publisher = e.target.value;
                                     onChange({ ...content, articles: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="md:col-span-3 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Date</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Date</label>
                                 <input
                                 type="text"
                                 value={item.date}
@@ -396,11 +396,11 @@ export default function PublicationsPage() {
                                     newItems[index].date = e.target.value;
                                     onChange({ ...content, articles: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="md:col-span-12 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">URL</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">URL</label>
                                 <input
                                 type="text"
                                 value={item.link}
@@ -409,7 +409,7 @@ export default function PublicationsPage() {
                                     newItems[index].link = e.target.value;
                                     onChange({ ...content, articles: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm text-blue-600 font-mono"
+                                className="wb-input"
                                 />
                             </div>
                         </div>
@@ -420,19 +420,19 @@ export default function PublicationsPage() {
           </details>
 
           {/* Journals List Accordion */}
-          <details className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <summary className="px-6 py-4 bg-slate-50/50 cursor-pointer flex items-center justify-between font-semibold text-slate-900 select-none hover:bg-slate-100 transition-colors">
+          <details className="group bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden">
+            <summary className="px-6 py-4 bg-[var(--raised)] cursor-pointer flex items-center justify-between font-semibold text-[var(--text)] select-none hover:bg-[var(--hover)] transition-colors">
                 <div className="flex items-center gap-3">
-                    <BookOpen className="text-purple-600" size={20} />
+                    <BookOpen className="text-[var(--accent)]" size={20} />
                     <span>Research Journals</span>
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold border border-purple-200">
+                    <span className="text-xs bg-[var(--raised)] text-[var(--accent)] px-2 py-0.5 rounded-full font-bold border border-[var(--line)]">
                         {content.journals?.length || 0}
                     </span>
                 </div>
-                <ChevronDown size={20} className="text-slate-400 transition-transform duration-300 group-open:rotate-180" />
+                <ChevronDown size={20} className="text-[var(--faint)] transition-transform duration-300 group-open:rotate-180" />
             </summary>
 
-            <div className="p-6 border-t border-slate-100 bg-slate-50/30">
+            <div className="p-6 border-t border-[var(--line)] bg-[var(--raised)]">
                 <div className="flex justify-end mb-4">
                     <button
                         onClick={() => onChange({
@@ -442,7 +442,7 @@ export default function PublicationsPage() {
                             ...(content.journals || [])
                         ]
                         })}
-                        className="text-sm bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-sm"
+                        className="text-sm bg-[var(--accent)] text-white px-4 py-2 rounded-[4px] font-medium hover:opacity-90 transition-colors flex items-center gap-2"
                     >
                         <Plus size={16} /> Add Journal
                     </button>
@@ -450,26 +450,26 @@ export default function PublicationsPage() {
 
                 <div className="space-y-4">
                     {(!content.journals || content.journals.length === 0) && (
-                        <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
+                        <div className="text-center py-8 bg-[var(--raised)] rounded-[4px] border border-dashed border-[var(--line)] text-[var(--faint)] text-sm">
                             No journals listed.
                         </div>
                     )}
                     {content.journals?.map((item, index) => (
-                    <div key={index} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group hover:border-purple-200 transition-colors">
+                    <div key={index} className="bg-[var(--surface)] border border-[var(--line)] rounded-[4px] p-6 relative group hover:border-[var(--line)] transition-colors">
                         <button
                         onClick={() => {
                             const newItems = [...content.journals];
                             newItems.splice(index, 1);
                             onChange({ ...content, journals: newItems });
                         }}
-                        className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded"
+                        className="absolute top-4 right-4 text-[var(--faint)] hover:text-[var(--danger)] transition-colors p-1 hover:bg-[var(--raised)] rounded"
                         >
                         <Trash2 size={18} />
                         </button>
 
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 pr-8 items-start">
                             <div className="md:col-span-6 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Paper Title</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Paper Title</label>
                                 <textarea
                                 value={item.title}
                                 onChange={(e) => {
@@ -477,11 +477,11 @@ export default function PublicationsPage() {
                                     newItems[index].title = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm font-medium resize-none h-20"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="md:col-span-3 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Publisher</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Publisher</label>
                                 <input
                                 type="text"
                                 value={item.publisher}
@@ -490,11 +490,11 @@ export default function PublicationsPage() {
                                     newItems[index].publisher = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="md:col-span-3 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Date</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Date</label>
                                 <input
                                 type="text"
                                 value={item.date}
@@ -503,11 +503,11 @@ export default function PublicationsPage() {
                                     newItems[index].date = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="md:col-span-6 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">URL</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">URL</label>
                                 <input
                                 type="text"
                                 value={item.link}
@@ -516,11 +516,11 @@ export default function PublicationsPage() {
                                     newItems[index].link = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm text-blue-600 font-mono"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="md:col-span-6 space-y-1">
-                                <label className="text-xs font-medium text-slate-500">DOI (Digital Object Identifier)</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">DOI (Digital Object Identifier)</label>
                                 <input
                                 type="text"
                                 value={item.doi || ''}
@@ -529,7 +529,7 @@ export default function PublicationsPage() {
                                     newItems[index].doi = e.target.value;
                                     onChange({ ...content, journals: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm font-mono"
+                                className="wb-input"
                                 />
                             </div>
                         </div>
@@ -540,35 +540,35 @@ export default function PublicationsPage() {
           </details>
 
           {/* Blog Settings Accordion */}
-          <details className="group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <summary className="px-6 py-4 bg-slate-50/50 cursor-pointer flex items-center justify-between font-semibold text-slate-900 select-none hover:bg-slate-100 transition-colors">
+          <details className="group bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden">
+            <summary className="px-6 py-4 bg-[var(--raised)] cursor-pointer flex items-center justify-between font-semibold text-[var(--text)] select-none hover:bg-[var(--hover)] transition-colors">
                 <div className="flex items-center gap-3">
-                    <Rss className="text-orange-600" size={20} />
+                    <Rss className="text-[var(--warn)]" size={20} />
                     <span>Blog Posts</span>
-                    <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-bold border border-orange-200">
+                    <span className="text-xs bg-[var(--raised)] text-[var(--warn)] px-2 py-0.5 rounded-full font-bold border border-[var(--line)]">
                         Auto-fetched
                     </span>
                 </div>
-                <ChevronDown size={20} className="text-slate-400 transition-transform duration-300 group-open:rotate-180" />
+                <ChevronDown size={20} className="text-[var(--faint)] transition-transform duration-300 group-open:rotate-180" />
             </summary>
 
-            <div className="p-6 border-t border-slate-100 bg-slate-50/30">
+            <div className="p-6 border-t border-[var(--line)] bg-[var(--raised)]">
                 {/* Blog URL Info */}
-                <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+                <div className="bg-[var(--raised)] border border-[var(--line)] rounded-[4px] p-4 mb-6">
                     <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <ExternalLink className="w-5 h-5 text-orange-600" />
+                        <div className="w-10 h-10 bg-[var(--raised)] rounded-[4px] flex items-center justify-center flex-shrink-0">
+                            <ExternalLink className="w-5 h-5 text-[var(--warn)]" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-orange-900">Your Blog</h3>
-                            <p className="text-sm text-orange-700 mt-1">
+                            <h3 className="font-semibold text-[var(--warn)]">Your Blog</h3>
+                            <p className="text-sm text-[var(--warn)] mt-1">
                                 Posts are automatically fetched from your blog RSS feed.
                             </p>
                             <a
                                 href="https://blog.suzarilshah.uk"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-white border border-orange-200 rounded-lg text-orange-600 font-medium hover:bg-orange-50 transition-colors"
+                                className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[var(--surface)] border border-[var(--line)] rounded-[4px] text-[var(--warn)] font-medium hover:bg-[var(--raised)] transition-colors"
                             >
                                 blog.suzarilshah.uk
                                 <ExternalLink size={14} />
@@ -579,10 +579,10 @@ export default function PublicationsPage() {
 
                 {/* Display Options */}
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between p-4 bg-[var(--surface)] rounded-[4px] border border-[var(--line)]">
                         <div>
-                            <label className="text-sm font-semibold text-slate-900">Show Categories</label>
-                            <p className="text-xs text-slate-500 mt-0.5">Display category tags on blog post cards</p>
+                            <label className="text-sm font-semibold text-[var(--text)]">Show Categories</label>
+                            <p className="text-xs text-[var(--faint)] mt-0.5">Display category tags on blog post cards</p>
                         </div>
                         <button
                             onClick={() => onChange({
@@ -590,19 +590,19 @@ export default function PublicationsPage() {
                                 blog: { ...content.blog, showCategories: !content.blog?.showCategories }
                             })}
                             className={`relative w-12 h-6 rounded-full transition-colors ${
-                                content.blog?.showCategories !== false ? 'bg-orange-600' : 'bg-slate-300'
+                                content.blog?.showCategories !== false ? 'bg-[var(--warn)]' : 'bg-slate-300'
                             }`}
                         >
                             <span
-                                className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                                className={`absolute top-1 w-4 h-4 bg-[var(--surface)] rounded-full  transition-transform ${
                                     content.blog?.showCategories !== false ? 'left-7' : 'left-1'
                                 }`}
                             />
                         </button>
                     </div>
 
-                    <div className="p-4 bg-white rounded-lg border border-slate-200">
-                        <label className="text-sm font-semibold text-slate-900 block mb-2">
+                    <div className="p-4 bg-[var(--surface)] rounded-[4px] border border-[var(--line)]">
+                        <label className="text-sm font-semibold text-[var(--text)] block mb-2">
                             Maximum Posts to Display
                         </label>
                         <div className="flex items-center gap-4">
@@ -615,11 +615,11 @@ export default function PublicationsPage() {
                                     ...content,
                                     blog: { ...content.blog, maxPosts: parseInt(e.target.value) }
                                 })}
-                                className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-600"
+                                className="flex-1 h-2 bg-[var(--raised)] rounded-[4px] appearance-none cursor-pointer accent-orange-600"
                             />
-                            <span className="w-8 text-center font-bold text-slate-900">{content.blog?.maxPosts || 6}</span>
+                            <span className="w-8 text-center font-bold text-[var(--text)]">{content.blog?.maxPosts || 6}</span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-2">
+                        <p className="text-xs text-[var(--faint)] mt-2">
                             Shows up to {content.blog?.maxPosts || 6} posts in the Blog tab
                         </p>
                     </div>

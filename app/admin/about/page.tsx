@@ -26,30 +26,30 @@ export default function AboutPage() {
       renderForm={(content, onChange) => (
         <div className="space-y-8">
           <div className="space-y-3">
-            <label className="text-sm font-semibold text-slate-900">Biography</label>
-            <p className="text-xs text-slate-500">Your professional story. Use new lines for paragraphs.</p>
+            <label className="text-sm font-semibold text-[var(--text)]">Biography</label>
+            <p className="text-xs text-[var(--faint)]">Your professional story. Use new lines for paragraphs.</p>
             <textarea 
               value={content.bio} 
               onChange={(e) => onChange({ ...content, bio: e.target.value })}
-              className="w-full p-4 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none h-48 resize-none text-base leading-relaxed"
+              className="wb-input"
             />
           </div>
 
           <div className="space-y-3">
-            <label className="text-sm font-semibold text-slate-900">Technical Skills</label>
-            <p className="text-xs text-slate-500">Comma-separated list of your top skills (e.g. React, Azure, Docker).</p>
+            <label className="text-sm font-semibold text-[var(--text)]">Technical Skills</label>
+            <p className="text-xs text-[var(--faint)]">Comma-separated list of your top skills (e.g. React, Azure, Docker).</p>
             <textarea 
               value={content.skills?.join(', ') || ''} 
               onChange={(e) => onChange({ 
                 ...content, 
                 skills: e.target.value.split(',').map(s => s.trim()).filter(Boolean) 
               })}
-              className="w-full p-4 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none h-32 resize-none font-mono text-sm"
+              className="wb-input"
               placeholder="React, Node.js, TypeScript..."
             />
             <div className="flex flex-wrap gap-2 mt-2">
                 {content.skills?.map((skill, i) => (
-                    <span key={i} className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200">
+                    <span key={i} className="px-2 py-1 bg-[var(--raised)] text-[var(--dim)] text-xs rounded border border-[var(--line)]">
                         {skill}
                     </span>
                 ))}

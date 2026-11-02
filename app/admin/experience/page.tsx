@@ -82,13 +82,13 @@ function TagInput({
         {tags.map((tag, index) => (
           <span
             key={`${tag}-${index}`}
-            className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full group"
+            className="inline-flex items-center gap-1 px-2.5 py-1 bg-[var(--raised)] text-[var(--accent)] text-xs font-medium rounded-full group"
           >
             {tag}
             <button
               type="button"
               onClick={() => removeTag(index)}
-              className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+              className="hover:bg-[var(--hover)] rounded-full p-0.5 transition-colors"
             >
               <X size={12} />
             </button>
@@ -103,7 +103,7 @@ function TagInput({
         onBlur={handleBlur}
         onPaste={handlePaste}
         placeholder={tags.length === 0 ? placeholder : "Add another..."}
-        className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm"
+        className="wb-input"
       />
     </div>
   );
@@ -194,30 +194,30 @@ function WorkJobCard({ job, index, jobs, onChange, dragHandleProps }: {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group hover:border-blue-200 transition-colors">
+    <div className="bg-[var(--surface)] border border-[var(--line)] rounded-[4px] p-6 relative group hover:border-[var(--line)] transition-colors">
       {/* Controls */}
       <div className="absolute top-4 left-4 flex flex-col items-center gap-1">
         <div
           {...dragHandleProps}
-          className="text-slate-300 hover:text-slate-600 cursor-grab active:cursor-grabbing p-1.5 hover:bg-slate-100 rounded transition-colors"
+          className="text-[var(--faint)] hover:text-[var(--dim)] cursor-grab active:cursor-grabbing p-1.5 hover:bg-[var(--hover)] rounded transition-colors"
         >
           <GripVertical size={18} />
         </div>
         <div className="flex flex-col gap-0.5">
-          <button onClick={() => moveJob('up')} disabled={index === 0} className="text-slate-300 hover:text-blue-500 disabled:opacity-30 p-0.5 hover:bg-blue-50 rounded transition-colors">
+          <button onClick={() => moveJob('up')} disabled={index === 0} className="text-[var(--faint)] hover:text-[var(--accent)] disabled:opacity-30 p-0.5 hover:bg-[var(--raised)] rounded transition-colors">
             <ChevronUp size={14} />
           </button>
-          <button onClick={() => moveJob('down')} disabled={index === jobs.length - 1} className="text-slate-300 hover:text-blue-500 disabled:opacity-30 p-0.5 hover:bg-blue-50 rounded transition-colors">
+          <button onClick={() => moveJob('down')} disabled={index === jobs.length - 1} className="text-[var(--faint)] hover:text-[var(--accent)] disabled:opacity-30 p-0.5 hover:bg-[var(--raised)] rounded transition-colors">
             <ChevronDown size={14} />
           </button>
         </div>
       </div>
 
-      <button onClick={deleteJob} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded">
+      <button onClick={deleteJob} className="absolute top-4 right-4 text-[var(--faint)] hover:text-[var(--danger)] transition-colors p-1 hover:bg-[var(--raised)] rounded">
         <Trash2 size={18} />
       </button>
 
-      <div className="absolute top-4 left-16 bg-blue-100 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+      <div className="absolute top-4 left-16 bg-[var(--raised)] text-[var(--accent)] text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
         <Briefcase size={10} />
         #{index + 1}
       </div>
@@ -225,32 +225,32 @@ function WorkJobCard({ job, index, jobs, onChange, dragHandleProps }: {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-14 pr-8 pt-4">
         <div className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Company</label>
-            <input type="text" value={job.company} onChange={(e) => updateJob('company', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm font-bold" />
+            <label className="text-xs font-medium text-[var(--faint)]">Company</label>
+            <input type="text" value={job.company} onChange={(e) => updateJob('company', e.target.value)} className="wb-input" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Role</label>
-            <input type="text" value={job.role} onChange={(e) => updateJob('role', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm" />
+            <label className="text-xs font-medium text-[var(--faint)]">Role</label>
+            <input type="text" value={job.role} onChange={(e) => updateJob('role', e.target.value)} className="wb-input" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500">Period</label>
-              <input type="text" value={job.period} onChange={(e) => updateJob('period', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm font-mono" />
+              <label className="text-xs font-medium text-[var(--faint)]">Period</label>
+              <input type="text" value={job.period} onChange={(e) => updateJob('period', e.target.value)} className="wb-input" />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500">Location</label>
-              <input type="text" value={job.location} onChange={(e) => updateJob('location', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm" />
+              <label className="text-xs font-medium text-[var(--faint)]">Location</label>
+              <input type="text" value={job.location} onChange={(e) => updateJob('location', e.target.value)} className="wb-input" />
             </div>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Description</label>
-            <textarea value={job.description} onChange={(e) => updateJob('description', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm h-32 resize-none" />
+            <label className="text-xs font-medium text-[var(--faint)]">Description</label>
+            <textarea value={job.description} onChange={(e) => updateJob('description', e.target.value)} className="wb-input" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Tags</label>
+            <label className="text-xs font-medium text-[var(--faint)]">Tags</label>
             <TagInput tags={job.tags || []} onChange={(tags) => updateJob('tags', tags)} />
           </div>
         </div>
@@ -286,27 +286,27 @@ function PMJobCard({ job, index, jobs, onChange, dragHandleProps }: {
   };
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-white border border-purple-200 rounded-xl p-6 shadow-sm relative group hover:border-purple-300 transition-colors">
+    <div className="bg-gradient-to-br from-purple-50 to-white border border-[var(--line)] rounded-[4px] p-6 relative group hover:border-[var(--line)] transition-colors">
       {/* Controls */}
       <div className="absolute top-4 left-4 flex flex-col items-center gap-1">
-        <div {...dragHandleProps} className="text-slate-300 hover:text-slate-600 cursor-grab active:cursor-grabbing p-1.5 hover:bg-slate-100 rounded transition-colors">
+        <div {...dragHandleProps} className="text-[var(--faint)] hover:text-[var(--dim)] cursor-grab active:cursor-grabbing p-1.5 hover:bg-[var(--hover)] rounded transition-colors">
           <GripVertical size={18} />
         </div>
         <div className="flex flex-col gap-0.5">
-          <button onClick={() => moveJob('up')} disabled={index === 0} className="text-slate-300 hover:text-purple-500 disabled:opacity-30 p-0.5 hover:bg-purple-50 rounded transition-colors">
+          <button onClick={() => moveJob('up')} disabled={index === 0} className="text-[var(--faint)] hover:text-[var(--accent)] disabled:opacity-30 p-0.5 hover:bg-[var(--raised)] rounded transition-colors">
             <ChevronUp size={14} />
           </button>
-          <button onClick={() => moveJob('down')} disabled={index === jobs.length - 1} className="text-slate-300 hover:text-purple-500 disabled:opacity-30 p-0.5 hover:bg-purple-50 rounded transition-colors">
+          <button onClick={() => moveJob('down')} disabled={index === jobs.length - 1} className="text-[var(--faint)] hover:text-[var(--accent)] disabled:opacity-30 p-0.5 hover:bg-[var(--raised)] rounded transition-colors">
             <ChevronDown size={14} />
           </button>
         </div>
       </div>
 
-      <button onClick={deleteJob} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded">
+      <button onClick={deleteJob} className="absolute top-4 right-4 text-[var(--faint)] hover:text-[var(--danger)] transition-colors p-1 hover:bg-[var(--raised)] rounded">
         <Trash2 size={18} />
       </button>
 
-      <div className="absolute top-4 left-16 bg-purple-100 text-purple-600 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+      <div className="absolute top-4 left-16 bg-[var(--raised)] text-[var(--accent)] text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
         <Target size={10} />
         PM #{index + 1}
       </div>
@@ -315,59 +315,59 @@ function PMJobCard({ job, index, jobs, onChange, dragHandleProps }: {
         {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Company / Organization</label>
-            <input type="text" value={job.company} onChange={(e) => updateJob('company', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm font-bold" />
+            <label className="text-xs font-medium text-[var(--faint)]">Company / Organization</label>
+            <input type="text" value={job.company} onChange={(e) => updateJob('company', e.target.value)} className="wb-input" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Role / Title</label>
-            <input type="text" value={job.role} onChange={(e) => updateJob('role', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm" />
+            <label className="text-xs font-medium text-[var(--faint)]">Role / Title</label>
+            <input type="text" value={job.role} onChange={(e) => updateJob('role', e.target.value)} className="wb-input" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Period</label>
-            <input type="text" value={job.period} onChange={(e) => updateJob('period', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm font-mono" />
+            <label className="text-xs font-medium text-[var(--faint)]">Period</label>
+            <input type="text" value={job.period} onChange={(e) => updateJob('period', e.target.value)} className="wb-input" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500">Location</label>
-            <input type="text" value={job.location} onChange={(e) => updateJob('location', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm" />
+            <label className="text-xs font-medium text-[var(--faint)]">Location</label>
+            <input type="text" value={job.location} onChange={(e) => updateJob('location', e.target.value)} className="wb-input" />
           </div>
         </div>
 
         {/* Description */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-500">Description</label>
-          <textarea value={job.description} onChange={(e) => updateJob('description', e.target.value)} className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm h-24 resize-none" />
+          <label className="text-xs font-medium text-[var(--faint)]">Description</label>
+          <textarea value={job.description} onChange={(e) => updateJob('description', e.target.value)} className="wb-input" />
         </div>
 
         {/* PM-Specific Fields */}
-        <div className="bg-white rounded-lg p-4 border border-slate-100">
-          <h4 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-            <Layers size={14} className="text-purple-500" />
+        <div className="bg-[var(--surface)] rounded-[4px] p-4 border border-[var(--line)]">
+          <h4 className="text-sm font-bold text-[var(--dim)] mb-4 flex items-center gap-2">
+            <Layers size={14} className="text-[var(--accent)]" />
             Project Management Details
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500 flex items-center gap-1">
+              <label className="text-xs font-medium text-[var(--faint)] flex items-center gap-1">
                 <Users size={10} /> Team Size
               </label>
-              <input type="text" value={job.team_size || ''} onChange={(e) => updateJob('team_size', e.target.value)} placeholder="e.g. 10-15" className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm" />
+              <input type="text" value={job.team_size || ''} onChange={(e) => updateJob('team_size', e.target.value)} placeholder="e.g. 10-15" className="wb-input" />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500 flex items-center gap-1">
+              <label className="text-xs font-medium text-[var(--faint)] flex items-center gap-1">
                 <TrendingUp size={10} /> Budget
               </label>
-              <input type="text" value={job.budget || ''} onChange={(e) => updateJob('budget', e.target.value)} placeholder="e.g. $500K+" className="w-full p-2 border border-slate-200 rounded-md focus:border-purple-500 outline-none text-sm" />
+              <input type="text" value={job.budget || ''} onChange={(e) => updateJob('budget', e.target.value)} placeholder="e.g. $500K+" className="wb-input" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500 flex items-center gap-1">
+              <label className="text-xs font-medium text-[var(--faint)] flex items-center gap-1">
                 <Layers size={10} /> Methodologies
               </label>
               <TagInput tags={job.methodologies || []} onChange={(tags) => updateJob('methodologies', tags)} placeholder="Agile, Scrum, Waterfall..." />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500 flex items-center gap-1">
+              <label className="text-xs font-medium text-[var(--faint)] flex items-center gap-1">
                 <Code size={10} /> Tools Used
               </label>
               <TagInput tags={job.tools || []} onChange={(tags) => updateJob('tools', tags)} placeholder="Jira, Confluence, MS Project..." />
@@ -375,7 +375,7 @@ function PMJobCard({ job, index, jobs, onChange, dragHandleProps }: {
           </div>
 
           <div className="mt-4 space-y-1">
-            <label className="text-xs font-medium text-slate-500 flex items-center gap-1">
+            <label className="text-xs font-medium text-[var(--faint)] flex items-center gap-1">
               <Award size={10} /> Key Achievements
             </label>
             <TagInput tags={job.key_achievements || []} onChange={(tags) => updateJob('key_achievements', tags)} placeholder="On-time delivery, Under budget..." />
@@ -384,7 +384,7 @@ function PMJobCard({ job, index, jobs, onChange, dragHandleProps }: {
 
         {/* Tags */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-500">Display Tags</label>
+          <label className="text-xs font-medium text-[var(--faint)]">Display Tags</label>
           <TagInput tags={job.tags || []} onChange={(tags) => updateJob('tags', tags)} />
         </div>
       </div>
@@ -402,18 +402,18 @@ function TabButton({ active, onClick, icon: Icon, label, count, color = 'blue' }
   color?: 'blue' | 'purple';
 }) {
   const colors = {
-    blue: active ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300',
-    purple: active ? 'bg-purple-600 text-white' : 'bg-white text-slate-600 border-slate-200 hover:border-purple-300'
+    blue: active ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface)] text-[var(--dim)] border-[var(--line)] hover:border-[var(--line)]',
+    purple: active ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface)] text-[var(--dim)] border-[var(--line)] hover:border-[var(--line)]'
   };
 
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all border ${colors[color]}`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-[4px] font-medium transition-all border ${colors[color]}`}
     >
       <Icon size={16} />
       <span>{label}</span>
-      <span className={`ml-1 px-1.5 py-0.5 rounded text-xs font-bold ${active ? 'bg-white/20' : 'bg-slate-100'}`}>
+      <span className={`ml-1 px-1.5 py-0.5 rounded text-xs font-bold ${active ? 'bg-[var(--surface)]' : 'bg-[var(--raised)]'}`}>
         {count}
       </span>
     </button>
@@ -458,29 +458,29 @@ export default function ExperiencePage() {
         return (
           <div className="space-y-8">
             {/* Section Settings */}
-            <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 space-y-6">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <div className="bg-[var(--raised)] p-6 rounded-[4px] border border-[var(--line)] space-y-6">
+              <h3 className="text-lg font-bold text-[var(--text)] flex items-center gap-2">
                 <Type size={18} />
                 Section Settings
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Section Title</label>
+                  <label className="text-sm font-semibold text-[var(--text)]">Section Title</label>
                   <input
                     type="text"
                     value={normalizedContent.title}
                     onChange={(e) => onChange({ ...normalizedContent, title: e.target.value })}
-                    className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                    className="wb-input"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-900">Subtitle</label>
+                  <label className="text-sm font-semibold text-[var(--text)]">Subtitle</label>
                   <input
                     type="text"
                     value={normalizedContent.subtitle}
                     onChange={(e) => onChange({ ...normalizedContent, subtitle: e.target.value })}
-                    className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                    className="wb-input"
                   />
                 </div>
               </div>
@@ -492,9 +492,9 @@ export default function ExperiencePage() {
                     type="checkbox"
                     checked={normalizedContent.show_typing_effect}
                     onChange={(e) => onChange({ ...normalizedContent, show_typing_effect: e.target.checked })}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-[var(--line)] text-[var(--accent)] blue-500"
                   />
-                  <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                  <span className="text-sm font-medium text-[var(--dim)] flex items-center gap-1">
                     {normalizedContent.show_typing_effect ? <Eye size={14} /> : <EyeOff size={14} />}
                     Typing Effect
                   </span>
@@ -504,9 +504,9 @@ export default function ExperiencePage() {
                     type="checkbox"
                     checked={normalizedContent.show_curved_text}
                     onChange={(e) => onChange({ ...normalizedContent, show_curved_text: e.target.checked })}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-[var(--line)] text-[var(--accent)] blue-500"
                   />
-                  <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                  <span className="text-sm font-medium text-[var(--dim)] flex items-center gap-1">
                     {normalizedContent.show_curved_text ? <Eye size={14} /> : <EyeOff size={14} />}
                     Curved Text
                   </span>
@@ -516,9 +516,9 @@ export default function ExperiencePage() {
                     type="checkbox"
                     checked={normalizedContent.show_parallax_background}
                     onChange={(e) => onChange({ ...normalizedContent, show_parallax_background: e.target.checked })}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-[var(--line)] text-[var(--accent)] blue-500"
                   />
-                  <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                  <span className="text-sm font-medium text-[var(--dim)] flex items-center gap-1">
                     {normalizedContent.show_parallax_background ? <Eye size={14} /> : <EyeOff size={14} />}
                     Parallax Background
                   </span>
@@ -528,9 +528,9 @@ export default function ExperiencePage() {
 
             {/* Typing Phrases */}
             {normalizedContent.show_typing_effect && (
-              <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 space-y-4">
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Type size={18} className="text-blue-600" />
+              <div className="bg-[var(--raised)] p-6 rounded-[4px] border border-[var(--line)] space-y-4">
+                <h3 className="text-lg font-bold text-[var(--text)] flex items-center gap-2">
+                  <Type size={18} className="text-[var(--accent)]" />
                   Typing Effect Phrases
                 </h3>
                 <TagInput
@@ -538,45 +538,45 @@ export default function ExperiencePage() {
                   onChange={(phrases) => onChange({ ...normalizedContent, typing_phrases: phrases })}
                   placeholder="Add phrases that will be typed out..."
                 />
-                <p className="text-xs text-slate-500">These phrases will cycle with a typing animation effect.</p>
+                <p className="text-xs text-[var(--faint)]">These phrases will cycle with a typing animation effect.</p>
               </div>
             )}
 
             {/* Curved Text Settings */}
             {normalizedContent.show_curved_text && (
-              <div className="bg-purple-50 p-6 rounded-xl border border-purple-100 space-y-4">
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <RotateCcw size={18} className="text-purple-600" />
+              <div className="bg-[var(--raised)] p-6 rounded-[4px] border border-[var(--line)] space-y-4">
+                <h3 className="text-lg font-bold text-[var(--text)] flex items-center gap-2">
+                  <RotateCcw size={18} className="text-[var(--accent)]" />
                   Curved Scroll Text
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">Text</label>
+                    <label className="text-sm font-semibold text-[var(--text)]">Text</label>
                     <input
                       type="text"
                       value={normalizedContent.curved_text}
                       onChange={(e) => onChange({ ...normalizedContent, curved_text: e.target.value })}
-                      className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none bg-white"
+                      className="wb-input"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-900">Repeat Count</label>
+                    <label className="text-sm font-semibold text-[var(--text)]">Repeat Count</label>
                     <input
                       type="number"
                       min={1}
                       max={5}
                       value={normalizedContent.curved_text_repeat}
                       onChange={(e) => onChange({ ...normalizedContent, curved_text_repeat: parseInt(e.target.value) || 3 })}
-                      className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none bg-white"
+                      className="wb-input"
                     />
                   </div>
                 </div>
-                <p className="text-xs text-slate-500">Preview: {Array(normalizedContent.curved_text_repeat).fill(normalizedContent.curved_text).join('')}</p>
+                <p className="text-xs text-[var(--faint)]">Preview: {Array(normalizedContent.curved_text_repeat).fill(normalizedContent.curved_text).join('')}</p>
               </div>
             )}
 
             {/* Tab Navigation */}
-            <div className="flex gap-4 border-b border-slate-200 pb-4">
+            <div className="flex gap-4 border-b border-[var(--line)] pb-4">
               <TabButton
                 active={activeTab === 'work'}
                 onClick={() => setActiveTab('work')}
@@ -600,8 +600,8 @@ export default function ExperiencePage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Work Experience</h3>
-                    <p className="text-xs text-slate-500">Engineering, development, and technical roles</p>
+                    <h3 className="text-lg font-bold text-[var(--text)]">Work Experience</h3>
+                    <p className="text-xs text-[var(--faint)]">Engineering, development, and technical roles</p>
                   </div>
                   <button
                     onClick={() => onChange({
@@ -611,7 +611,7 @@ export default function ExperiencePage() {
                         ...normalizedContent.work_experience
                       ]
                     })}
-                    className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    className="text-sm bg-[var(--accent)] text-white px-3 py-1.5 rounded-[4px] font-medium hover:opacity-90 transition-colors flex items-center gap-2"
                   >
                     <Plus size={16} /> Add Work Role
                   </button>
@@ -627,7 +627,7 @@ export default function ExperiencePage() {
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                className={snapshot.isDragging ? 'shadow-xl ring-2 ring-blue-200' : ''}
+                                className={snapshot.isDragging ? 'shadow-xl ' : ''}
                               >
                                 <WorkJobCard
                                   job={job}
@@ -653,8 +653,8 @@ export default function ExperiencePage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Project Management Experience</h3>
-                    <p className="text-xs text-slate-500">PM, leadership, and delivery roles with detailed metrics</p>
+                    <h3 className="text-lg font-bold text-[var(--text)]">Project Management Experience</h3>
+                    <p className="text-xs text-[var(--faint)]">PM, leadership, and delivery roles with detailed metrics</p>
                   </div>
                   <button
                     onClick={() => onChange({
@@ -668,7 +668,7 @@ export default function ExperiencePage() {
                         ...normalizedContent.project_management
                       ]
                     })}
-                    className="text-sm bg-purple-600 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center gap-2"
+                    className="text-sm bg-[var(--accent)] text-white px-3 py-1.5 rounded-[4px] font-medium hover:opacity-90 transition-colors flex items-center gap-2"
                   >
                     <Plus size={16} /> Add PM Role
                   </button>
@@ -684,7 +684,7 @@ export default function ExperiencePage() {
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                className={snapshot.isDragging ? 'shadow-xl ring-2 ring-purple-200' : ''}
+                                className={snapshot.isDragging ? 'shadow-xl ' : ''}
                               >
                                 <PMJobCard
                                   job={job}
@@ -704,10 +704,10 @@ export default function ExperiencePage() {
                 </DragDropContext>
 
                 {normalizedContent.project_management.length === 0 && (
-                  <div className="text-center py-12 bg-purple-50 rounded-xl border-2 border-dashed border-purple-200">
-                    <Target size={40} className="mx-auto text-purple-300 mb-3" />
-                    <p className="text-slate-600 font-medium">No project management experience added yet</p>
-                    <p className="text-sm text-slate-500 mt-1">Click &quot;Add PM Role&quot; to get started</p>
+                  <div className="text-center py-12 bg-[var(--raised)] rounded-[4px] border-2 border-dashed border-[var(--line)]">
+                    <Target size={40} className="mx-auto text-[var(--accent)] mb-3" />
+                    <p className="text-[var(--dim)] font-medium">No project management experience added yet</p>
+                    <p className="text-sm text-[var(--faint)] mt-1">Click &quot;Add PM Role&quot; to get started</p>
                   </div>
                 )}
               </div>

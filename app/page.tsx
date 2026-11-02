@@ -103,7 +103,7 @@ export default async function Home() {
   const SectionComponents: Record<string, React.ReactNode> = {
     hero: <HeroSection key="hero" content={sectionData.hero} settings={settings} />,
     about: <AboutSection key="about" content={sectionData.about} settings={settings} />,
-    skills: <SkillsMatrix key="skills" />,
+    skills: <SkillsMatrix key="skills" content={sectionData.skills} />,
     projects: <ProjectsShowcase key="projects" content={sectionData.projects} />,
     experience: <ExperienceSection key="experience" content={sectionData.experience} settings={settings} />,
     education: <EducationSection key="education" content={sectionData.education} />,

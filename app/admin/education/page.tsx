@@ -53,18 +53,18 @@ export default function EducationPage() {
       renderForm={(content, onChange) => (
         <div className="space-y-8">
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-900">Section Title</label>
+            <label className="text-sm font-semibold text-[var(--text)]">Section Title</label>
             <input 
               type="text" 
               value={content.title} 
               onChange={(e) => onChange({ ...content, title: e.target.value })}
-              className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+              className="wb-input"
             />
           </div>
 
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-              <h3 className="text-lg font-bold text-slate-900">Academic History</h3>
+            <div className="flex justify-between items-center border-b border-[var(--line)] pb-4">
+              <h3 className="text-lg font-bold text-[var(--text)]">Academic History</h3>
               <button 
                 onClick={() => onChange({
                   ...content,
@@ -73,7 +73,7 @@ export default function EducationPage() {
                     ...(content.items || [])
                   ]
                 })}
-                className="text-sm bg-slate-900 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-slate-800 transition-colors flex items-center gap-2"
+                className="text-sm bg-[var(--accent)] text-[#06080b] px-3 py-1.5 rounded-[4px] font-medium hover:bg-[var(--accent)] transition-colors flex items-center gap-2"
               >
                 <Plus size={16} /> Add Education
               </button>
@@ -81,14 +81,14 @@ export default function EducationPage() {
 
             <div className="grid gap-4">
                 {content.items?.map((item, index) => (
-                <div key={index} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group hover:border-blue-200 transition-colors">
+                <div key={index} className="bg-[var(--surface)] border border-[var(--line)] rounded-[4px] p-6 relative group hover:border-[var(--line)] transition-colors">
                     <button 
                     onClick={() => {
                         const newItems = [...content.items];
                         newItems.splice(index, 1);
                         onChange({ ...content, items: newItems });
                     }}
-                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded"
+                    className="absolute top-4 right-4 text-[var(--faint)] hover:text-[var(--danger)] transition-colors p-1 hover:bg-[var(--raised)] rounded"
                     >
                     <Trash2 size={18} />
                     </button>
@@ -96,7 +96,7 @@ export default function EducationPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-8">
                         <div className="space-y-3">
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Degree</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Degree</label>
                                 <input 
                                 type="text" 
                                 value={item.degree} 
@@ -105,11 +105,11 @@ export default function EducationPage() {
                                     newItems[index].degree = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm font-bold"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Institution</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Institution</label>
                                 <input 
                                 type="text" 
                                 value={item.institution} 
@@ -118,11 +118,11 @@ export default function EducationPage() {
                                     newItems[index].institution = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Period</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Period</label>
                                 <input 
                                 type="text" 
                                 value={item.period} 
@@ -131,13 +131,13 @@ export default function EducationPage() {
                                     newItems[index].period = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm font-mono"
+                                className="wb-input"
                                 />
                             </div>
                         </div>
                         <div className="space-y-3">
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Specialization</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Specialization</label>
                                 <input 
                                 type="text" 
                                 value={item.specialization} 
@@ -146,11 +146,11 @@ export default function EducationPage() {
                                     newItems[index].specialization = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Details / Honors</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Details / Honors</label>
                                 <textarea 
                                 value={item.details} 
                                 onChange={(e) => {
@@ -158,7 +158,7 @@ export default function EducationPage() {
                                     newItems[index].details = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm h-20 resize-none"
+                                className="wb-input"
                                 />
                             </div>
                         </div>

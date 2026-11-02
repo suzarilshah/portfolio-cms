@@ -82,63 +82,63 @@ export default function SettingsForm() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64 text-slate-400">Loading settings...</div>;
+    return <div className="flex items-center justify-center h-64 text-[var(--faint)]">Loading settings...</div>;
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
       
       {/* Brand Identity */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-            <Globe size={18} className="text-blue-600" />
-            <h3 className="font-semibold text-slate-900">Brand Identity</h3>
+      <div className="bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--line)] bg-[var(--raised)] flex items-center gap-2">
+            <Globe size={18} className="text-[var(--accent)]" />
+            <h3 className="font-semibold text-[var(--text)]">Brand Identity</h3>
         </div>
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Logo Text</label>
+                <label className="text-sm font-medium text-[var(--dim)]">Logo Text</label>
                 <input 
                     type="text" 
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                    className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all"
                     value={settings.logo_text}
                     onChange={e => setSettings({...settings, logo_text: e.target.value})}
                     placeholder="e.g. SUZARIL"
                 />
             </div>
             <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Highlight (Accent)</label>
+                <label className="text-sm font-medium text-[var(--dim)]">Highlight (Accent)</label>
                 <input 
                     type="text" 
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                    className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all"
                     value={settings.logo_highlight}
                     onChange={e => setSettings({...settings, logo_highlight: e.target.value})}
                     placeholder="e.g. SHAH"
                 />
             </div>
             <div className="md:col-span-2 space-y-2">
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    Logo Image <span className="text-xs font-normal text-slate-400">(Optional, overrides text)</span>
+                <label className="text-sm font-medium text-[var(--dim)] flex items-center gap-2">
+                    Logo Image <span className="text-xs font-normal text-[var(--faint)]">(Optional, overrides text)</span>
                 </label>
                 <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
                         <input 
                             type="text" 
-                            className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm"
+                            className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all text-sm"
                             value={settings.logo_url || ''}
                             onChange={e => setSettings({...settings, logo_url: e.target.value})}
                             placeholder="https://..."
                         />
                         <div className="flex items-center gap-2">
-                            <label className="cursor-pointer bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
+                            <label className="cursor-pointer bg-[var(--raised)] border border-[var(--line)] hover:bg-[var(--raised)] text-[var(--dim)] px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
                                 <Upload size={14} />
                                 {uploadingField === 'logo_url' ? 'Uploading...' : 'Upload Logo'}
                                 <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'logo_url')} disabled={uploadingField === 'logo_url'} />
                             </label>
-                            <span className="text-xs text-slate-400">Supports PNG, JPG, SVG</span>
+                            <span className="text-xs text-[var(--faint)]">Supports PNG, JPG, SVG</span>
                         </div>
                     </div>
                     {settings.logo_url && (
-                        <div className="w-16 h-16 rounded bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 p-2">
+                        <div className="w-16 h-16 rounded bg-[var(--raised)] border border-[var(--line)] flex items-center justify-center overflow-hidden shrink-0 p-2">
                             <img src={settings.logo_url} alt="Logo Preview" className="w-full h-full object-contain" />
                         </div>
                     )}
@@ -148,68 +148,68 @@ export default function SettingsForm() {
       </div>
 
       {/* Visual Assets */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-            <ImageIcon size={18} className="text-purple-600" />
-            <h3 className="font-semibold text-slate-900">Visual Assets</h3>
+      <div className="bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--line)] bg-[var(--raised)] flex items-center gap-2">
+            <ImageIcon size={18} className="text-[var(--accent)]" />
+            <h3 className="font-semibold text-[var(--text)]">Visual Assets</h3>
         </div>
         <div className="p-6 space-y-6">
              {/* Profile Photo */}
              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    <label className="text-sm font-medium text-[var(--dim)] flex items-center gap-2">
                         <User size={16} /> Profile Photo
                     </label>
                     <input 
                         type="text" 
-                        className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm"
+                        className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all text-sm"
                         value={settings.profile_photo_url || ''}
                         onChange={e => setSettings({...settings, profile_photo_url: e.target.value})}
                         placeholder="https://..."
                     />
                     <div className="flex items-center gap-2 pt-1">
-                        <label className="cursor-pointer bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
+                        <label className="cursor-pointer bg-[var(--raised)] border border-[var(--line)] hover:bg-[var(--raised)] text-[var(--dim)] px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
                             <Upload size={14} />
                             {uploadingField === 'profile_photo_url' ? 'Uploading...' : 'Upload Photo'}
                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'profile_photo_url')} disabled={uploadingField === 'profile_photo_url'} />
                         </label>
-                        <p className="text-xs text-slate-500">Used in the Hero section and About cards.</p>
+                        <p className="text-xs text-[var(--faint)]">Used in the Hero section and About cards.</p>
                     </div>
                 </div>
-                <div className="w-24 h-24 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shadow-inner">
+                <div className="w-24 h-24 rounded-full bg-[var(--raised)] border border-[var(--line)] flex items-center justify-center overflow-hidden shadow-inner">
                     {settings.profile_photo_url ? (
                         <img src={settings.profile_photo_url} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                        <User size={32} className="text-slate-300" />
+                        <User size={32} className="text-[var(--faint)]" />
                     )}
                 </div>
              </div>
 
              {/* Favicon */}
-             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start border-t border-slate-100 pt-6">
+             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start border-t border-[var(--line)] pt-6">
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Favicon</label>
+                    <label className="text-sm font-medium text-[var(--dim)]">Favicon</label>
                     <input 
                         type="text" 
-                        className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm"
+                        className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all text-sm"
                         value={settings.favicon_url || ''}
                         onChange={e => setSettings({...settings, favicon_url: e.target.value})}
                         placeholder="https://..."
                     />
                     <div className="flex items-center gap-2 pt-1">
-                        <label className="cursor-pointer bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
+                        <label className="cursor-pointer bg-[var(--raised)] border border-[var(--line)] hover:bg-[var(--raised)] text-[var(--dim)] px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
                             <Upload size={14} />
                             {uploadingField === 'favicon_url' ? 'Uploading...' : 'Upload Favicon'}
                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'favicon_url')} disabled={uploadingField === 'favicon_url'} />
                         </label>
-                        <p className="text-xs text-slate-500">Recommended 32x32px or 64x64px.</p>
+                        <p className="text-xs text-[var(--faint)]">Recommended 32x32px or 64x64px.</p>
                     </div>
                 </div>
-                <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shadow-sm">
+                <div className="w-12 h-12 rounded-[4px] bg-[var(--raised)] border border-[var(--line)] flex items-center justify-center overflow-hidden">
                     {settings.favicon_url ? (
                         <img src={settings.favicon_url} alt="Favicon" className="w-full h-full object-contain" />
                     ) : (
-                        <Globe size={20} className="text-slate-300" />
+                        <Globe size={20} className="text-[var(--faint)]" />
                     )}
                 </div>
              </div>
@@ -217,32 +217,32 @@ export default function SettingsForm() {
       </div>
 
       {/* Documents & Resume */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-            <FileText size={18} className="text-orange-600" />
-            <h3 className="font-semibold text-slate-900">Documents</h3>
+      <div className="bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--line)] bg-[var(--raised)] flex items-center gap-2">
+            <FileText size={18} className="text-[var(--warn)]" />
+            <h3 className="font-semibold text-[var(--text)]">Documents</h3>
         </div>
         <div className="p-6 space-y-6">
              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <label className="text-sm font-medium text-[var(--dim)] flex items-center gap-2">
                     Resume / CV
                 </label>
                 <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
                         <input 
                             type="text" 
-                            className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm font-mono text-slate-600"
+                            className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all text-sm font-mono text-[var(--dim)]"
                             value={settings.resume_url || ''}
                             onChange={e => setSettings({...settings, resume_url: e.target.value})}
                             placeholder="https://..."
                         />
                         <div className="flex items-center gap-2">
-                            <label className="cursor-pointer bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
+                            <label className="cursor-pointer bg-[var(--raised)] border border-[var(--line)] hover:bg-[var(--raised)] text-[var(--dim)] px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
                                 <Upload size={14} />
                                 {uploadingField === 'resume_url' ? 'Uploading...' : 'Upload Resume'}
                                 <input type="file" className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => handleFileUpload(e, 'resume_url')} disabled={uploadingField === 'resume_url'} />
                             </label>
-                            <span className="text-xs text-slate-400">PDF, DOC, DOCX</span>
+                            <span className="text-xs text-[var(--faint)]">PDF, DOC, DOCX</span>
                         </div>
                     </div>
                     {settings.resume_url && (
@@ -250,7 +250,7 @@ export default function SettingsForm() {
                             href={settings.resume_url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="h-10 px-4 rounded bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center font-medium text-sm hover:bg-orange-100 transition-colors"
+                            className="h-10 px-4 rounded bg-[var(--raised)] text-[var(--warn)] border border-[var(--line)] flex items-center justify-center font-medium text-sm hover:bg-[var(--raised)] transition-colors"
                         >
                             View PDF
                         </a>
@@ -261,69 +261,69 @@ export default function SettingsForm() {
       </div>
 
       {/* Search Engine Optimization (SEO) */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-            <Search size={18} className="text-green-600" />
-            <h3 className="font-semibold text-slate-900">Search Engine Optimization (SEO)</h3>
+      <div className="bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--line)] bg-[var(--raised)] flex items-center gap-2">
+            <Search size={18} className="text-[var(--ok)]" />
+            <h3 className="font-semibold text-[var(--text)]">Search Engine Optimization (SEO)</h3>
         </div>
         <div className="p-6 space-y-6">
              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Site Title Template</label>
+                <label className="text-sm font-medium text-[var(--dim)]">Site Title Template</label>
                 <input 
                     type="text" 
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                    className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all"
                     value={settings.seo_title || ''}
                     onChange={e => setSettings({...settings, seo_title: e.target.value})}
                     placeholder="e.g. Suzaril Shah | AI & Cloud Architect"
                 />
-                <p className="text-xs text-slate-500">Used as the default window title.</p>
+                <p className="text-xs text-[var(--faint)]">Used as the default window title.</p>
              </div>
              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Meta Description</label>
+                <label className="text-sm font-medium text-[var(--dim)]">Meta Description</label>
                 <textarea 
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all h-24 resize-none"
+                    className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all h-24 resize-none"
                     value={settings.seo_description || ''}
                     onChange={e => setSettings({...settings, seo_description: e.target.value})}
                     placeholder="Brief summary of your portfolio for search results (150-160 chars recommended)..."
                 />
              </div>
              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Keywords</label>
+                <label className="text-sm font-medium text-[var(--dim)]">Keywords</label>
                 <input 
                     type="text" 
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                    className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all"
                     value={settings.seo_keywords || ''}
                     onChange={e => setSettings({...settings, seo_keywords: e.target.value})}
                     placeholder="e.g. Cloud, Azure, DevOps, AI, Portfolio"
                 />
-                <p className="text-xs text-slate-500">Comma-separated list of topics.</p>
+                <p className="text-xs text-[var(--faint)]">Comma-separated list of topics.</p>
              </div>
              
              {/* OG Image */}
-             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start border-t border-slate-100 pt-6">
+             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start border-t border-[var(--line)] pt-6">
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Social Share Image (OG Image)</label>
+                    <label className="text-sm font-medium text-[var(--dim)]">Social Share Image (OG Image)</label>
                     <input 
                         type="text" 
-                        className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm"
+                        className="w-full border border-[var(--line)] rounded-[4px] px-3 py-2 outline-none transition-all text-sm"
                         value={settings.seo_og_image || ''}
                         onChange={e => setSettings({...settings, seo_og_image: e.target.value})}
                         placeholder="https://..."
                     />
                     <div className="flex items-center gap-2 pt-1">
-                        <label className="cursor-pointer bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
+                        <label className="cursor-pointer bg-[var(--raised)] border border-[var(--line)] hover:bg-[var(--raised)] text-[var(--dim)] px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">
                             <Upload size={14} />
                             {uploadingField === 'seo_og_image' ? 'Uploading...' : 'Upload Image'}
                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'seo_og_image')} disabled={uploadingField === 'seo_og_image'} />
                         </label>
-                        <p className="text-xs text-slate-500">Recommended 1200x630px for Facebook/LinkedIn/Twitter cards.</p>
+                        <p className="text-xs text-[var(--faint)]">Recommended 1200x630px for Facebook/LinkedIn/Twitter cards.</p>
                     </div>
                 </div>
-                <div className="w-32 h-[67px] rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shadow-sm">
+                <div className="w-32 h-[67px] rounded-[4px] bg-[var(--raised)] border border-[var(--line)] flex items-center justify-center overflow-hidden">
                     {settings.seo_og_image ? (
                         <img src={settings.seo_og_image} alt="OG Preview" className="w-full h-full object-cover" />
                     ) : (
-                        <ImageIcon size={24} className="text-slate-300" />
+                        <ImageIcon size={24} className="text-[var(--faint)]" />
                     )}
                 </div>
              </div>
@@ -331,42 +331,42 @@ export default function SettingsForm() {
       </div>
 
       {/* Design System */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-            <Palette size={18} className="text-emerald-600" />
-            <h3 className="font-semibold text-slate-900">Design System</h3>
+      <div className="bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--line)] bg-[var(--raised)] flex items-center gap-2">
+            <Palette size={18} className="text-[var(--ok)]" />
+            <h3 className="font-semibold text-[var(--text)]">Design System</h3>
         </div>
         <div className="p-6 space-y-8">
             <div className="space-y-3">
-                <label className="block text-sm font-medium text-slate-700">Primary Accent Color</label>
+                <label className="block text-sm font-medium text-[var(--dim)]">Primary Accent Color</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                     {[
-                        { value: 'primary', label: 'Executive Blue', color: 'bg-blue-600' },
-                        { value: 'indigo', label: 'Deep Indigo', color: 'bg-indigo-600' },
-                        { value: 'violet', label: 'Creative Violet', color: 'bg-violet-600' },
-                        { value: 'emerald', label: 'Tech Emerald', color: 'bg-emerald-600' },
+                        { value: 'primary', label: 'Executive Blue', color: 'bg-[var(--accent)]' },
+                        { value: 'indigo', label: 'Deep Indigo', color: 'bg-[var(--accent)]' },
+                        { value: 'violet', label: 'Creative Violet', color: 'bg-[var(--accent)]' },
+                        { value: 'emerald', label: 'Tech Emerald', color: 'bg-[var(--ok)]' },
                         { value: 'slate', label: 'Minimal Slate', color: 'bg-slate-600' },
-                        { value: 'orange', label: 'Energetic Orange', color: 'bg-orange-500' },
-                        { value: 'cyan', label: 'Modern Cyan', color: 'bg-cyan-500' },
-                        { value: 'rose', label: 'Passionate Rose', color: 'bg-rose-500' },
+                        { value: 'orange', label: 'Energetic Orange', color: 'bg-[var(--warn)]' },
+                        { value: 'cyan', label: 'Modern Cyan', color: 'bg-[var(--accent)]' },
+                        { value: 'rose', label: 'Passionate Rose', color: 'bg-[var(--danger)]' },
                         { value: 'teal', label: 'Calm Teal', color: 'bg-teal-500' },
-                        { value: 'amber', label: 'Warm Amber', color: 'bg-amber-500' },
+                        { value: 'amber', label: 'Warm Amber', color: 'bg-transparent0' },
                     ].map((option) => (
                         <button
                             key={option.value}
                             type="button"
                             onClick={() => setSettings({...settings, accent_color: option.value})}
-                            className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${settings.accent_color === option.value ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}
+                            className={`flex items-center gap-3 p-3 rounded-[4px] border transition-all ${settings.accent_color === option.value ? 'border-[var(--accent-line)]  bg-[var(--raised)]' : 'border-[var(--line)] hover:bg-[var(--raised)]'}`}
                         >
-                            <div className={`w-6 h-6 rounded-full ${option.color} shadow-sm`} />
-                            <span className="text-xs font-medium text-slate-700">{option.label}</span>
+                            <div className={`w-6 h-6 rounded-full ${option.color} `} />
+                            <span className="text-xs font-medium text-[var(--dim)]">{option.label}</span>
                         </button>
                     ))}
                 </div>
             </div>
 
-            <div className="space-y-3 border-t border-slate-100 pt-6">
-                <label className="block text-sm font-medium text-slate-700">Background Pattern</label>
+            <div className="space-y-3 border-t border-[var(--line)] pt-6">
+                <label className="block text-sm font-medium text-[var(--dim)]">Background Pattern</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {[
                         { value: 'topography', label: 'Topography', preview: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` },
@@ -381,7 +381,7 @@ export default function SettingsForm() {
                             key={pattern.value}
                             type="button"
                             onClick={() => setSettings({...settings, background_pattern: pattern.value})}
-                            className={`relative h-24 rounded-lg border overflow-hidden transition-all group ${settings.background_pattern === pattern.value ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200 hover:border-slate-300'}`}
+                            className={`relative h-24 rounded-[4px] border overflow-hidden transition-all group ${settings.background_pattern === pattern.value ? 'border-[var(--accent-line)] ' : 'border-[var(--line)] hover:border-[var(--line)]'}`}
                         >
                             <div
                                 className="absolute inset-0"
@@ -391,11 +391,11 @@ export default function SettingsForm() {
                                     backgroundColor: '#f8fafc'
                                 }}
                             />
-                            <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-2 border-t border-slate-100 text-xs font-medium text-slate-700 text-center">
+                            <div className="absolute bottom-0 left-0 right-0 bg-[var(--surface)] p-2 border-t border-[var(--line)] text-xs font-medium text-[var(--dim)] text-center">
                                 {pattern.label}
                             </div>
                             {settings.background_pattern === pattern.value && (
-                                <div className="absolute top-2 right-2 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-sm">
+                                <div className="absolute top-2 right-2 w-5 h-5 bg-[var(--accent)] rounded-full flex items-center justify-center text-white">
                                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                                 </div>
                             )}
@@ -407,51 +407,51 @@ export default function SettingsForm() {
       </div>
 
       {/* Background SVG Settings */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-            <Grid3X3 size={18} className="text-cyan-600" />
-            <h3 className="font-semibold text-slate-900">Background Grid Effect</h3>
+      <div className="bg-[var(--surface)] rounded-[4px] border border-[var(--line)] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--line)] bg-[var(--raised)] flex items-center gap-2">
+            <Grid3X3 size={18} className="text-[var(--accent)]" />
+            <h3 className="font-semibold text-[var(--text)]">Background Grid Effect</h3>
         </div>
         <div className="p-6 space-y-6">
             {/* SVG Grid Color */}
             <div className="space-y-3">
-                <label className="block text-sm font-medium text-slate-700">Grid Pattern Color</label>
-                <p className="text-xs text-slate-500">Choose the color for the animated grid background pattern.</p>
+                <label className="block text-sm font-medium text-[var(--dim)]">Grid Pattern Color</label>
+                <p className="text-xs text-[var(--faint)]">Choose the color for the animated grid background pattern.</p>
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                     {[
-                        { value: 'blue', label: 'Blue', hue: 210, color: 'bg-blue-500' },
+                        { value: 'blue', label: 'Blue', hue: 210, color: 'bg-[var(--accent)]' },
                         { value: 'lime', label: 'Lime', hue: 75, color: 'bg-lime-400' },
                         { value: 'cyan', label: 'Cyan', hue: 180, color: 'bg-cyan-400' },
-                        { value: 'purple', label: 'Purple', hue: 270, color: 'bg-purple-500' },
-                        { value: 'rose', label: 'Rose', hue: 350, color: 'bg-rose-500' },
-                        { value: 'emerald', label: 'Emerald', hue: 150, color: 'bg-emerald-500' },
-                        { value: 'orange', label: 'Orange', hue: 30, color: 'bg-orange-500' },
+                        { value: 'purple', label: 'Purple', hue: 270, color: 'bg-[var(--accent)]' },
+                        { value: 'rose', label: 'Rose', hue: 350, color: 'bg-[var(--danger)]' },
+                        { value: 'emerald', label: 'Emerald', hue: 150, color: 'bg-[var(--ok)]' },
+                        { value: 'orange', label: 'Orange', hue: 30, color: 'bg-[var(--warn)]' },
                         { value: 'amber', label: 'Amber', hue: 45, color: 'bg-amber-400' },
-                        { value: 'indigo', label: 'Indigo', hue: 240, color: 'bg-indigo-500' },
+                        { value: 'indigo', label: 'Indigo', hue: 240, color: 'bg-[var(--accent)]' },
                         { value: 'teal', label: 'Teal', hue: 170, color: 'bg-teal-500' },
                         { value: 'pink', label: 'Pink', hue: 330, color: 'bg-pink-500' },
-                        { value: 'slate', label: 'Slate', hue: 215, color: 'bg-slate-500' },
+                        { value: 'slate', label: 'Slate', hue: 215, color: 'bg-[var(--raised)]0' },
                     ].map((option) => (
                         <button
                             key={option.value}
                             type="button"
                             onClick={() => setSettings({...settings, background_svg_color: option.value})}
-                            className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-all ${settings.background_svg_color === option.value ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}
+                            className={`flex flex-col items-center gap-2 p-3 rounded-[4px] border transition-all ${settings.background_svg_color === option.value ? 'border-[var(--accent-line)]  bg-[var(--raised)]' : 'border-[var(--line)] hover:bg-[var(--raised)]'}`}
                         >
-                            <div className={`w-8 h-8 rounded-full ${option.color} shadow-sm`} />
-                            <span className="text-xs font-medium text-slate-700">{option.label}</span>
+                            <div className={`w-8 h-8 rounded-full ${option.color} `} />
+                            <span className="text-xs font-medium text-[var(--dim)]">{option.label}</span>
                         </button>
                     ))}
                 </div>
             </div>
 
             {/* White Overlay Opacity */}
-            <div className="space-y-3 border-t border-slate-100 pt-6">
+            <div className="space-y-3 border-t border-[var(--line)] pt-6">
                 <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-slate-700">White Overlay Opacity</label>
-                    <span className="text-sm font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">{settings.background_overlay_opacity}%</span>
+                    <label className="block text-sm font-medium text-[var(--dim)]">White Overlay Opacity</label>
+                    <span className="text-sm font-mono text-[var(--faint)] bg-[var(--raised)] px-2 py-0.5 rounded">{settings.background_overlay_opacity}%</span>
                 </div>
-                <p className="text-xs text-slate-500">Lower values make the grid more visible and vibrant. Higher values make it more subtle.</p>
+                <p className="text-xs text-[var(--faint)]">Lower values make the grid more visible and vibrant. Higher values make it more subtle.</p>
                 <input
                     type="range"
                     min="0"
@@ -459,9 +459,9 @@ export default function SettingsForm() {
                     step="5"
                     value={settings.background_overlay_opacity}
                     onChange={(e) => setSettings({...settings, background_overlay_opacity: parseInt(e.target.value)})}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                    className="w-full h-2 bg-[var(--raised)] rounded-[4px] appearance-none cursor-pointer accent-blue-600"
                 />
-                <div className="flex justify-between text-xs text-slate-400">
+                <div className="flex justify-between text-xs text-[var(--faint)]">
                     <span>More Vibrant</span>
                     <span>More Subtle</span>
                 </div>
@@ -473,7 +473,7 @@ export default function SettingsForm() {
           <button 
             type="submit" 
             disabled={saving}
-            className="bg-slate-900 text-white px-8 py-3 rounded-lg font-medium hover:bg-slate-800 flex items-center gap-2 disabled:opacity-50 shadow-lg shadow-slate-900/20 transition-all"
+            className="bg-[var(--accent)] text-[#06080b] px-8 py-3 rounded-[4px] font-medium hover:bg-[var(--accent)] flex items-center gap-2 disabled:opacity-50 transition-all"
           >
             {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
             {saving ? 'Saving Configuration...' : 'Save Global Settings'}

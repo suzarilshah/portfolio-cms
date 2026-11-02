@@ -10,27 +10,54 @@ import {
   Workflow,
   Database,
   Terminal,
-  Zap
+  Zap,
 } from 'lucide-react';
 
-interface SkillCategory {
+/** Icons cannot round-trip through JSON, so content stores a key. */
+export const SKILL_ICONS = {
+  cloud: Cloud,
+  container: Container,
+  blocks: Blocks,
+  workflow: Workflow,
+  code: Code2,
+  database: Database,
+  terminal: Terminal,
+  award: Award,
+} as const;
+
+export type SkillIcon = keyof typeof SKILL_ICONS;
+export const SKILL_COLORS = ['primary', 'indigo', 'violet', 'emerald'] as const;
+export type SkillColor = (typeof SKILL_COLORS)[number];
+
+export interface SkillCategory {
   title: string;
-  icon: React.ReactNode;
+  icon: SkillIcon;
+  color: SkillColor;
   skills: string[];
-  color: string;
 }
 
-export default function SkillsMatrix() {
-  const colorClasses: Record<string, { badge: string; dot: string }> = {
-    primary: { badge: 'bg-primary-100 text-primary-600', dot: 'bg-primary-500' },
-    indigo: { badge: 'bg-indigo-100 text-indigo-600', dot: 'bg-indigo-500' },
-    violet: { badge: 'bg-violet-100 text-violet-600', dot: 'bg-violet-500' },
-    emerald: { badge: 'bg-emerald-100 text-emerald-600', dot: 'bg-emerald-500' },
-  };
-  const skillCategories: SkillCategory[] = [
+export interface SkillsContent {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  categories: SkillCategory[];
+}
+
+/**
+ * The values this section shipped with while it was hardcoded. They are the
+ * fallback, so an empty or missing `skills` row renders exactly what it did
+ * before the section became editable.
+ */
+export const DEFAULT_SKILLS: SkillsContent = {
+  eyebrow: 'Technical Expertise',
+  heading: 'Skills & Technologies',
+  intro:
+    'Comprehensive expertise across cloud platforms, DevOps tools, and modern infrastructure technologies',
+  categories: [
     {
       title: 'Cloud Platforms',
-      icon: <Cloud className="w-6 h-6" />,
+      icon: 'cloud',
+      color: 'primary',
       skills: [
         'Microsoft Azure',
         'Azure AI & OpenAI',
@@ -40,37 +67,23 @@ export default function SkillsMatrix() {
         'Azure IoT Hub',
         'Azure DevOps',
       ],
-      color: 'primary',
     },
     {
       title: 'Container & Orchestration',
-      icon: <Container className="w-6 h-6" />,
-      skills: [
-        'Kubernetes',
-        'Docker',
-        'Docker Compose',
-        'Helm',
-        'Container Registry',
-        'Service Mesh',
-      ],
+      icon: 'container',
       color: 'indigo',
+      skills: ['Kubernetes', 'Docker', 'Docker Compose', 'Helm', 'Container Registry', 'Service Mesh'],
     },
     {
       title: 'Infrastructure as Code',
-      icon: <Blocks className="w-6 h-6" />,
-      skills: [
-        'Terraform',
-        'ARM Templates',
-        'Bicep',
-        'CloudFormation',
-        'Ansible',
-        'Pulumi',
-      ],
+      icon: 'blocks',
       color: 'violet',
+      skills: ['Terraform', 'ARM Templates', 'Bicep', 'CloudFormation', 'Ansible', 'Pulumi'],
     },
     {
       title: 'CI/CD & DevOps',
-      icon: <Workflow className="w-6 h-6" />,
+      icon: 'workflow',
+      color: 'emerald',
       skills: [
         'Azure Pipelines',
         'GitHub Actions',
@@ -80,38 +93,23 @@ export default function SkillsMatrix() {
         'GitOps',
         'Continuous Deployment',
       ],
-      color: 'emerald',
     },
     {
       title: 'Programming & Scripting',
-      icon: <Code2 className="w-6 h-6" />,
-      skills: [
-        'Python',
-        'TypeScript',
-        'JavaScript',
-        'Bash/Shell',
-        'PowerShell',
-        'Go',
-        'Node.js',
-      ],
+      icon: 'code',
       color: 'primary',
+      skills: ['Python', 'TypeScript', 'JavaScript', 'Bash/Shell', 'PowerShell', 'Go', 'Node.js'],
     },
     {
       title: 'Databases & Storage',
-      icon: <Database className="w-6 h-6" />,
-      skills: [
-        'PostgreSQL',
-        'MongoDB',
-        'Redis',
-        'Cosmos DB',
-        'SQL Server',
-        'MySQL',
-      ],
+      icon: 'database',
       color: 'indigo',
+      skills: ['PostgreSQL', 'MongoDB', 'Redis', 'Cosmos DB', 'SQL Server', 'MySQL'],
     },
     {
       title: 'Monitoring & Observability',
-      icon: <Terminal className="w-6 h-6" />,
+      icon: 'terminal',
+      color: 'violet',
       skills: [
         'Azure Monitor',
         'Prometheus',
@@ -121,11 +119,11 @@ export default function SkillsMatrix() {
         'Datadog',
         'New Relic',
       ],
-      color: 'violet',
     },
     {
       title: 'Certifications & Recognition',
-      icon: <Award className="w-6 h-6" />,
+      icon: 'award',
+      color: 'emerald',
       skills: [
         'Microsoft MVP (AI & Azure)',
         'Docker Captain',
@@ -134,9 +132,26 @@ export default function SkillsMatrix() {
         'Azure Certified',
         'Kubernetes Expert',
       ],
-      color: 'emerald',
     },
-  ];
+  ],
+};
+
+const colorClasses: Record<string, { badge: string; dot: string }> = {
+  primary: { badge: 'bg-primary-100 text-primary-600', dot: 'bg-primary-500' },
+  indigo: { badge: 'bg-indigo-100 text-indigo-600', dot: 'bg-indigo-500' },
+  violet: { badge: 'bg-violet-100 text-violet-600', dot: 'bg-violet-500' },
+  emerald: { badge: 'bg-emerald-100 text-emerald-600', dot: 'bg-emerald-500' },
+};
+
+export default function SkillsMatrix({ content }: { content?: Partial<SkillsContent> | null }) {
+  const data: SkillsContent = {
+    ...DEFAULT_SKILLS,
+    ...(content || {}),
+    categories:
+      content?.categories && content.categories.length > 0
+        ? content.categories
+        : DEFAULT_SKILLS.categories,
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -173,15 +188,13 @@ export default function SkillsMatrix() {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full mb-4">
             <Zap className="w-4 h-4" />
             <span className="font-mono text-sm font-semibold uppercase tracking-wider">
-              Technical Expertise
+              {data.eyebrow}
             </span>
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
-            Skills & Technologies
+            {data.heading}
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            Comprehensive expertise across cloud platforms, DevOps tools, and modern infrastructure technologies
-          </p>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto">{data.intro}</p>
         </motion.div>
 
         {/* Skills Grid */}
@@ -192,43 +205,48 @@ export default function SkillsMatrix() {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {skillCategories.map((category, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-primary-200"
-            >
-              {/* Category Header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`p-3 rounded-xl group-hover:scale-110 transition-transform duration-300 ${
-                  colorClasses[category.color]?.badge || 'bg-primary-100 text-primary-600'
-                }`}>
-                  {category.icon}
-                </div>
-                <h3 className="font-semibold text-lg text-slate-900">
-                  {category.title}
-                </h3>
-              </div>
-
-              {/* Skills List */}
-              <ul className="space-y-2">
-                {category.skills.map((skill, skillIndex) => (
-                  <li
-                    key={skillIndex}
-                    className="flex items-center gap-2 text-slate-600 text-sm"
+          {data.categories.map((category, index) => {
+            const Icon = SKILL_ICONS[category.icon] || Cloud;
+            return (
+              <motion.div
+                key={`${category.title}-${index}`}
+                variants={itemVariants}
+                className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-primary-200"
+              >
+                {/* Category Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className={`p-3 rounded-xl group-hover:scale-110 transition-transform duration-300 ${
+                      colorClasses[category.color]?.badge || 'bg-primary-100 text-primary-600'
+                    }`}
                   >
-                    <div className={`w-1.5 h-1.5 rounded-full ${
-                      colorClasses[category.color]?.dot || 'bg-primary-500'
-                    }`} />
-                    <span>{skill}</span>
-                  </li>
-                ))}
-              </ul>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-slate-900">{category.title}</h3>
+                </div>
 
-              {/* Hover Effect Border */}
-              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-primary-400/20 to-primary-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl`} />
-            </motion.div>
-          ))}
+                {/* Skills List */}
+                <ul className="space-y-2">
+                  {(category.skills || []).map((skill, skillIndex) => (
+                    <li
+                      key={skillIndex}
+                      className="flex items-center gap-2 text-slate-600 text-sm"
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          colorClasses[category.color]?.dot || 'bg-primary-500'
+                        }`}
+                      />
+                      <span>{skill}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Hover Effect Border */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary-400/20 to-primary-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
+              </motion.div>
+            );
+          })}
         </motion.div>
 
         {/* SEO-Optimized Skills Summary (Hidden but crawlable) */}

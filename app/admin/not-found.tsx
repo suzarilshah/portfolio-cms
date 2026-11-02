@@ -25,14 +25,14 @@ export default function AdminNotFound() {
   ];
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-24 relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--surface)] flex items-center justify-center px-6 py-24 relative overflow-hidden">
       {/* Large background 404 - Very light and subtle */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
         <motion.span
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-[20rem] md:text-[28rem] lg:text-[36rem] font-display font-bold text-slate-100 leading-none tracking-tighter"
+          className="text-[20rem] md:text-[28rem] lg:text-[36rem] font-display font-bold text-[var(--faint)] leading-none tracking-tighter"
         >
           404
         </motion.span>
@@ -47,8 +47,8 @@ export default function AdminNotFound() {
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center">
-            <Search className="w-8 h-8 text-slate-400" />
+          <div className="w-16 h-16 mx-auto rounded-[4px] bg-[var(--raised)] flex items-center justify-center">
+            <Search className="w-8 h-8 text-[var(--faint)]" />
           </div>
         </motion.div>
 
@@ -58,10 +58,10 @@ export default function AdminNotFound() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-[var(--text)] mb-4">
             Admin page not found
           </h1>
-          <p className="text-slate-500 text-lg mb-8 max-w-md mx-auto leading-relaxed">
+          <p className="text-[var(--faint)] text-lg mb-8 max-w-md mx-auto leading-relaxed">
             This admin page doesn&apos;t exist or has been moved.
           </p>
         </motion.div>
@@ -75,14 +75,14 @@ export default function AdminNotFound() {
         >
           <Link
             href="/admin"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-medium rounded-full hover:bg-slate-800 hover:-translate-y-0.5 transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent)] text-[#06080b] font-medium rounded-full hover:bg-[var(--accent)] hover:-translate-y-0.5 transition-all duration-300"
           >
             <LayoutDashboard className="w-4 h-4" />
             Go to Dashboard
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-medium rounded-full hover:border-slate-300 hover:text-slate-900 hover:-translate-y-0.5 transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--surface)] border border-[var(--line)] text-[var(--dim)] font-medium rounded-full hover:border-[var(--line)] hover:text-[var(--text)] hover:-translate-y-0.5 transition-all duration-300"
           >
             <ArrowLeft className="w-4 h-4" />
             Go Back
@@ -95,7 +95,7 @@ export default function AdminNotFound() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-4">
+          <p className="text-xs font-medium text-[var(--faint)] uppercase tracking-wider mb-4">
             Admin Sections
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -110,10 +110,10 @@ export default function AdminNotFound() {
                 >
                   <Link
                     href={section.href}
-                    className="group flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all duration-300"
+                    className="group flex flex-col items-center gap-2 p-4 bg-[var(--raised)] rounded-[4px] hover:bg-[var(--raised)] transition-all duration-300"
                   >
-                    <Icon className="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                    <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">
+                    <Icon className="w-5 h-5 text-[var(--faint)] group-hover:text-[var(--dim)] transition-colors" />
+                    <span className="text-sm font-medium text-[var(--dim)] group-hover:text-[var(--text)] transition-colors">
                       {section.label}
                     </span>
                   </Link>
@@ -128,9 +128,9 @@ export default function AdminNotFound() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="mt-12 text-sm text-slate-400"
+          className="mt-12 text-sm text-[var(--faint)]"
         >
-          <Link href="/" className="text-slate-600 hover:text-slate-900 underline underline-offset-2">
+          <Link href="/" className="text-[var(--dim)] hover:text-[var(--text)] underline underline-offset-2">
             Return to public site
           </Link>
         </motion.p>

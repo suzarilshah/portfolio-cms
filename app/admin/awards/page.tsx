@@ -78,30 +78,30 @@ export default function AwardsPage() {
       defaultContent={defaultAwards}
       renderForm={(content, onChange) => (
         <div className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-xl border border-slate-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[var(--raised)] p-6 rounded-[4px] border border-[var(--line)]">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-900">Section Title</label>
+              <label className="text-sm font-semibold text-[var(--text)]">Section Title</label>
               <input 
                 type="text" 
                 value={content.title} 
                 onChange={(e) => onChange({ ...content, title: e.target.value })}
-                className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                className="wb-input"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-900">Subtitle</label>
+              <label className="text-sm font-semibold text-[var(--text)]">Subtitle</label>
               <input 
                 type="text" 
                 value={content.subtitle} 
                 onChange={(e) => onChange({ ...content, subtitle: e.target.value })}
-                className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                className="wb-input"
               />
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-              <h3 className="text-lg font-bold text-slate-900">Awards List</h3>
+            <div className="flex justify-between items-center border-b border-[var(--line)] pb-4">
+              <h3 className="text-lg font-bold text-[var(--text)]">Awards List</h3>
               <button 
                 onClick={() => onChange({
                   ...content,
@@ -110,7 +110,7 @@ export default function AwardsPage() {
                     ...(content.items || [])
                   ]
                 })}
-                className="text-sm bg-slate-900 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-slate-800 transition-colors flex items-center gap-2"
+                className="text-sm bg-[var(--accent)] text-[#06080b] px-3 py-1.5 rounded-[4px] font-medium hover:bg-[var(--accent)] transition-colors flex items-center gap-2"
               >
                 <Plus size={16} /> Add Award
               </button>
@@ -118,7 +118,7 @@ export default function AwardsPage() {
 
             <div className="grid gap-6">
                 {content.items?.map((item, index) => (
-                <div key={index} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group hover:border-blue-200 transition-colors">
+                <div key={index} className="bg-[var(--surface)] border border-[var(--line)] rounded-[4px] p-6 relative group hover:border-[var(--line)] transition-colors">
                     <div className="absolute top-4 right-4 flex gap-2">
                         {/* Reorder buttons */}
                         <div className="flex flex-col gap-1">
@@ -131,7 +131,7 @@ export default function AwardsPage() {
                                     }
                                 }}
                                 disabled={index === 0}
-                                className="text-slate-300 hover:text-slate-500 disabled:text-slate-200 disabled:cursor-not-allowed transition-colors p-1 hover:bg-slate-50 rounded"
+                                className="text-[var(--faint)] hover:text-[var(--faint)] disabled:text-[var(--faint)] disabled:cursor-not-allowed transition-colors p-1 hover:bg-[var(--hover)] rounded"
                                 title="Move up"
                             >
                                 <ChevronUp size={16} />
@@ -145,7 +145,7 @@ export default function AwardsPage() {
                                     }
                                 }}
                                 disabled={index === content.items.length - 1}
-                                className="text-slate-300 hover:text-slate-500 disabled:text-slate-200 disabled:cursor-not-allowed transition-colors p-1 hover:bg-slate-50 rounded"
+                                className="text-[var(--faint)] hover:text-[var(--faint)] disabled:text-[var(--faint)] disabled:cursor-not-allowed transition-colors p-1 hover:bg-[var(--hover)] rounded"
                                 title="Move down"
                             >
                                 <ChevronDown size={16} />
@@ -158,7 +158,7 @@ export default function AwardsPage() {
                             newItems.splice(index, 1);
                             onChange({ ...content, items: newItems });
                         }}
-                        className="text-slate-300 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded"
+                        className="text-[var(--faint)] hover:text-[var(--danger)] transition-colors p-1 hover:bg-[var(--raised)] rounded"
                         >
                         <Trash2 size={18} />
                         </button>
@@ -167,7 +167,7 @@ export default function AwardsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pr-8">
                         <div className="space-y-4">
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Award Title</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Award Title</label>
                                 <input 
                                 type="text" 
                                 value={item.title} 
@@ -176,11 +176,11 @@ export default function AwardsPage() {
                                     newItems[index].title = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm font-bold"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Issuer</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Issuer</label>
                                 <input 
                                 type="text" 
                                 value={item.issuer} 
@@ -189,12 +189,12 @@ export default function AwardsPage() {
                                     newItems[index].issuer = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm"
+                                className="wb-input"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-xs font-medium text-slate-500">Year</label>
+                                    <label className="text-xs font-medium text-[var(--faint)]">Year</label>
                                     <input 
                                     type="text" 
                                     value={item.year} 
@@ -203,11 +203,11 @@ export default function AwardsPage() {
                                         newItems[index].year = e.target.value;
                                         onChange({ ...content, items: newItems });
                                     }}
-                                    className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm font-mono"
+                                    className="wb-input"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-xs font-medium text-slate-500">Icon</label>
+                                    <label className="text-xs font-medium text-[var(--faint)]">Icon</label>
                                     <select
                                         value={item.icon}
                                         onChange={(e) => {
@@ -215,7 +215,7 @@ export default function AwardsPage() {
                                             newItems[index].icon = e.target.value;
                                             onChange({ ...content, items: newItems });
                                         }}
-                                        className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm bg-white"
+                                        className="wb-input"
                                     >
                                         <option value="trophy">Trophy</option>
                                         <option value="award">Award</option>
@@ -225,7 +225,7 @@ export default function AwardsPage() {
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">External URL (Optional)</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">External URL (Optional)</label>
                                 <input 
                                 type="url" 
                                 value={item.link || ''} 
@@ -235,14 +235,14 @@ export default function AwardsPage() {
                                     newItems[index].link = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm"
+                                className="wb-input"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-slate-500">Description</label>
+                                <label className="text-xs font-medium text-[var(--faint)]">Description</label>
                                 <textarea 
                                 value={item.description} 
                                 onChange={(e) => {
@@ -250,7 +250,7 @@ export default function AwardsPage() {
                                     newItems[index].description = e.target.value;
                                     onChange({ ...content, items: newItems });
                                 }}
-                                className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 outline-none text-sm h-36 resize-none leading-relaxed"
+                                className="wb-input"
                                 />
                             </div>
                         </div>

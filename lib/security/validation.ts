@@ -574,6 +574,34 @@ export class SecurityValidator {
         sanitized.website = this.sanitizeHtml(content.website.trim().substring(0, 500));
       }
 
+      // Skills section: header copy plus the capability matrix. `icon` and
+      // `color` are closed sets because the renderer looks them up in a map.
+      if (content.eyebrow) {
+        sanitized.eyebrow = this.sanitizeHtml(String(content.eyebrow).trim().substring(0, 100));
+      }
+      if (content.heading) {
+        sanitized.heading = this.sanitizeHtml(String(content.heading).trim().substring(0, 200));
+      }
+      if (content.intro) {
+        sanitized.intro = this.sanitizeHtml(String(content.intro).trim().substring(0, 1000));
+      }
+      if (content.categories && Array.isArray(content.categories)) {
+        const allowedIcons = ['cloud', 'container', 'blocks', 'workflow', 'code', 'database', 'terminal', 'award'];
+        const allowedColors = ['primary', 'indigo', 'violet', 'emerald'];
+
+        sanitized.categories = content.categories.slice(0, 12).map((category: any) => ({
+          title: this.sanitizeHtml(String(category?.title || '').trim().substring(0, 100)),
+          icon: allowedIcons.includes(category?.icon) ? category.icon : 'cloud',
+          color: allowedColors.includes(category?.color) ? category.color : 'primary',
+          skills: Array.isArray(category?.skills)
+            ? category.skills
+                .filter((skill: any) => typeof skill === 'string' && skill.trim().length > 0 && skill.length <= 60)
+                .map((skill: string) => this.sanitizeHtml(skill.trim()))
+                .slice(0, 20)
+            : [],
+        }));
+      }
+
     } else {
       errors.push('Content must be a valid object');
     }

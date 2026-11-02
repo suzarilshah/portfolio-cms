@@ -2,11 +2,30 @@ import { stackServerApp } from "@/stack";
 import { redirect } from "next/navigation";
 import { StackProvider, StackTheme } from "@stackframe/stack";
 import { isAdminEmail } from "@/lib/security/admin";
-import AdminSidebar from "./components/AdminSidebar";
+import pool from "@/lib/db";
+import AdminNav from "./components/AdminNav";
+import type { SectionRow } from "./sections";
+import "./workbench.css";
+
+export const dynamic = "force-dynamic";
+
+async function getSections(): Promise<SectionRow[]> {
+  if (!process.env.DATABASE_URL) return [];
+  try {
+    const res = await pool.query(
+      "SELECT section_key, sort_order, is_visible, updated_at FROM content_sections ORDER BY sort_order ASC"
+    );
+    return res.rows;
+  } catch (error) {
+    // The nav degrades to the config links rather than taking the CMS down.
+    console.error("Could not load section list for admin nav:", error);
+    return [];
+  }
+}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await stackServerApp.getUser();
-  
+
   if (!user) {
     redirect("/handler/sign-in?redirect_url=" + encodeURIComponent("/admin"));
   }
@@ -15,17 +34,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // cannot drift apart.
   if (!isAdminEmail(user.primaryEmail)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-900">
-        <div className="max-w-md text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200">
-          <h1 className="text-xl font-bold text-red-600 mb-2">Access Denied</h1>
-          <p className="text-slate-600 mb-4">
-            This CMS is restricted to the site owner only.
+      <div className="wb flex min-h-screen items-center justify-center p-6">
+        <div className="wb-panel max-w-sm p-6 text-center">
+          <p className="wb-label text-[var(--danger)]">Access denied</p>
+          <h1 className="mt-3 text-[15px] font-semibold">This CMS is restricted to the site owner.</h1>
+          <p className="mt-2 text-[13px] leading-relaxed text-[var(--dim)]">
+            You are signed in, but this address is not on the admin allowlist.
           </p>
-          <p className="text-xs font-mono text-slate-400">User: {user.primaryEmail}</p>
+          <p className="wb-meta mt-4 border-t border-[var(--line)] pt-3">{user.primaryEmail}</p>
         </div>
       </div>
     );
   }
+
+  const sections = await getSections();
 
   const clientUser = {
     displayName: user.displayName,
@@ -35,18 +57,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <StackProvider app={stackServerApp}>
       <StackTheme>
-        <div className="flex min-h-screen bg-slate-50 text-slate-900">
-          {/* Background Pattern */}
-          <div className="fixed inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none z-0" />
-
-          {/* Responsive Sidebar */}
-          <AdminSidebar user={clientUser} />
-          
-          {/* Main Content */}
-          <main className="flex-1 md:ml-64 pt-16 md:pt-0 overflow-y-auto h-full relative z-10">
-            <div className="max-w-5xl mx-auto p-4 md:p-12">
-              {children}
-            </div>
+        <div className="wb min-h-screen">
+          <AdminNav user={clientUser} sections={sections} />
+          <main className="pt-14 md:ml-[248px] md:pt-0">
+            <div className="mx-auto max-w-4xl px-4 py-8 md:px-8 md:py-10">{children}</div>
           </main>
         </div>
       </StackTheme>

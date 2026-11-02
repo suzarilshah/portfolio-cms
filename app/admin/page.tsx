@@ -1,84 +1,253 @@
 import Link from "next/link";
-import { FileText, Award, Settings, ArrowRight, Globe, Clock, Shield } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, EyeOff, FileWarning } from "lucide-react";
+import pool from "@/lib/db";
+import { Dot, Label, Meta, Panel, PageHeader, Pill } from "./components/ui";
+import { SECTION_EDITORS, type SectionRow, relativeTime } from "./sections";
 
-export default function AdminDashboard() {
+export const dynamic = "force-dynamic";
+
+interface Overview {
+  sections: SectionRow[];
+  projects: number;
+  badges: number;
+  downloads: number;
+  resumeUrl: string | null;
+  ok: boolean;
+}
+
+async function getOverview(): Promise<Overview> {
+  const empty: Overview = {
+    sections: [],
+    projects: 0,
+    badges: 0,
+    downloads: 0,
+    resumeUrl: null,
+    ok: false,
+  };
+  if (!process.env.DATABASE_URL) return empty;
+
+  try {
+    const [sections, projects, badges, downloads, settings] = await Promise.all([
+      pool.query(
+        "SELECT section_key, sort_order, is_visible, updated_at FROM content_sections ORDER BY sort_order ASC"
+      ),
+      pool.query("SELECT COUNT(*)::int AS n FROM projects"),
+      pool.query("SELECT COUNT(*)::int AS n FROM badges"),
+      pool.query("SELECT COUNT(*)::int AS n FROM resume_downloads"),
+      pool.query("SELECT resume_url FROM site_settings LIMIT 1"),
+    ]);
+
+    return {
+      sections: sections.rows,
+      projects: projects.rows[0]?.n ?? 0,
+      badges: badges.rows[0]?.n ?? 0,
+      downloads: downloads.rows[0]?.n ?? 0,
+      resumeUrl: settings.rows[0]?.resume_url ?? null,
+      ok: true,
+    };
+  } catch (error) {
+    console.error("Overview query failed:", error);
+    return empty;
+  }
+}
+
+function Stat({ label, value, href }: { label: string; value: string | number; href?: string }) {
+  const inner = (
+    <div className="rounded-[4px] border border-[var(--line)] bg-[var(--surface)] px-4 py-3.5 transition-colors hover:border-[#2c333b]">
+      <Label>{label}</Label>
+      <p className="wb-num mt-2 text-[22px] leading-none text-[var(--text)]">{value}</p>
+    </div>
+  );
+  return href ? <Link href={href}>{inner}</Link> : inner;
+}
+
+export default async function AdminDashboard() {
+  const { sections, projects, badges, downloads, resumeUrl, ok } = await getOverview();
+
+  const visible = sections.filter((s) => s.is_visible !== false);
+  const hidden = sections.filter((s) => s.is_visible === false);
+  const orphans = sections.filter((s) => !SECTION_EDITORS[s.section_key]);
+  const lastEdited = [...sections]
+    .filter((s) => s.updated_at)
+    .sort((a, b) => new Date(b.updated_at!).getTime() - new Date(a.updated_at!).getTime())
+    .slice(0, 3);
+
+  const issues = [
+    ...orphans.map((s) => ({
+      key: `orphan-${s.section_key}`,
+      icon: AlertTriangle,
+      tone: "warn" as const,
+      text: `"${s.section_key}" has a database row but no editor in the CMS.`,
+      href: "/admin/sections",
+      cta: "Review",
+    })),
+    ...(!resumeUrl
+      ? [
+          {
+            key: "resume",
+            icon: FileWarning,
+            tone: "warn" as const,
+            text: "No resume file is configured, so the download buttons stay hidden.",
+            href: "/admin/settings",
+            cta: "Upload",
+          },
+        ]
+      : []),
+    ...(!ok
+      ? [
+          {
+            key: "db",
+            icon: AlertTriangle,
+            tone: "danger" as const,
+            text: "Could not read the database. The public site is serving fallback content.",
+            href: "/admin/settings",
+            cta: "Settings",
+          },
+        ]
+      : []),
+  ];
+
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-slate-900">Overview</h1>
-        <p className="text-slate-500 mt-2">Welcome back. Here is what&apos;s happening with your portfolio.</p>
+    <div className="space-y-6">
+      <PageHeader
+        eyebrow={<Label>Overview</Label>}
+        title="Your portfolio, right now"
+        description="Everything the public page is currently rendering, and anything that needs a decision."
+        actions={
+          <Link href="/" target="_blank" rel="noreferrer">
+            <button className="wb-btn wb-btn-default">
+              View live site
+              <ArrowUpRight size={14} />
+            </button>
+          </Link>
+        }
+      />
+
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <Stat label="Sections live" value={`${visible.length}/${sections.length}`} href="/admin/sections" />
+        <Stat label="Projects" value={projects} href="/admin/projects" />
+        <Stat label="Badges" value={badges} href="/admin/badges" />
+        <Stat label="Resume leads" value={downloads} href="/admin/resume" />
       </div>
 
-      {/* Status Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow group">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-              <Globe size={20} />
-            </div>
-            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">Online</span>
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900 mb-1">Live Portfolio</h3>
-          <p className="text-sm text-slate-500">suzarilshah.uk</p>
-        </div>
+      {issues.length > 0 && (
+        <Panel
+          title="Needs attention"
+          description="Surfaced from the live database, not a checklist."
+        >
+          <ul className="space-y-2">
+            {issues.map(({ key, icon: Icon, tone, text, href, cta }) => (
+              <li
+                key={key}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[4px] border border-[var(--line)] px-3.5 py-3"
+              >
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <Icon
+                    size={14}
+                    className={tone === "danger" ? "text-[var(--danger)]" : "text-[var(--warn)]"}
+                  />
+                  <span className="text-[13px] text-[var(--dim)]">{text}</span>
+                </div>
+                <Link href={href} className="wb-btn wb-btn-default shrink-0">
+                  {cta}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
 
-        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow group">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-              <Shield size={20} />
-            </div>
-            <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Secured</span>
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900 mb-1">Stack Auth</h3>
-          <p className="text-sm text-slate-500">Admin Access Only</p>
-        </div>
+      <Panel
+        title="The page"
+        description="Top to bottom, exactly as a visitor meets it."
+        actions={
+          <Link href="/admin/sections" className="wb-btn wb-btn-ghost">
+            Reorder
+          </Link>
+        }
+        bodyClassName="p-0"
+      >
+        <ul className="divide-y divide-[var(--line-soft)]">
+          {sections.length === 0 && (
+            <li className="px-5 py-8 text-center">
+              <Meta>No sections found.</Meta>
+            </li>
+          )}
+          {sections.map((section, index) => {
+            const editor = SECTION_EDITORS[section.section_key];
+            const isHidden = section.is_visible === false;
 
-        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow group">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
-              <Clock size={20} />
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900 mb-1">Neon DB</h3>
-          <p className="text-sm text-slate-500">Connected & Active</p>
-        </div>
-      </div>
+            const row = (
+              <div className="flex items-center gap-3 px-5 py-3">
+                <span className="wb-num w-[18px] text-[10px] text-[var(--faint)]">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={`truncate text-[13px] ${
+                      isHidden ? "text-[var(--faint)]" : "text-[var(--text)]"
+                    }`}
+                  >
+                    {editor?.label ?? section.section_key}
+                  </p>
+                  <Meta>{editor?.blurb ?? "No editor available"}</Meta>
+                </div>
+                <Meta className="hidden sm:block">{relativeTime(section.updated_at)}</Meta>
+                {!editor ? (
+                  <Pill tone="warn">
+                    <AlertTriangle size={10} /> No editor
+                  </Pill>
+                ) : isHidden ? (
+                  <Pill>
+                    <EyeOff size={10} /> Hidden
+                  </Pill>
+                ) : (
+                  <Pill tone="ok">
+                    <Dot tone="ok" /> Live
+                  </Pill>
+                )}
+              </div>
+            );
 
-      <h2 className="font-display text-xl font-bold text-slate-900 mb-6">Quick Actions</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link href="/admin/content" className="group bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:border-blue-500/30 hover:shadow-md hover:shadow-blue-500/5 transition-all">
-          <div className="mb-4 w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-            <FileText size={24} />
-          </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">Edit Content</h3>
-          <p className="text-sm text-slate-500 mb-4 line-clamp-2">Update hero text, experience, education, and other page sections.</p>
-          <div className="flex items-center text-sm font-medium text-blue-600 group-hover:gap-2 transition-all">
-            Open Editor <ArrowRight size={16} className="ml-1" />
-          </div>
-        </Link>
+            return (
+              <li key={section.section_key}>
+                {editor ? (
+                  <Link href={editor.href} className="block transition-colors hover:bg-[var(--raised)]">
+                    {row}
+                  </Link>
+                ) : (
+                  <div className="opacity-70">{row}</div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </Panel>
 
-        <Link href="/admin/badges" className="group bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:border-purple-500/30 hover:shadow-md hover:shadow-purple-500/5 transition-all">
-          <div className="mb-4 w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-            <Award size={24} />
-          </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">Manage Badges</h3>
-          <p className="text-sm text-slate-500 mb-4 line-clamp-2">Add or remove Credly badges and update recognition details.</p>
-          <div className="flex items-center text-sm font-medium text-purple-600 group-hover:gap-2 transition-all">
-            Manage Credentials <ArrowRight size={16} className="ml-1" />
-          </div>
-        </Link>
+      {lastEdited.length > 0 && (
+        <Panel title="Recently edited">
+          <ul className="space-y-1.5">
+            {lastEdited.map((section) => {
+              const editor = SECTION_EDITORS[section.section_key];
+              return (
+                <li key={section.section_key} className="flex items-center justify-between gap-3">
+                  <span className="text-[13px] text-[var(--dim)]">
+                    {editor?.label ?? section.section_key}
+                  </span>
+                  <Meta>{relativeTime(section.updated_at)}</Meta>
+                </li>
+              );
+            })}
+          </ul>
+        </Panel>
+      )}
 
-        <Link href="/admin/settings" className="group bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:border-slate-500/30 hover:shadow-md hover:shadow-slate-500/5 transition-all">
-          <div className="mb-4 w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-600 group-hover:bg-slate-800 group-hover:text-white transition-colors">
-            <Settings size={24} />
-          </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">Site Settings</h3>
-          <p className="text-sm text-slate-500 mb-4 line-clamp-2">Configure global SEO, branding, logos, and accent colors.</p>
-          <div className="flex items-center text-sm font-medium text-slate-600 group-hover:gap-2 transition-all">
-            Configure <ArrowRight size={16} className="ml-1" />
-          </div>
-        </Link>
-      </div>
+      {hidden.length > 0 && (
+        <p className="wb-meta">
+          {hidden.length} section{hidden.length === 1 ? "" : "s"} hidden:{" "}
+          {hidden.map((s) => SECTION_EDITORS[s.section_key]?.label ?? s.section_key).join(", ")}.
+        </p>
+      )}
     </div>
   );
 }
