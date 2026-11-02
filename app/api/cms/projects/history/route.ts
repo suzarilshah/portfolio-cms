@@ -119,4 +119,4 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}, { requireAuth: true });
+}, { requireAdmin: true, requireCSRF: true });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addFullSecurityHeaders, addCORSHeaders } from '@/lib/security/headers';
-import { getClientIdentifier, apiRateLimiter, createRateLimitResponse } from '@/lib/security/rate-limiter';
+import { getClientIdentifier, apiRateLimiter, createRateLimitResponse, shouldRateLimit } from '@/lib/security/rate-limiter';
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
   const identifier = getClientIdentifier(request);
 
   // Apply rate limiting to API routes (excluding auth routes)
-  if (request.nextUrl.pathname.startsWith('/api/') && !request.nextUrl.pathname.startsWith('/api/cms/')) {
+  if (shouldRateLimit(request.nextUrl.pathname)) {
     const rateLimitResult = apiRateLimiter.check(identifier);
     if (!rateLimitResult.allowed) {
       return createRateLimitResponse(rateLimitResult.resetTime);

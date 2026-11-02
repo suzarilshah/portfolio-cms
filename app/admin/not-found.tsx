@@ -62,7 +62,7 @@ export default function AdminNotFound() {
             Admin page not found
           </h1>
           <p className="text-slate-500 text-lg mb-8 max-w-md mx-auto leading-relaxed">
-            This admin page doesn't exist or has been moved.
+            This admin page doesn&apos;t exist or has been moved.
           </p>
         </motion.div>
 

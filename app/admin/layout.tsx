@@ -1,6 +1,7 @@
 import { stackServerApp } from "@/stack";
 import { redirect } from "next/navigation";
 import { StackProvider, StackTheme } from "@stackframe/stack";
+import { isAdminEmail } from "@/lib/security/admin";
 import AdminSidebar from "./components/AdminSidebar";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -10,8 +11,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/handler/sign-in?redirect_url=" + encodeURIComponent("/admin"));
   }
 
-  // Strict email lock for the "1 Trillion USD" security standard
-  if (user.primaryEmail !== 'suzarilshah@gmail.com') {
+  // Same allowlist the API routes enforce, so the UI gate and the data gate
+  // cannot drift apart.
+  if (!isAdminEmail(user.primaryEmail)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-900">
         <div className="max-w-md text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200">

@@ -220,6 +220,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               </svg>
               {retrying ? 'Retrying...' : 'Try Again'}
             </button>
+            {/* A full reload, not next/link: global-error replaces the root
+                layout, so the client router is not trustworthy here. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a href="/" className="btn-secondary">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />

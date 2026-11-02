@@ -6,7 +6,7 @@ export default function AdminDashboard() {
     <div>
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-slate-900">Overview</h1>
-        <p className="text-slate-500 mt-2">Welcome back. Here is what's happening with your portfolio.</p>
+        <p className="text-slate-500 mt-2">Welcome back. Here is what&apos;s happening with your portfolio.</p>
       </div>
 
       {/* Status Grid */}

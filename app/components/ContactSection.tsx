@@ -62,10 +62,10 @@ export default function ContactSection({ content }: { content?: any }) {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-3">Let's Collaborate</h2>
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-3">Let&apos;s Collaborate</h2>
           <p className="text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
-            Whether you're interested in discussing cloud architecture, AI solutions,
-            or community building, I'm always open to connecting.
+            Whether you&apos;re interested in discussing cloud architecture, AI solutions,
+            or community building, I&apos;m always open to connecting.
           </p>
         </motion.div>
 

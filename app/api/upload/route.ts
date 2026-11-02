@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     // Token issuance must authenticate the browser before granting storage access.
     if (body.type === 'blob.generate-client-token') {
       const denied = await SecurityMiddleware.handle(request, {
-        requireAuth: true, requireCSRF: true,
+        requireAdmin: true, requireCSRF: true,
         rateLimit: { windowMs: 60000, maxRequests: 20 },
       });
       if (denied) return denied;

@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getClientIdentifier, apiRateLimiter, createRateLimitResponse } from './rate-limiter';
-import { InMemoryRateLimiter } from './rate-limiter';
-import { addDefaultSecurityHeaders, addFullSecurityHeaders } from './headers';
+import { getClientIdentifier, createRateLimitResponse, getRateLimiter } from './rate-limiter';
+import { addDefaultSecurityHeaders } from './headers';
+import { isAdminEmail } from './admin';
+import { isSameOrigin } from './csrf';
 import { stackServerApp } from '@/stack';
 
 export interface SecurityMiddlewareOptions {
   requireAuth?: boolean;
+  /** Requires a signed-in user whose email is on the admin allowlist. Implies requireAuth. */
+  requireAdmin?: boolean;
   rateLimit?: {
     windowMs?: number;
     maxRequests?: number;
@@ -21,7 +24,8 @@ export class SecurityMiddleware {
     options: SecurityMiddlewareOptions = {}
   ): Promise<NextResponse | null> {
     const {
-      requireAuth = false,
+      requireAdmin = false,
+      requireAuth = requireAdmin,
       rateLimit,
       validateContentType = true,
       allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -30,27 +34,17 @@ export class SecurityMiddleware {
 
     // CSRF protection for state-changing requests (only if explicitly enabled)
     if (requireCSRF && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
-      const origin = request.headers.get('origin');
-      const referer = request.headers.get('referer');
-      const host = request.headers.get('host');
+      const sameOrigin = isSameOrigin(
+        request.headers.get('origin'),
+        request.headers.get('referer'),
+        request.headers.get('host')
+      );
 
-      // Skip CSRF check for API-to-API requests (server-side)
-      if (request.headers.get('x-requested-with') === 'XMLHttpRequest') {
-        // Allow AJAX requests
-      } else {
-        if (!origin && !referer) {
-          return NextResponse.json(
-            { error: 'CSRF validation failed: Missing origin/referer' },
-            { status: 403 }
-          );
-        }
-
-        if (origin && !origin.includes(host || '')) {
-          return NextResponse.json(
-            { error: 'CSRF validation failed: Invalid origin' },
-            { status: 403 }
-          );
-        }
+      if (!sameOrigin) {
+        return NextResponse.json(
+          { error: 'CSRF validation failed: Invalid origin' },
+          { status: 403 }
+        );
       }
     }
 
@@ -62,18 +56,19 @@ export class SecurityMiddleware {
       );
     }
 
-    // Rate limiting
-    const identifier = getClientIdentifier(request);
-    const limiter = rateLimit 
-      ? new InMemoryRateLimiter(
-          rateLimit.windowMs || 60000,
-          rateLimit.maxRequests || 100
-        )
-      : apiRateLimiter;
+    // Rate limiting. The edge middleware already applies the global API budget
+    // to every /api/ path, so only a route-specific override runs here —
+    // checking both would consume two slots per request.
+    if (rateLimit) {
+      const limiter = getRateLimiter(
+        rateLimit.windowMs || 60000,
+        rateLimit.maxRequests || 100
+      );
 
-    const rateLimitResult = limiter.check(identifier);
-    if (!rateLimitResult.allowed) {
-      return createRateLimitResponse(rateLimitResult.resetTime);
+      const rateLimitResult = limiter.check(getClientIdentifier(request));
+      if (!rateLimitResult.allowed) {
+        return createRateLimitResponse(rateLimitResult.resetTime);
+      }
     }
 
     // Content-Type validation for POST/PUT requests
@@ -87,21 +82,33 @@ export class SecurityMiddleware {
       }
     }
 
-    // Authentication check
+    // Authentication and authorization check
     if (requireAuth) {
+      let user: Awaited<ReturnType<typeof stackServerApp.getUser>> = null;
+
       try {
-        const user = await stackServerApp.getUser();
-        if (!user) {
-          return NextResponse.json(
-            { error: 'Authorization required' },
-            { status: 401 }
-          );
-        }
+        user = await stackServerApp.getUser();
       } catch (error) {
         console.error('Auth check error:', error);
         return NextResponse.json(
           { error: 'Authorization required' },
           { status: 401 }
+        );
+      }
+
+      if (!user) {
+        return NextResponse.json(
+          { error: 'Authorization required' },
+          { status: 401 }
+        );
+      }
+
+      // Signing in is not enough: writes are restricted to the allowlist, so a
+      // self-registered Stack Auth account cannot reach the CMS.
+      if (requireAdmin && !isAdminEmail(user.primaryEmail)) {
+        return NextResponse.json(
+          { error: 'Forbidden' },
+          { status: 403 }
         );
       }
     }

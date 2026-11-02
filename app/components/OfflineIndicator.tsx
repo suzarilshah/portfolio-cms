@@ -52,7 +52,7 @@ export default function OfflineIndicator() {
         >
           <div className="m-4 px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-full shadow-lg shadow-red-500/25 flex items-center gap-3">
             <WifiOff className="w-5 h-5 animate-pulse" />
-            <span className="font-medium">You're offline</span>
+            <span className="font-medium">You&apos;re offline</span>
             <span className="text-white/80 text-sm hidden sm:inline">
               • Check your connection
             </span>

@@ -38,4 +38,4 @@ export const POST = createSecureAPIHandler(async (request) => {
     console.error('Thumbnail save failed:', error);
     return NextResponse.json({ error: 'Failed to save thumbnail' }, { status: 400 });
   }
-}, { requireAuth: true, requireCSRF: true });
+}, { requireAdmin: true, requireCSRF: true });

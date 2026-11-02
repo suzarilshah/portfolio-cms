@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { secureDb } from '@/lib/security/database';
-import { stackServerApp } from '@/stack';
 import { SecurityValidator } from '@/lib/security/validation';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
 import { getClientIdentifier, apiRateLimiter, createRateLimitResponse } from '@/lib/security/rate-limiter';
@@ -17,9 +16,6 @@ export const GET = createSecureAPIHandler(async () => {
 });
 
 export const POST = createSecureAPIHandler(async (request: Request) => {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   try {
     const body = await request.json();
     
@@ -56,12 +52,9 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}, { requireAuth: true, requireCSRF: true });
+}, { requireAdmin: true, requireCSRF: true });
 
 export const PUT = createSecureAPIHandler(async (request: Request) => {
-    const user = await stackServerApp.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
     try {
         const body = await request.json();
         
@@ -101,12 +94,9 @@ export const PUT = createSecureAPIHandler(async (request: Request) => {
         console.error('Database error:', error);
         return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
-}, { requireAuth: true, requireCSRF: true });
+}, { requireAdmin: true, requireCSRF: true });
 
 export const DELETE = createSecureAPIHandler(async (request: Request) => {
-    const user = await stackServerApp.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
@@ -120,4 +110,4 @@ export const DELETE = createSecureAPIHandler(async (request: Request) => {
     } catch (error) {
         return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
-}, { requireAuth: true, requireCSRF: true });
+}, { requireAdmin: true, requireCSRF: true });

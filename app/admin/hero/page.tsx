@@ -118,7 +118,7 @@ export default function HeroPage() {
           <div className="space-y-8">
             <div className="space-y-3">
               <label className="text-sm font-semibold text-slate-900">Main Headline</label>
-              <p className="text-xs text-slate-500">The static text before the typing animation (e.g., "Building the Future of").</p>
+              <p className="text-xs text-slate-500">The static text before the typing animation (e.g., &quot;Building the Future of&quot;).</p>
               <input
                 type="text"
                 value={normalizedContent.headline}

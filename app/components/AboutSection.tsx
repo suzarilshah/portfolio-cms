@@ -50,7 +50,7 @@ export default function AboutSection({ content, settings }: { content?: any, set
             {/* Quote Card */}
             <div className="absolute -bottom-8 -right-8 max-w-xs bg-white p-6 rounded-xl shadow-xl border border-slate-100 hidden md:block">
               <p className="font-serif italic text-slate-700 mb-2">
-                "Aut inveniam viam aut faciam."
+                &quot;Aut inveniam viam aut faciam.&quot;
               </p>
               <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">
                 - I shall either find a way or make one

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { secureDb } from '@/lib/security/database';
-import { stackServerApp } from '@/stack';
 import { SecurityValidator } from '@/lib/security/validation';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
 
@@ -28,9 +27,6 @@ export const GET = createSecureAPIHandler(async (request: Request) => {
 });
 
 export const POST = createSecureAPIHandler(async (request: Request) => {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   try {
     const body = await request.json();
     const { section_key, content } = body;
@@ -63,4 +59,4 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-}, { requireAuth: true, requireCSRF: true });
+}, { requireAdmin: true, requireCSRF: true });

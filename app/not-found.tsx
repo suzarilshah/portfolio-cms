@@ -59,7 +59,7 @@ export default function NotFound() {
             Page not found
           </h1>
           <p className="text-slate-500 text-lg mb-8 max-w-md mx-auto leading-relaxed">
-            Sorry, the page you're looking for doesn't exist or has been moved.
+            Sorry, the page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
         </motion.div>
 

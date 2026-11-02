@@ -44,4 +44,4 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
       details: error instanceof Error ? error.stack : String(error)
     }, { status: 500 });
   }
-}, { requireAuth: true });
+}, { requireAdmin: true, requireCSRF: true });

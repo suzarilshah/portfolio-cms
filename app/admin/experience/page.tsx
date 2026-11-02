@@ -707,7 +707,7 @@ export default function ExperiencePage() {
                   <div className="text-center py-12 bg-purple-50 rounded-xl border-2 border-dashed border-purple-200">
                     <Target size={40} className="mx-auto text-purple-300 mb-3" />
                     <p className="text-slate-600 font-medium">No project management experience added yet</p>
-                    <p className="text-sm text-slate-500 mt-1">Click "Add PM Role" to get started</p>
+                    <p className="text-sm text-slate-500 mt-1">Click &quot;Add PM Role&quot; to get started</p>
                   </div>
                 )}
               </div>

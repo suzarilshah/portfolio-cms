@@ -56,6 +56,29 @@ export class InMemoryRateLimiter {
   }
 }
 
+// Which paths the edge middleware throttles. Every API route counts, including
+// /api/cms, which used to be exempt. Stack Auth's own handler is left out so a
+// burst of sign-in redirects cannot lock the owner out of the CMS.
+export function shouldRateLimit(pathname: string): boolean {
+  return pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/');
+}
+
+// Limiters are keyed by configuration and reused. Constructing one per request
+// would reset its counters every time, so the cap would never be reached.
+const limiterCache = new Map<string, InMemoryRateLimiter>();
+
+export function getRateLimiter(windowMs: number, maxRequests: number): InMemoryRateLimiter {
+  const key = `${windowMs}:${maxRequests}`;
+  let limiter = limiterCache.get(key);
+
+  if (!limiter) {
+    limiter = new InMemoryRateLimiter(windowMs, maxRequests);
+    limiterCache.set(key, limiter);
+  }
+
+  return limiter;
+}
+
 // Rate limiters for different endpoints
 export const authRateLimiter = new InMemoryRateLimiter(15 * 60 * 1000, 10); // 10 requests per 15 minutes
 export const apiRateLimiter = new InMemoryRateLimiter(60 * 1000, 100); // 100 requests per minute
@@ -67,6 +90,7 @@ if (typeof window === 'undefined') {
     authRateLimiter.cleanup();
     apiRateLimiter.cleanup();
     uploadRateLimiter.cleanup();
+    limiterCache.forEach((limiter) => limiter.cleanup());
   }, 5 * 60 * 1000);
 }
 
