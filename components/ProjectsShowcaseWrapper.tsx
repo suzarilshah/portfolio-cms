@@ -95,7 +95,14 @@ function normalizeTech(value: unknown): string[] {
 
 async function getProjects() {
   try {
-    const result = await secureDb.query('SELECT * FROM projects WHERE is_visible = true ORDER BY sort_order ASC, created_at DESC');
+    // `is_visible = $1` rather than `= true`: validateQuery cannot tell a
+    // literal from an interpolated value, so it rejects any WHERE without a
+    // placeholder. It was rejecting this one, and the catch below quietly
+    // served the hardcoded fallbacks instead of the real projects.
+    const result = await secureDb.query(
+      'SELECT * FROM projects WHERE is_visible = $1 ORDER BY sort_order ASC, created_at DESC',
+      [true]
+    );
     return result.map((p: any) => ({
       ...p,
       impact: normalizeImpact(p.impact),

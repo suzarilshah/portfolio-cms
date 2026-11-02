@@ -65,7 +65,9 @@ const nextConfig = {
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            // SAMEORIGIN, so the CMS can preview the live page in an iframe.
+            // See lib/security/headers.ts for why that is still safe.
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-Content-Type-Options',

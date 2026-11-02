@@ -66,7 +66,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           {/* Bottom padding clears the mobile nav bar; the left offset clears
               the desktop rail plus its inset. */}
           <main className="md:ml-[268px]">
-            <div className="mx-auto max-w-5xl px-4 pb-28 pt-6 sm:px-6 md:pb-10 md:pr-6 md:pt-8">
+            <div className="studio-container mx-auto px-4 pb-28 pt-6 sm:px-6 md:pb-10 md:pr-6 md:pt-8">
               {children}
             </div>
           </main>

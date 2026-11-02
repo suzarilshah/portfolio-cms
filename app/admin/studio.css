@@ -93,6 +93,20 @@
   box-shadow: var(--lift-lg);
 }
 
+/* Layout ----------------------------------------------------------------- */
+
+/* Most screens read best in a column. The split-view editor needs the whole
+ * window, and asking every other screen to opt into its own max width to
+ * accommodate it would be the wrong default — so the container widens only
+ * when it actually contains a split view. */
+.studio-container {
+  max-width: 64rem;
+}
+
+.studio-container:has(.studio-split) {
+  max-width: 1680px;
+}
+
 /* Fields ----------------------------------------------------------------- */
 
 .studio-input {

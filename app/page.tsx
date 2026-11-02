@@ -1,15 +1,7 @@
 import pool from '@/lib/db';
 import Navigation from './components/Navigation';
-import HeroSection from './components/HeroSection';
-import AboutSection from './components/AboutSection';
-import SkillsMatrix from '@/components/SkillsMatrix';
+import PageSections from './components/PageSections';
 import ProjectsShowcase from '@/components/ProjectsShowcaseWrapper';
-import ExperienceSection from './components/ExperienceSection';
-import EducationSection from './components/EducationSection';
-import AwardsSection from './components/AwardsSection';
-import PublicationsSection from './components/PublicationsSection';
-import CommunitySection from './components/CommunitySection';
-import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 import GridBackground from '@/components/GridBackground';
 
@@ -99,20 +91,6 @@ async function getData() {
 export default async function Home() {
   const { sectionData, renderOrder, badges, settings } = await getData();
 
-  // Component Mapping
-  const SectionComponents: Record<string, React.ReactNode> = {
-    hero: <HeroSection key="hero" content={sectionData.hero} settings={settings} />,
-    about: <AboutSection key="about" content={sectionData.about} settings={settings} />,
-    skills: <SkillsMatrix key="skills" content={sectionData.skills} />,
-    projects: <ProjectsShowcase key="projects" content={sectionData.projects} />,
-    experience: <ExperienceSection key="experience" content={sectionData.experience} settings={settings} />,
-    education: <EducationSection key="education" content={sectionData.education} />,
-    awards: <AwardsSection key="awards" badges={badges} content={sectionData.awards} />,
-    publications: <PublicationsSection key="publications" content={sectionData.publications} />,
-    community: <CommunitySection key="community" content={sectionData.community} />,
-    contact: <ContactSection key="contact" content={sectionData.contact} />
-  };
-
   return (
     <main className="relative min-h-screen overflow-hidden selection:bg-primary-100 selection:text-primary-900">
       {/* Global Grid Background with Parallax */}
@@ -124,10 +102,15 @@ export default async function Home() {
       {/* Navigation */}
       <Navigation settings={settings} />
 
-      {/* Main content */}
-      <div className="relative z-10">
-        {renderOrder.map((key: string) => SectionComponents[key] || null)}
-      </div>
+      {/* Main content. The key → component map lives in PageSections so the
+          CMS can swap content in without a round trip; see lib/preview. */}
+      <PageSections
+        sectionData={sectionData}
+        renderOrder={renderOrder}
+        badges={badges}
+        settings={settings}
+        projectsSlot={<ProjectsShowcase content={sectionData.projects} />}
+      />
 
       {/* Footer */}
       <Footer />

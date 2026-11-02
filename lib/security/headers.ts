@@ -23,6 +23,10 @@ export class SecurityHeadersBuilder {
       "img-src 'self' data: https: blob:",
       "connect-src 'self' https://*.blob.vercel-storage.com https://*.vercel-storage.com https://ep-orange-fire-a85s6psf-pooler.eastus2.azure.neon.tech https://*.stack.inc https://*.stack-auth.com https://sessionize.com https://*.sessionize.com",
       "frame-src 'self' https://*.stack.inc https://*.stack-auth.com https://www.credly.com",
+      // The CMS previews the live page in an iframe, so the page must be
+      // framable — but only by us. This is the modern half of the pair with
+      // X-Frame-Options below; both say the same thing for old and new agents.
+      "frame-ancestors 'self'",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -33,9 +37,17 @@ export class SecurityHeadersBuilder {
     return this;
   }
 
-  // Clickjacking protection
-  withFrameOptions(): this {
-    this.headers['X-Frame-Options'] = 'DENY';
+  /**
+   * Clickjacking protection.
+   *
+   * SAMEORIGIN rather than DENY: the CMS preview frames the public page. That
+   * is not a weakening of the clickjacking posture — a same-origin frame can
+   * only be opened by our own pages, and the only page that does is behind
+   * the admin allowlist. API responses keep DENY, since nothing should ever
+   * frame those.
+   */
+  withFrameOptions(value: 'DENY' | 'SAMEORIGIN' = 'SAMEORIGIN'): this {
+    this.headers['X-Frame-Options'] = value;
     return this;
   }
 
@@ -97,7 +109,7 @@ export class SecurityHeadersBuilder {
 // Default security headers for API routes
 export function addDefaultSecurityHeaders(response: NextResponse): NextResponse {
   return new SecurityHeadersBuilder()
-    .withFrameOptions()
+    .withFrameOptions('DENY')
     .withContentTypeOptions()
     .withReferrerPolicy()
     .withPermissionsPolicy()

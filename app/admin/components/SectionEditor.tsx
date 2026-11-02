@@ -1,15 +1,20 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowUpRight,
   Clock,
   History,
   Loader2,
+  Monitor,
+  PencilLine,
   RotateCcw,
   X,
 } from 'lucide-react';
+import LivePreview from './LivePreview';
+import { SECTION_EDITORS } from '../sections';
 import {
   Button,
   Dot,
@@ -56,6 +61,10 @@ export default function SectionEditor<T>({
   const [save, setSave] = useState<SaveState>({ status: 'idle' });
   const [togglingVisibility, setTogglingVisibility] = useState(false);
 
+  // Below the split-view breakpoint the two halves become tabs; there is not
+  // enough width to show a usable form and a usable page at once.
+  const [tab, setTab] = useState<'edit' | 'preview'>('edit');
+
   const [showHistory, setShowHistory] = useState(false);
   const [historyItems, setHistoryItems] = useState<{ id: number; created_at: string }[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -63,8 +72,21 @@ export default function SectionEditor<T>({
   // defaultContent is a fresh object literal on every render in most callers,
   // so it cannot be an effect dependency without looping.
   const defaults = useRef(defaultContent);
+  const router = useRouter();
 
   const dirty = stable(content) !== baseline;
+
+  // Clicking another section in the preview is a navigation, so it has to
+  // respect the same unsaved-work guard the browser applies to a reload.
+  const handlePreviewSelect = useCallback(
+    (key: string) => {
+      const target = SECTION_EDITORS[key];
+      if (!target) return;
+      if (dirty && !confirm('Leave this section? Unsaved changes will be lost.')) return;
+      router.push(target.href);
+    },
+    [dirty, router]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -186,9 +208,12 @@ export default function SectionEditor<T>({
   const known = row.is_visible !== undefined;
   const visible = row.is_visible !== false;
 
-  return (
+  // The panel column: header, visibility, form and save bar. In split view it
+  // scrolls independently of the preview beside it.
+  const panel = (
     <div className="pb-2">
       <PageHeader
+        compact
         eyebrow={
           <div className="flex items-center gap-2">
             <Label>Section</Label>
@@ -341,6 +366,54 @@ export default function SectionEditor<T>({
           </aside>
         </>
       )}
+    </div>
+  );
+
+  const preview = (
+    <LivePreview sectionKey={sectionKey} content={content} onSelect={handlePreviewSelect} />
+  );
+
+  return (
+    // `studio-split` widens the admin container; see studio.css.
+    <div className="studio-split">
+      {/* Tabs, below the split-view breakpoint only. */}
+      <div className="mb-4 flex gap-1 rounded-[var(--r-pill)] bg-[var(--sunken)] p-1 xl:hidden">
+        {(
+          [
+            ['edit', 'Edit', PencilLine],
+            ['preview', 'Preview', Monitor],
+          ] as const
+        ).map(([id, label, Icon]) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            aria-pressed={tab === id}
+            className={`studio-label flex flex-1 items-center justify-center gap-1.5 rounded-[var(--r-pill)] py-2 transition-colors ${
+              tab === id ? 'bg-[var(--card)] text-[var(--text)] shadow-[var(--lift)]' : 'text-[var(--muted)]'
+            }`}
+          >
+            <Icon size={13} />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_460px] xl:items-start xl:gap-5">
+        {/* Preview first in the DOM on wide screens so it reads left-to-right,
+            but the form must come first for keyboard and screen-reader order
+            on narrow ones — hence the explicit order classes. */}
+        <div
+          className={`order-2 xl:order-1 ${tab === 'preview' ? 'block' : 'hidden'} xl:block`}
+        >
+          <div className="studio-card h-[70vh] overflow-hidden p-0 xl:sticky xl:top-6 xl:h-[calc(100vh-6rem)]">
+            {preview}
+          </div>
+        </div>
+
+        <div className={`order-1 xl:order-2 ${tab === 'edit' ? 'block' : 'hidden'} xl:block`}>
+          {panel}
+        </div>
+      </div>
     </div>
   );
 }

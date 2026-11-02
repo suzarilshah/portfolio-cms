@@ -62,19 +62,41 @@ export function PageHeader({
   title,
   description,
   actions,
+  compact,
 }: {
   eyebrow?: React.ReactNode;
   title: string;
   description?: string;
   actions?: React.ReactNode;
+  /**
+   * Always stack, and set the title at body scale.
+   *
+   * Breakpoints answer "how wide is the window", but inside the editor's
+   * side panel the question is "how wide is this column" — a wide window can
+   * still leave the header 460px. `compact` is the caller stating that
+   * directly rather than guessing from the viewport.
+   */
+  compact?: boolean;
 }) {
   return (
-    <header className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+    <header
+      className={cn(
+        'flex flex-col gap-5',
+        !compact && 'md:flex-row md:items-end md:justify-between'
+      )}
+    >
       <div className="min-w-0">
         {eyebrow && <div className="mb-2.5">{eyebrow}</div>}
-        <h1 className="studio-display">{title}</h1>
+        <h1 className={compact ? 'text-[22px] font-bold tracking-[-0.02em]' : 'studio-display'}>
+          {title}
+        </h1>
         {description && (
-          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--muted)]">
+          <p
+            className={cn(
+              'mt-3 leading-relaxed text-[var(--muted)]',
+              compact ? 'text-[14px]' : 'max-w-xl text-[15px]'
+            )}
+          >
             {description}
           </p>
         )}
