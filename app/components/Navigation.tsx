@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home, User, Briefcase, Award, BookOpen, Users, Mail, Rss } from 'lucide-react';
+import { Menu, X, Home, User, Briefcase, Award, BookOpen, Users, Mail } from 'lucide-react';
 
+// No #blog entry: that section was removed, so the link scrolled nowhere.
+// The real blog lives at blog.suzarilshah.uk and will be surfaced from its
+// own feed rather than by an anchor to a section that does not exist.
 const navItems = [
   { name: 'Home', href: '#home', icon: Home },
   { name: 'About', href: '#about', icon: User },
   { name: 'Experience', href: '#experience', icon: Briefcase },
   { name: 'Awards', href: '#awards', icon: Award },
   { name: 'Publications', href: '#publications', icon: BookOpen },
-  { name: 'Blog', href: '#blog', icon: Rss },
   { name: 'Community', href: '#community', icon: Users },
   { name: 'Contact', href: '#contact', icon: Mail },
 ];

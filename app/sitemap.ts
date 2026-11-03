@@ -42,12 +42,9 @@ async function getAllUrls(): Promise<{ url: string; lastmod?: string; changefreq
       changefreq: 'monthly' as const,
       priority: 0.7,
     },
-    {
-      url: `${baseUrl}#blog`,
-      lastmod: currentDate,
-      changefreq: 'daily' as const,
-      priority: 0.85,
-    },
+    // No #blog: the section was removed, so this advertised a fragment that
+    // resolves to nothing. A sitemap entry for a non-existent anchor is a
+    // crawl error, not a ranking signal.
     {
       url: `${baseUrl}#community`,
       lastmod: currentDate,
