@@ -95,6 +95,11 @@ export default function AboutSection({
   const quote = content?.quote?.text ? content.quote : DEFAULT_ABOUT.quote;
   const interests = content?.interests?.length ? content.interests : DEFAULT_ABOUT.interests;
   const profilePhoto = settings?.profile_photo_url;
+  // A portrait of the person the page is about is content, not decoration,
+  // so it gets a real alternative text rather than alt="".
+  const photoAlt = settings?.identity?.name
+    ? `Portrait of ${settings.identity.name}`
+    : 'Portrait';
 
   // Blank lines are paragraph breaks. Rendering the bio as one block was what
   // made it a wall; this lets the first line carry weight on its own.
@@ -117,9 +122,16 @@ export default function AboutSection({
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
           <motion.div {...fadeIn} className="lg:sticky lg:top-28 lg:self-start">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-100">
+            {/* 3:2 on phones. At 4:5 the portrait was 472px tall on a 390px
+                screen — most of the first view of this section, before a
+                single word of the bio. */}
+            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-slate-100 sm:aspect-[4/5]">
               {profilePhoto ? (
-                <img src={profilePhoto} alt="" className="h-full w-full object-cover" />
+                <img
+                  src={profilePhoto}
+                  alt={photoAlt}
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <div className="grid h-full w-full place-items-center text-slate-300">
                   <User size={56} />

@@ -177,7 +177,7 @@ export default function CommunitySection({ content }: { content?: any }) {
   const displayEvents = showAllEvents ? displayCommunityEvents : displayCommunityEvents.slice(0, 4);
 
   return (
-    <section id="community" className="py-24 relative overflow-hidden">
+    <section id="community" className="py-20 sm:py-24 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute inset-0 bg-slate-50 -z-20"></div>
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-50/50 to-transparent -z-10"></div>

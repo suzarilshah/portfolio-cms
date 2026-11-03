@@ -97,7 +97,7 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
   };
 
   return (
-    <section id="awards" className="py-20 md:py-32 relative bg-slate-50/50 overflow-hidden">
+    <section id="awards" className="py-20 sm:py-24 relative bg-slate-50/50 overflow-hidden">
       {/* Background Blobs */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-blue-100/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
@@ -109,7 +109,7 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
       <div className="max-w-[1400px] mx-auto px-6 relative z-10">
         
         {/* AWARDS SECTION */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-16">
           {/* Header */}
           <div className="lg:col-span-4 relative lg:sticky lg:top-32">
             <motion.div
@@ -128,10 +128,10 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
 
           {/* Awards Grid */}
           <div className="lg:col-span-8">
-            {items.length > 6 && !showAllAwards ? (
+            {items.length > 4 && !showAllAwards ? (
               <div className="relative">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {items.slice(0, 6).map((award: any, index: number) => {
+                  {items.slice(0, 4).map((award: any, index: number) => {
                     const Icon = getIcon(award.icon);
                     const CardContent = (
                       <>
@@ -281,7 +281,7 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
 
         {/* CREDLY BADGES GALLERY */}
         {badges && badges.length > 0 && (
-            <div className="border-t border-slate-200 pt-24">
+            <div className="border-t border-slate-200 pt-16">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h3 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-4">Verified Credentials</h3>
                     <p className="text-slate-600 text-lg">

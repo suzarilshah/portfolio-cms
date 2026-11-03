@@ -175,7 +175,7 @@ export default function SkillsMatrix({ content }: { content?: Partial<SkillsCont
   };
 
   return (
-    <section id="skills" className="py-24 bg-slate-50/50">
+    <section id="skills" className="py-20 sm:py-24 bg-slate-50/50">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
         <motion.div

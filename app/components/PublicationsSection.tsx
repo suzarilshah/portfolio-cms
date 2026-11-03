@@ -210,7 +210,7 @@ export default function PublicationsSection({ content }: { content?: any }) {
   ];
 
   return (
-    <section id="publications" className="py-16 md:py-24 bg-white">
+    <section id="publications" className="py-20 sm:py-24">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-12 gap-12">
 

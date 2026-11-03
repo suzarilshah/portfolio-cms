@@ -32,6 +32,26 @@ async function getSettings() {
   }
 }
 
+/**
+ * The hero's credentials, reused in JSON-LD.
+ *
+ * Structured data that claims credentials the page does not show — or misses
+ * ones it does — is the kind of inconsistency search engines penalise, so
+ * both read the same row.
+ */
+async function getHeroCredentials() {
+  try {
+    const res = await pool.query(
+      'SELECT content FROM content_sections WHERE section_key = $1',
+      ['hero']
+    );
+    const credentials = res.rows[0]?.content?.credentials;
+    return Array.isArray(credentials) ? credentials : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   
@@ -135,7 +155,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSettings();
+  const [settings, heroCredentials] = await Promise.all([getSettings(), getHeroCredentials()]);
   const accent = settings?.accent_color || 'primary';
   const pattern = settings?.background_pattern || 'dots';
   const gaId = settings?.ga_measurement_id || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -144,7 +164,12 @@ export default async function RootLayout({
     <html lang="en" className="scroll-smooth" data-accent={accent} suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased relative min-h-screen`} suppressHydrationWarning>
         {/* SEO Structured Data & Analytics (client-safe in body) */}
-        <StructuredData type="all" profilePhotoUrl={settings.profile_photo_url} />
+        <StructuredData
+          type="all"
+          profilePhotoUrl={settings.profile_photo_url}
+          identity={settings.identity}
+          credentials={heroCredentials}
+        />
         <GoogleAnalytics measurementId={gaId} />
         {/* Global Background Pattern */}
         <BackgroundPattern pattern={pattern} />

@@ -35,7 +35,7 @@ export default function EducationSection({ content }: { content?: any }) {
   const title = content?.title || "Academic Foundation";
 
   return (
-    <section id="education" className="py-16 md:py-24 bg-white">
+    <section id="education" className="py-20 sm:py-24">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Header Column */}

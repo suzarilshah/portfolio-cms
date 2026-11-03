@@ -1,6 +1,32 @@
 import { NextResponse } from 'next/server';
 import { secureDb } from '@/lib/security/database';
 import { createSecureAPIHandler } from '@/lib/security/middleware';
+import { SecurityValidator } from '@/lib/security/validation';
+
+/**
+ * Normalise a list of `{ label, href }` links.
+ *
+ * Both the nav and the footer render these as anchors, so `href` is held to
+ * the same rule as everywhere else: a same-page fragment, or an absolute
+ * http(s) URL. A link that survives with no destination is dropped rather
+ * than rendered as a dead one — the public site has carried two of those
+ * ("Privacy Policy", "Terms of Service", both pointing at `#`).
+ */
+function sanitizeLinks(value: unknown, max: number): { label: string; href: string }[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item: any) => {
+      const label = item?.label ? String(item.label).trim().substring(0, 60) : '';
+      const raw = typeof item?.href === 'string' ? item.href.trim() : '';
+      const href =
+        /^#[\w-]{1,60}$/.test(raw) || SecurityValidator.isSafeHttpUrl(raw)
+          ? raw.substring(0, 300)
+          : '';
+      return { label, href };
+    })
+    .filter((link) => link.label && link.href)
+    .slice(0, max);
+}
 
 export const GET = createSecureAPIHandler(async () => {
   try {
@@ -33,6 +59,31 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
     const background_overlay_opacity = typeof body.background_overlay_opacity === 'number'
       ? Math.max(0, Math.min(80, body.background_overlay_opacity))
       : 30;
+    const background_grid_intensity = typeof body.background_grid_intensity === 'number'
+      ? Math.max(0, Math.min(100, Math.round(body.background_grid_intensity)))
+      : 14;
+
+    // Chrome that used to be hardcoded in components. Each is normalised here
+    // rather than trusted: these values end up in hrefs on the public page.
+    const nav_items = sanitizeLinks(body.nav_items, 8);
+    const footer = {
+      tagline: body.footer?.tagline ? String(body.footer.tagline).substring(0, 200) : '',
+      note: body.footer?.note ? String(body.footer.note).substring(0, 200) : '',
+      links: sanitizeLinks(body.footer?.links, 6),
+    };
+    const identity = {
+      name: body.identity?.name ? String(body.identity.name).substring(0, 120) : '',
+      job_title: body.identity?.job_title ? String(body.identity.job_title).substring(0, 120) : '',
+      employer: body.identity?.employer ? String(body.identity.employer).substring(0, 120) : '',
+      locality: body.identity?.locality ? String(body.identity.locality).substring(0, 120) : '',
+      country: body.identity?.country ? String(body.identity.country).substring(0, 8) : '',
+      same_as: Array.isArray(body.identity?.same_as)
+        ? body.identity.same_as
+            .filter((url: unknown) => SecurityValidator.isSafeHttpUrl(url))
+            .map((url: string) => url.trim().substring(0, 300))
+            .slice(0, 10)
+        : [],
+    };
 
     // Ensure expected columns exist (self-heal if migrations haven't run)
     try {
@@ -48,7 +99,11 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
         ADD COLUMN IF NOT EXISTS seo_og_image TEXT,
         ADD COLUMN IF NOT EXISTS background_pattern TEXT DEFAULT 'dots',
         ADD COLUMN IF NOT EXISTS background_svg_color TEXT DEFAULT 'blue',
-        ADD COLUMN IF NOT EXISTS background_overlay_opacity INTEGER DEFAULT 30;
+        ADD COLUMN IF NOT EXISTS background_overlay_opacity INTEGER DEFAULT 30,
+        ADD COLUMN IF NOT EXISTS background_grid_intensity INTEGER DEFAULT 14,
+        ADD COLUMN IF NOT EXISTS nav_items JSONB,
+        ADD COLUMN IF NOT EXISTS footer JSONB,
+        ADD COLUMN IF NOT EXISTS identity JSONB;
       `);
     } catch (e) {
       // ignore
@@ -70,13 +125,20 @@ export const POST = createSecureAPIHandler(async (request: Request) => {
            background_pattern = $12,
            background_svg_color = $13,
            background_overlay_opacity = $14,
+           background_grid_intensity = $15,
+           nav_items = $16::jsonb,
+           footer = $17::jsonb,
+           identity = $18::jsonb,
            updated_at = NOW()
-       WHERE id = $15 RETURNING *`,
+       WHERE id = $19 RETURNING *`,
       [
         logo_text, logo_highlight, accent_color, logo_url,
         profile_photo_url, favicon_url, resume_url,
         seo_title, seo_description, seo_keywords, seo_og_image,
-        background_pattern, background_svg_color, background_overlay_opacity, 1
+        background_pattern, background_svg_color, background_overlay_opacity,
+        background_grid_intensity,
+        JSON.stringify(nav_items), JSON.stringify(footer), JSON.stringify(identity),
+        1
       ]
     );
 

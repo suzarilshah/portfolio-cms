@@ -355,7 +355,7 @@ export default function ExperienceSection({ content, settings }: { content?: any
   const resumeUrl = settings?.resume_url;
 
   return (
-    <section id="experience" className="relative py-16 md:py-20 overflow-hidden">
+    <section id="experience" className="relative py-20 sm:py-24 overflow-hidden">
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* Section Header with Typing Effect - more compact */}
         <div className="text-center mb-10">

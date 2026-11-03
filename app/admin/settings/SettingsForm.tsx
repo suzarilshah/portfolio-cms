@@ -2,7 +2,207 @@
 
 import { useState, useEffect } from 'react';
 import { uploadPortfolioFile } from '@/lib/upload-client';
-import { Save, Loader2, Image as ImageIcon, User, Globe, Palette, Upload, FileText, Search, Grid3X3, Layers } from 'lucide-react';
+import { Save, Loader2, Image as ImageIcon, User, Globe, Palette, Upload, FileText, Search, Grid3X3, Layers, Compass, Link2, Plus, Trash2 } from 'lucide-react';
+import { Button, Field, Input, Label, Meta, TagInput, Textarea } from '../components/ui';
+
+export interface SiteLink {
+  label: string;
+  href: string;
+}
+
+/**
+ * Navigation, footer and identity.
+ *
+ * These were hardcoded in Navigation.tsx, Footer.tsx and StructuredData.tsx.
+ * That is how a nav link to a deleted #blog section and two footer links
+ * pointing at "#" survived on the live site: nothing in the CMS could see
+ * them, so nothing in the CMS could fix them.
+ */
+function LinkListEditor({
+  links,
+  onChange,
+  max,
+  addLabel,
+}: {
+  links: SiteLink[];
+  onChange: (next: SiteLink[]) => void;
+  max: number;
+  addLabel: string;
+}) {
+  return (
+    <div className="space-y-2">
+      {links.length === 0 && (
+        <p className="rounded-[var(--r-field)] bg-[var(--sunken)] px-4 py-5 text-center text-[13px] text-[var(--muted)]">
+          Nothing here yet.
+        </p>
+      )}
+      {links.map((link, index) => (
+        <div key={index} className="flex items-center gap-2">
+          <Input
+            value={link.label}
+            placeholder="Label"
+            className="sm:w-[180px]"
+            onChange={(e) =>
+              onChange(links.map((l, i) => (i === index ? { ...l, label: e.target.value } : l)))
+            }
+          />
+          <Input
+            value={link.href}
+            placeholder="#section or https://…"
+            onChange={(e) =>
+              onChange(links.map((l, i) => (i === index ? { ...l, href: e.target.value } : l)))
+            }
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            aria-label={`Remove ${link.label || 'link'}`}
+            onClick={() => onChange(links.filter((_, i) => i !== index))}
+          >
+            <Trash2 size={14} />
+          </Button>
+        </div>
+      ))}
+      <Button
+        type="button"
+        onClick={() => onChange([...links, { label: '', href: '' }])}
+        disabled={links.length >= max}
+      >
+        <Plus size={14} />
+        {addLabel}
+      </Button>
+      <Meta>
+        A link needs both a label and a destination to be saved. Anything else is dropped rather
+        than published as a dead link.
+      </Meta>
+    </div>
+  );
+}
+
+function SiteChromeFields({
+  settings,
+  setSettings,
+}: {
+  settings: any;
+  setSettings: (next: any) => void;
+}) {
+  const identity = settings.identity ?? {};
+  const footer = settings.footer ?? { tagline: '', note: '', links: [] };
+
+  return (
+    <>
+      <div className="studio-card p-6 sm:p-7">
+        <div className="mb-5 flex items-center gap-2">
+          <Compass size={18} className="text-[var(--accent)]" />
+          <h2 className="text-[15px] font-semibold">Navigation</h2>
+        </div>
+        <p className="mb-4 text-[13px] leading-relaxed text-[var(--muted)]">
+          The links in the floating nav, in order. Up to eight.
+        </p>
+        <LinkListEditor
+          links={settings.nav_items ?? []}
+          max={8}
+          addLabel="Add nav link"
+          onChange={(nav_items) => setSettings({ ...settings, nav_items })}
+        />
+      </div>
+
+      <div className="studio-card p-6 sm:p-7">
+        <div className="mb-5 flex items-center gap-2">
+          <Link2 size={18} className="text-[var(--accent)]" />
+          <h2 className="text-[15px] font-semibold">Footer</h2>
+        </div>
+        <div className="space-y-5">
+          <Field label="Tagline">
+            <Input
+              value={footer.tagline || ''}
+              onChange={(e) =>
+                setSettings({ ...settings, footer: { ...footer, tagline: e.target.value } })
+              }
+            />
+          </Field>
+          <Field label="Small print" hint="Sits opposite the copyright line.">
+            <Input
+              value={footer.note || ''}
+              onChange={(e) =>
+                setSettings({ ...settings, footer: { ...footer, note: e.target.value } })
+              }
+            />
+          </Field>
+          <div>
+            <Label>Footer links</Label>
+            <div className="mt-2.5">
+              <LinkListEditor
+                links={footer.links ?? []}
+                max={6}
+                addLabel="Add footer link"
+                onChange={(links) => setSettings({ ...settings, footer: { ...footer, links } })}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="studio-card p-6 sm:p-7">
+        <div className="mb-5 flex items-center gap-2">
+          <User size={18} className="text-[var(--accent)]" />
+          <h2 className="text-[15px] font-semibold">Identity</h2>
+        </div>
+        <p className="mb-5 text-[13px] leading-relaxed text-[var(--muted)]">
+          What the page tells Google and LinkedIn about you, as JSON-LD. Your hero credentials are
+          included automatically, so the two cannot disagree.
+        </p>
+        <div className="space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Full name">
+              <Input
+                value={identity.name || ''}
+                onChange={(e) =>
+                  setSettings({ ...settings, identity: { ...identity, name: e.target.value } })
+                }
+              />
+            </Field>
+            <Field label="Job title">
+              <Input
+                value={identity.job_title || ''}
+                onChange={(e) =>
+                  setSettings({ ...settings, identity: { ...identity, job_title: e.target.value } })
+                }
+              />
+            </Field>
+            <Field label="Employer">
+              <Input
+                value={identity.employer || ''}
+                onChange={(e) =>
+                  setSettings({ ...settings, identity: { ...identity, employer: e.target.value } })
+                }
+              />
+            </Field>
+            <Field label="City">
+              <Input
+                value={identity.locality || ''}
+                onChange={(e) =>
+                  setSettings({ ...settings, identity: { ...identity, locality: e.target.value } })
+                }
+              />
+            </Field>
+          </div>
+          <Field
+            label="Profiles elsewhere"
+            hint="Full https:// URLs. These are the sameAs links that tie your profiles together for search engines."
+          >
+            <TagInput
+              values={identity.same_as ?? []}
+              max={10}
+              placeholder="https://linkedin.com/in/…"
+              onChange={(same_as) => setSettings({ ...settings, identity: { ...identity, same_as } })}
+            />
+          </Field>
+        </div>
+      </div>
+    </>
+  );
+}
 
 export default function SettingsForm() {
   const [settings, setSettings] = useState({
@@ -21,6 +221,18 @@ export default function SettingsForm() {
     // New background settings
     background_svg_color: 'blue',
     background_overlay_opacity: 50,
+    background_grid_intensity: 14,
+    // Chrome that used to be hardcoded in the page components.
+    nav_items: [] as SiteLink[],
+    footer: { tagline: '', note: '', links: [] as SiteLink[] },
+    identity: {
+      name: '',
+      job_title: '',
+      employer: '',
+      locality: '',
+      country: '',
+      same_as: [] as string[],
+    },
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -445,29 +657,33 @@ export default function SettingsForm() {
                 </div>
             </div>
 
-            {/* White Overlay Opacity */}
+            {/* Grid intensity. This replaced a "White Overlay Opacity"
+                slider that drove a separate wash and could not quiet the
+                grid at all — the grid's own opacity was hardcoded. */}
             <div className="space-y-3 border-t border-[var(--line)] pt-6">
                 <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-[var(--dim)]">White Overlay Opacity</label>
-                    <span className="text-sm font-mono text-[var(--faint)] bg-[var(--raised)] px-2 py-0.5 rounded">{settings.background_overlay_opacity}%</span>
+                    <label className="block text-sm font-medium text-[var(--dim)]">Grid intensity</label>
+                    <span className="text-sm font-mono text-[var(--faint)] bg-[var(--raised)] px-2 py-0.5 rounded">{settings.background_grid_intensity}</span>
                 </div>
-                <p className="text-xs text-[var(--faint)]">Lower values make the grid more visible and vibrant. Higher values make it more subtle.</p>
+                <p className="text-xs text-[var(--faint)]">How present the background grid is. It stays a texture at every setting; the old background competed with your content, which is what this fixes.</p>
                 <input
                     type="range"
                     min="0"
-                    max="80"
-                    step="5"
-                    value={settings.background_overlay_opacity}
-                    onChange={(e) => setSettings({...settings, background_overlay_opacity: parseInt(e.target.value)})}
+                    max="100"
+                    step="2"
+                    value={settings.background_grid_intensity}
+                    onChange={(e) => setSettings({...settings, background_grid_intensity: parseInt(e.target.value)})}
                     className="w-full h-2 bg-[var(--raised)] rounded-[4px] appearance-none cursor-pointer accent-blue-600"
                 />
                 <div className="flex justify-between text-xs text-[var(--faint)]">
-                    <span>More Vibrant</span>
-                    <span>More Subtle</span>
+                    <span>Invisible</span>
+                    <span>Present</span>
                 </div>
             </div>
         </div>
       </div>
+
+      <SiteChromeFields settings={settings} setSettings={setSettings} />
 
       <div className="flex justify-end pt-4">
           <button 

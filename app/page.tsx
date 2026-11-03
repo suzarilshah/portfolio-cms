@@ -125,7 +125,7 @@ export default async function Home() {
       />
 
       {/* Footer */}
-      <Footer />
+      <Footer content={settings.footer} settings={settings} />
     </main>
   );
 }

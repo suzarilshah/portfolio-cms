@@ -54,7 +54,7 @@ export default function ContactSection({ content }: { content?: any }) {
   };
 
   return (
-    <section id="contact" className="py-16 md:py-20 border-t border-slate-100">
+    <section id="contact" className="py-20 sm:py-24 border-t border-slate-200/80">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

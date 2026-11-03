@@ -12,38 +12,97 @@ function sanitizeString(str: any): string {
     .trim();
 }
 
+/** The identity facts JSON-LD asserts, as stored in site_settings.identity. */
+export interface SiteIdentity {
+  name?: string
+  job_title?: string
+  employer?: string
+  locality?: string
+  country?: string
+  same_as?: string[]
+  description?: string
+  email?: string
+}
+
 interface StructuredDataProps {
   type?: 'person' | 'professional-service' | 'all'
   profilePhotoUrl?: string
+  /** From the CMS. Anything unset falls back to the values below. */
+  identity?: SiteIdentity | null
+  /** Hero credentials, reused as schema.org credentials. */
+  credentials?: { label?: string; issuer?: string; url?: string }[] | null
 }
 
-export function StructuredData({ type = 'all', profilePhotoUrl }: StructuredDataProps) {
+// What the component asserted before any of this was editable. Kept as the
+// fallback so an unmigrated database still emits correct structured data
+// rather than a Person with no name.
+const FALLBACK_IDENTITY: Required<Omit<SiteIdentity, 'same_as'>> & { same_as: string[] } = {
+  name: 'Muhammad Suzaril Shah',
+  job_title: 'Senior IT Systems & Customer Engineer',
+  employer: 'Swift',
+  locality: 'Kuala Lumpur',
+  country: 'Malaysia',
+  description:
+    'Microsoft MVP, Docker Captain, and Cloud Engineering Technologist specializing in Azure, Kubernetes, DevOps, and IoT solutions.',
+  email: 'shah@suzarilshah.uk',
+  same_as: [
+    'https://www.linkedin.com/in/suzarilshah',
+    'https://github.com/suzarilshah',
+    'https://blog.suzarilshah.uk',
+    'https://mvp.microsoft.com/en-us/PublicProfile/5005264',
+    'https://www.docker.com/captains/muhammad-suzaril-shah/',
+    'https://sessionize.com/suzaril-shah',
+  ],
+}
+
+export function StructuredData({
+  type = 'all',
+  profilePhotoUrl,
+  identity,
+  credentials,
+}: StructuredDataProps) {
   const baseUrl = 'https://www.suzarilshah.uk'
+
+  const name = sanitizeString(identity?.name) || FALLBACK_IDENTITY.name
+  const jobTitle = sanitizeString(identity?.job_title) || FALLBACK_IDENTITY.job_title
+  const employer = sanitizeString(identity?.employer) || FALLBACK_IDENTITY.employer
+  const locality = sanitizeString(identity?.locality) || FALLBACK_IDENTITY.locality
+  const country = sanitizeString(identity?.country) || FALLBACK_IDENTITY.country
+  const sameAs =
+    Array.isArray(identity?.same_as) && identity.same_as.length > 0
+      ? identity.same_as
+      : FALLBACK_IDENTITY.same_as
+
+  // Credentials come from the hero, so the page and its structured data make
+  // the same claims — two lists would eventually disagree.
+  const credentialSchema = (credentials ?? [])
+    .filter((credential) => credential?.label)
+    .map((credential) => ({
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'Award',
+      name: sanitizeString(credential.label),
+      ...(credential.url ? { url: credential.url } : {}),
+      ...(credential.issuer
+        ? { recognizedBy: { '@type': 'Organization', name: sanitizeString(credential.issuer) } }
+        : {}),
+    }))
 
   // Person Schema - Professional Profile
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: 'Muhammad Suzaril Shah',
+    name,
     url: baseUrl,
     image: profilePhotoUrl || undefined,
-    jobTitle: 'Senior IT Systems & Customer Engineer',
-    description: 'Microsoft MVP, Docker Captain, and Cloud Engineering Technologist specializing in Azure, Kubernetes, DevOps, and IoT solutions. Senior IT Systems Engineer at Swift with expertise in cloud architecture, infrastructure automation, and platform engineering.',
-    email: 'shah@suzarilshah.uk',
+    jobTitle,
+    description: sanitizeString(identity?.description) || FALLBACK_IDENTITY.description,
+    email: sanitizeString(identity?.email) || FALLBACK_IDENTITY.email,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Kuala Lumpur',
-      addressCountry: 'Malaysia',
+      addressLocality: locality,
+      addressCountry: country,
     },
-    sameAs: [
-      'https://www.linkedin.com/in/suzarilshah',
-      'https://github.com/suzarilshah',
-      'https://twitter.com/suzarilshah',
-      'https://blog.suzarilshah.uk',
-      'https://mvp.microsoft.com/en-us/PublicProfile/5005264',
-      'https://www.docker.com/captains/muhammad-suzaril-shah/',
-      'https://sessionize.com/suzaril-shah',
-    ],
+    sameAs,
     knowsAbout: [
       'Microsoft Azure',
       'Azure Cloud Architecture',
@@ -82,32 +141,30 @@ export function StructuredData({ type = 'all', profilePhotoUrl }: StructuredData
       'Imagine Cup Runner Up - Top 4 Asia (2022)',
       'ITEX Silver Medal (2021)',
     ],
-    hasCredential: [
-      {
-        '@type': 'EducationalOccupationalCredential',
-        credentialCategory: 'Award',
-        name: 'Microsoft MVP - AI & Azure',
-        url: 'https://mvp.microsoft.com/en-us/PublicProfile/5005264',
-        recognizedBy: {
-          '@type': 'Organization',
-          name: 'Microsoft Corporation',
-        },
-      },
-      {
-        '@type': 'EducationalOccupationalCredential',
-        credentialCategory: 'Recognition',
-        name: 'Docker Captain',
-        url: 'https://www.docker.com/captains/',
-        recognizedBy: {
-          '@type': 'Organization',
-          name: 'Docker Inc.',
-        },
-      },
-    ],
+    // Falls back to the hardcoded pair only when the hero has no credentials
+    // set, so the two never disagree about what you hold.
+    hasCredential:
+      credentialSchema.length > 0
+        ? credentialSchema
+        : [
+            {
+              '@type': 'EducationalOccupationalCredential',
+              credentialCategory: 'Award',
+              name: 'Microsoft MVP - AI & Azure',
+              url: 'https://mvp.microsoft.com/en-us/PublicProfile/5005264',
+              recognizedBy: { '@type': 'Organization', name: 'Microsoft Corporation' },
+            },
+            {
+              '@type': 'EducationalOccupationalCredential',
+              credentialCategory: 'Recognition',
+              name: 'Docker Captain',
+              url: 'https://www.docker.com/captains/',
+              recognizedBy: { '@type': 'Organization', name: 'Docker Inc.' },
+            },
+          ],
     worksFor: {
       '@type': 'Organization',
-      name: 'Swift',
-      description: 'Global provider of secure financial messaging services',
+      name: employer,
     },
   }
 
