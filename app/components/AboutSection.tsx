@@ -1,114 +1,211 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { User, Code, Heart, Coffee, Gamepad, Music, Tv } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  BookOpen,
+  Camera,
+  Coffee,
+  Dumbbell,
+  Gamepad2,
+  Music,
+  Plane,
+  Sparkles,
+  Tv,
+  User,
+  type LucideIcon,
+} from 'lucide-react';
+import { DEFAULT_INTEREST_ICON, type AboutInterestIcon } from '@/lib/content/about';
 
-const skills = [
-  'Azure Cloud', 'DevOps', 'Docker', 'Kubernetes', 'CI/CD',
-  'Python', 'JavaScript/TypeScript', 'React', 'Next.js',
-  'IoT Solutions', 'AI Integration', 'System Architecture'
-];
+/**
+ * About.
+ *
+ * The previous version put a 390px unbroken paragraph next to a 584px square
+ * portrait, which made the section 930px tall and the bio a wall. The copy
+ * also opened with a credential run-on and slid into diary register, which
+ * undercut the authority the credentials had just established.
+ *
+ * Structurally: the bio splits on blank lines so the first paragraph can act
+ * as a lede, the portrait is no longer square, and everything — heading,
+ * quote, interests — comes from the database.
+ */
 
-const interests = [
-  { icon: Gamepad, label: 'Gaming' },
-  { icon: Tv, label: 'Sci-Fi Series' },
-  { icon: Music, label: 'Music' },
-  { icon: Coffee, label: 'Coffee' }
-];
+// The names live in lib/content/about so the validator can share them
+// without importing this client component.
+const INTEREST_ICONS: Record<AboutInterestIcon, LucideIcon> = {
+  gaming: Gamepad2,
+  tv: Tv,
+  music: Music,
+  coffee: Coffee,
+  reading: BookOpen,
+  travel: Plane,
+  photography: Camera,
+  fitness: Dumbbell,
+  sparkle: Sparkles,
+};
 
-export default function AboutSection({ content, settings }: { content?: any, settings?: any }) {
-  const bio = content?.bio || "I'm an Engineering Technologist with a passion for cloud architecture and community building.\n\nMy journey in tech is driven by a curiosity to understand how things work and a desire to make them work better for everyone.";
-  const skillsList = content?.skills || skills;
+export interface AboutContent {
+  eyebrow?: string;
+  heading?: string;
+  bio?: string;
+  skills?: string[];
+  quote?: { text?: string; attribution?: string };
+  interests?: { icon?: string; label?: string }[];
+}
+
+export const DEFAULT_ABOUT = {
+  eyebrow: 'About',
+  heading: 'I make complex infrastructure feel ordinary.',
+  skills: [
+    'Azure Cloud',
+    'Kubernetes',
+    'Docker',
+    'Terraform',
+    'CI/CD',
+    'Python',
+    'TypeScript',
+    'Next.js',
+    'IoT',
+    'AI Integration',
+    'System Architecture',
+  ],
+  quote: {
+    text: 'Aut inveniam viam aut faciam.',
+    attribution: 'I shall either find a way or make one',
+  },
+  interests: [
+    { icon: 'gaming', label: 'Gaming' },
+    { icon: 'tv', label: 'Sci-Fi' },
+    { icon: 'music', label: 'Music' },
+    { icon: 'coffee', label: 'Coffee' },
+  ],
+};
+
+export default function AboutSection({
+  content,
+  settings,
+}: {
+  content?: AboutContent;
+  settings?: any;
+}) {
+  const reduce = useReducedMotion();
+
+  const eyebrow = content?.eyebrow || DEFAULT_ABOUT.eyebrow;
+  const heading = content?.heading || DEFAULT_ABOUT.heading;
+  const skills = content?.skills?.length ? content.skills : DEFAULT_ABOUT.skills;
+  const quote = content?.quote?.text ? content.quote : DEFAULT_ABOUT.quote;
+  const interests = content?.interests?.length ? content.interests : DEFAULT_ABOUT.interests;
   const profilePhoto = settings?.profile_photo_url;
 
+  // Blank lines are paragraph breaks. Rendering the bio as one block was what
+  // made it a wall; this lets the first line carry weight on its own.
+  const paragraphs = (content?.bio || '')
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const fadeIn = reduce
+    ? {}
+    : {
+        initial: { opacity: 0, y: 16 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, margin: '-80px' },
+        transition: { duration: 0.5 },
+      };
+
   return (
-    <section id="about" className="py-16 md:py-24 bg-white relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Column - Image/Profile */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative"
-          >
-            <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative mb-8 shadow-2xl shadow-slate-200/50">
+    <section id="about" className="py-20 sm:py-24">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+          <motion.div {...fadeIn} className="lg:sticky lg:top-28 lg:self-start">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-100">
               {profilePhoto ? (
-                <img 
-                  src={profilePhoto} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
+                <img src={profilePhoto} alt="" className="h-full w-full object-cover" />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-                  <User size={64} />
+                <div className="grid h-full w-full place-items-center text-slate-300">
+                  <User size={56} />
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary-500/10 to-transparent pointer-events-none" />
             </div>
-            
-            {/* Quote Card */}
-            <div className="absolute -bottom-8 -right-8 max-w-xs bg-white p-6 rounded-xl shadow-xl border border-slate-100 hidden md:block">
-              <p className="font-serif italic text-slate-700 mb-2">
-                &quot;Aut inveniam viam aut faciam.&quot;
-              </p>
-              <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">
-                - I shall either find a way or make one
-              </p>
-            </div>
+
+            {quote?.text && (
+              <figure className="mt-5 border-l-2 border-primary-500 pl-4">
+                <blockquote className="text-[15px] italic leading-relaxed text-slate-700">
+                  “{quote.text}”
+                </blockquote>
+                {quote.attribution && (
+                  <figcaption className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-slate-400">
+                    {quote.attribution}
+                  </figcaption>
+                )}
+              </figure>
+            )}
           </motion.div>
 
-          {/* Right Column - Content */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="h-px w-8 bg-primary-500" />
-              <span className="text-primary-600 font-medium uppercase tracking-wider text-sm">About Me</span>
-            </div>
-            
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-              Bridging the gap between <span className="text-primary-600">Complex Systems</span> and <span className="text-primary-600">Human Experience</span>.
+          <motion.div {...fadeIn}>
+            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary-600">
+              {eyebrow}
+            </span>
+
+            <h2 className="mt-3 max-w-[20ch] text-balance text-[30px] font-bold leading-[1.12] tracking-[-0.03em] text-slate-900 sm:text-[38px]">
+              {heading}
             </h2>
 
-            <div className="space-y-6 text-slate-600 text-base md:text-lg leading-relaxed mb-8 whitespace-pre-line">
-              {bio}
-            </div>
+            {paragraphs.length > 0 && (
+              <div className="mt-6 space-y-4">
+                {paragraphs.map((paragraph, index) => (
+                  <p
+                    key={index}
+                    className={
+                      index === 0
+                        ? 'text-[17px] leading-relaxed text-slate-700 sm:text-[18px]'
+                        : 'text-[15px] leading-relaxed text-slate-600 sm:text-[16px]'
+                    }
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            )}
 
-            {/* Skills */}
-            <div className="mb-10">
-              <h3 className="font-display text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Code size={20} className="text-primary-500" />
-                Technical Expertise
+            <div className="mt-9 border-t border-slate-200/80 pt-7">
+              <h3 className="font-mono text-[10px] uppercase tracking-[0.1em] text-slate-500">
+                What I work with
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {skillsList.map((skill: string) => (
-                  <span key={skill} className="badge">
+              <ul className="mt-3.5 flex flex-wrap gap-2">
+                {skills.map((skill) => (
+                  <li
+                    key={skill}
+                    className="rounded-full border border-slate-200 px-3 py-1.5 text-[13px] text-slate-700"
+                  >
                     {skill}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
-            {/* Personal Interests */}
-            <div>
-              <h3 className="font-display text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Heart size={20} className="text-primary-500" />
-                Beyond Tech
-              </h3>
-              <div className="flex gap-6">
-                {interests.map((item, index) => (
-                  <div key={index} className="flex flex-col items-center gap-2 text-slate-500 hover:text-primary-600 transition-colors group">
-                    <div className="p-3 rounded-full bg-slate-50 group-hover:bg-primary-50 transition-colors">
-                      <item.icon size={20} />
-                    </div>
-                    <span className="text-xs font-medium">{item.label}</span>
-                  </div>
-                ))}
+            {interests.length > 0 && (
+              <div className="mt-7 border-t border-slate-200/80 pt-7">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.1em] text-slate-500">
+                  Outside work
+                </h3>
+                <ul className="mt-3.5 flex flex-wrap gap-2.5">
+                  {interests.map((interest) => {
+                    const Icon =
+                      INTEREST_ICONS[interest.icon as AboutInterestIcon] ??
+                      INTEREST_ICONS[DEFAULT_INTEREST_ICON];
+                    return (
+                      <li
+                        key={interest.label}
+                        className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3.5 py-2 text-[13px] text-slate-600"
+                      >
+                        <Icon size={14} className="text-slate-400" />
+                        {interest.label}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-            </div>
+            )}
           </motion.div>
         </div>
       </div>

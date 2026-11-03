@@ -1,187 +1,250 @@
 'use client';
 
-import { useState } from 'react';
 import SectionEditor from '../components/SectionEditor';
-import { X, Plus, Type } from 'lucide-react';
+import { Button, Field, Input, Label, Meta, Textarea } from '../components/ui';
+import { Award, GripVertical, Plus, Trash2 } from 'lucide-react';
+import { DEFAULT_HERO, type HeroContent, type HeroCredential } from '@/app/components/HeroSection';
 
-interface HeroContent {
-  headline: string;
-  subheadline: string;
-  description: string;
-  typing_phrases: string[];
-  curved_text: string;
-}
+/**
+ * The hero editor.
+ *
+ * It edits what the hero now renders: a headline, one fixed tagline, up to
+ * four credentials, a paragraph and two CTAs. The old fields it replaced —
+ * typing phrases and curved text — are gone from this screen; curved text in
+ * particular had outlived the component that drew it, so the CMS was offering
+ * control over something the page could not render.
+ */
 
 const defaultHero: HeroContent = {
-  headline: "Building the Future of",
-  subheadline: "Engineering Technologist • Microsoft MVP • Docker Captain",
-  description: "I am Muhammad Suzaril Shah, a Senior IT Systems Engineer at Swift. I bridge the gap between complex cloud infrastructure and human impact, specializing in Azure, AI, and DevOps ecosystems.",
-  typing_phrases: [
-    "Azure Cloud Architect",
-    "DevOps Advocate",
-    "Platform Engineering Leader",
-    "Microsoft MVP",
-    "Docker Captain"
-  ],
-  curved_text: "SHAH"
+  headline: DEFAULT_HERO.headline,
+  tagline: DEFAULT_HERO.tagline,
+  description: DEFAULT_HERO.description,
+  credentials: DEFAULT_HERO.credentials,
+  primary_cta: DEFAULT_HERO.primary_cta,
+  secondary_cta: DEFAULT_HERO.secondary_cta,
 };
 
-// Tag-style input for typing phrases
-function PhrasesInput({
-  phrases,
-  onChange
+const MAX_CREDENTIALS = 4;
+
+function CredentialRow({
+  credential,
+  index,
+  onChange,
+  onRemove,
+  onMove,
+  isFirst,
+  isLast,
 }: {
-  phrases: string[];
-  onChange: (phrases: string[]) => void;
+  credential: HeroCredential;
+  index: number;
+  onChange: (next: HeroCredential) => void;
+  onRemove: () => void;
+  onMove: (direction: -1 | 1) => void;
+  isFirst: boolean;
+  isLast: boolean;
 }) {
-  const [inputValue, setInputValue] = useState('');
-
-  const addPhrase = (phrase: string) => {
-    const trimmed = phrase.trim();
-    if (trimmed && !phrases.includes(trimmed)) {
-      onChange([...phrases, trimmed]);
-    }
-    setInputValue('');
-  };
-
-  const removePhrase = (index: number) => {
-    onChange(phrases.filter((_, i) => i !== index));
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addPhrase(inputValue);
-    } else if (e.key === 'Backspace' && inputValue === '' && phrases.length > 0) {
-      removePhrase(phrases.length - 1);
-    }
-  };
-
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2 min-h-[40px]">
-        {phrases.map((phrase, index) => (
-          <span
-            key={`${phrase}-${index}`}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-100 text-primary-700 text-sm font-medium rounded-[4px] group"
+    <li className="rounded-[var(--r-field)] border border-[var(--line)] bg-[var(--sunken)] p-4">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <GripVertical size={14} className="text-[var(--faint)]" />
+          <Meta>Slot {index + 1}</Meta>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            onClick={() => onMove(-1)}
+            disabled={isFirst}
+            aria-label={`Move ${credential.label || 'credential'} earlier`}
           >
-            {phrase}
-            <button
-              type="button"
-              onClick={() => removePhrase(index)}
-              className="hover:bg-primary-200 rounded p-0.5 transition-colors"
-            >
-              <X size={14} />
-            </button>
-          </span>
-        ))}
+            ↑
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => onMove(1)}
+            disabled={isLast}
+            aria-label={`Move ${credential.label || 'credential'} later`}
+          >
+            ↓
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={onRemove}
+            aria-label={`Remove ${credential.label || 'credential'}`}
+          >
+            <Trash2 size={14} />
+          </Button>
+        </div>
       </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Type a phrase and press Enter..."
-          className="studio-input"
-        />
-        <button
-          type="button"
-          onClick={() => addPhrase(inputValue)}
-          disabled={!inputValue.trim()}
-          className="px-3 py-2 bg-[var(--accent)] text-[#06080b] rounded-[4px] hover:bg-[var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+
+      <div className="space-y-3">
+        <Field label="Credential">
+          <Input
+            value={credential.label || ''}
+            placeholder="Microsoft MVP"
+            onChange={(e) => onChange({ ...credential, label: e.target.value })}
+          />
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Issuer">
+            <Input
+              value={credential.issuer || ''}
+              placeholder="AI & Azure"
+              onChange={(e) => onChange({ ...credential, issuer: e.target.value })}
+            />
+          </Field>
+          <Field label="Since">
+            <Input
+              value={credential.since || ''}
+              placeholder="2023"
+              onChange={(e) => onChange({ ...credential, since: e.target.value })}
+            />
+          </Field>
+        </div>
+        <Field
+          label="Verification link"
+          hint="Optional. A credential a recruiter can check is worth more than one they cannot."
         >
-          <Plus size={18} />
-        </button>
+          <Input
+            value={credential.url || ''}
+            placeholder="https://mvp.microsoft.com/…"
+            onChange={(e) => onChange({ ...credential, url: e.target.value })}
+          />
+        </Field>
       </div>
-    </div>
+    </li>
   );
 }
 
-export default function HeroPage() {
+export default function HeroEditor() {
   return (
     <SectionEditor<HeroContent>
       sectionKey="hero"
-      title="Hero Section"
-      description="Manage the main introduction banner at the top of your portfolio. Make a strong first impression."
+      title="Hero"
+      description="The first screen. Lead with proof, not adjectives."
       defaultContent={defaultHero}
       renderForm={(content, onChange) => {
-        // Ensure typing_phrases exists
-        const normalizedContent = {
-          ...defaultHero,
-          ...content,
-          typing_phrases: content.typing_phrases || defaultHero.typing_phrases,
-          curved_text: content.curved_text || defaultHero.curved_text,
-        };
+        const credentials = content.credentials ?? [];
+
+        const setCredentials = (next: HeroCredential[]) =>
+          onChange({ ...content, credentials: next });
 
         return (
-          <div className="space-y-8">
-            <div className="space-y-3">
-              <label className="text-sm font-semibold text-[var(--text)]">Main Headline</label>
-              <p className="text-xs text-[var(--faint)]">The static text before the typing animation (e.g., &quot;Building the Future of&quot;).</p>
-              <input
-                type="text"
-                value={normalizedContent.headline}
-                onChange={(e) => onChange({ ...normalizedContent, headline: e.target.value })}
-                className="studio-input"
+          <div className="space-y-7">
+            <Field
+              label="Headline"
+              hint="One concrete sentence about what you do. Specifics beat superlatives."
+            >
+              <Textarea
+                rows={2}
+                value={content.headline || ''}
+                onChange={(e) => onChange({ ...content, headline: e.target.value })}
               />
-            </div>
+            </Field>
 
-            {/* Typing Animation Phrases */}
-            <div className="space-y-3 bg-[var(--raised)] p-5 rounded-[4px] border border-[var(--line)]">
-              <div className="flex items-center gap-2">
-                <Type size={18} className="text-[var(--accent)]" />
-                <label className="text-sm font-semibold text-[var(--text)]">Typing Animation Phrases</label>
-              </div>
-              <p className="text-xs text-[var(--faint)]">These phrases will cycle with a typing animation effect below the headline.</p>
-              <PhrasesInput
-                phrases={normalizedContent.typing_phrases}
-                onChange={(phrases) => onChange({ ...normalizedContent, typing_phrases: phrases })}
+            <Field
+              label="Tagline"
+              hint="The single line under the headline. It replaced the typing animation, which was never fully readable."
+            >
+              <Input
+                value={content.tagline || ''}
+                onChange={(e) => onChange({ ...content, tagline: e.target.value })}
               />
-              <div className="mt-3 p-3 bg-[var(--surface)] rounded-[4px] border border-[var(--line)]">
-                <p className="text-xs text-[var(--faint)] mb-1">Preview:</p>
-                <p className="font-display text-lg">
-                  <span className="text-[var(--text)]">{normalizedContent.headline} </span>
-                  <span className="text-primary-600">{normalizedContent.typing_phrases[0] || '...'}</span>
-                  <span className="text-primary-500 animate-pulse">|</span>
+            </Field>
+
+            <div>
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Award size={15} className="text-[var(--accent)]" />
+                  <Label>Credentials</Label>
+                  <Meta>
+                    {credentials.length}/{MAX_CREDENTIALS}
+                  </Meta>
+                </div>
+                <Button
+                  onClick={() => setCredentials([...credentials, { label: '' }])}
+                  disabled={credentials.length >= MAX_CREDENTIALS}
+                >
+                  <Plus size={14} />
+                  Add
+                </Button>
+              </div>
+              <p className="mb-3 text-[13px] leading-relaxed text-[var(--faint)]">
+                These are the strongest facts on your site. The hero lays out four across, so a
+                fifth would be saved but never rendered.
+              </p>
+
+              {credentials.length === 0 ? (
+                <p className="rounded-[var(--r-field)] bg-[var(--sunken)] px-4 py-6 text-center text-[13px] text-[var(--muted)]">
+                  No credentials yet. The hero will fall back to the defaults.
                 </p>
-              </div>
+              ) : (
+                <ul className="space-y-3">
+                  {credentials.map((credential, index) => (
+                    <CredentialRow
+                      key={index}
+                      credential={credential}
+                      index={index}
+                      isFirst={index === 0}
+                      isLast={index === credentials.length - 1}
+                      onChange={(next) =>
+                        setCredentials(credentials.map((c, i) => (i === index ? next : c)))
+                      }
+                      onRemove={() => setCredentials(credentials.filter((_, i) => i !== index))}
+                      onMove={(direction) => {
+                        const target = index + direction;
+                        if (target < 0 || target >= credentials.length) return;
+                        const next = [...credentials];
+                        [next[index], next[target]] = [next[target], next[index]];
+                        setCredentials(next);
+                      }}
+                    />
+                  ))}
+                </ul>
+              )}
             </div>
 
-            <div className="space-y-3">
-              <label className="text-sm font-semibold text-[var(--text)]">Subheadline (Roles)</label>
-              <p className="text-xs text-[var(--faint)]">Your roles or titles, displayed above the headline.</p>
-              <input
-                type="text"
-                value={normalizedContent.subheadline}
-                onChange={(e) => onChange({ ...normalizedContent, subheadline: e.target.value })}
-                className="studio-input"
+            <Field label="Supporting paragraph" hint="Context under the fold line. Two sentences is plenty.">
+              <Textarea
+                rows={4}
+                value={content.description || ''}
+                onChange={(e) => onChange({ ...content, description: e.target.value })}
               />
+            </Field>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              {(
+                [
+                  ['primary_cta', 'Primary button'],
+                  ['secondary_cta', 'Secondary button'],
+                ] as const
+              ).map(([key, label]) => (
+                <div key={key} className="space-y-3 rounded-[var(--r-field)] bg-[var(--sunken)] p-4">
+                  <Label>{label}</Label>
+                  <Field label="Text">
+                    <Input
+                      value={content[key]?.label || ''}
+                      onChange={(e) =>
+                        onChange({ ...content, [key]: { ...content[key], label: e.target.value } })
+                      }
+                    />
+                  </Field>
+                  <Field label="Link" hint="#section or https://…">
+                    <Input
+                      value={content[key]?.href || ''}
+                      onChange={(e) =>
+                        onChange({ ...content, [key]: { ...content[key], href: e.target.value } })
+                      }
+                    />
+                  </Field>
+                </div>
+              ))}
             </div>
 
-            <div className="space-y-3">
-              <label className="text-sm font-semibold text-[var(--text)]">Bio Description</label>
-              <p className="text-xs text-[var(--faint)]">A short, impactful paragraph introducing yourself.</p>
-              <textarea
-                value={normalizedContent.description}
-                onChange={(e) => onChange({ ...normalizedContent, description: e.target.value })}
-                className="studio-input"
-              />
-            </div>
-
-            {/* Curved Text Settings */}
-            <div className="space-y-3 bg-[var(--raised)] p-5 rounded-[4px] border border-[var(--line)]">
-              <label className="text-sm font-semibold text-[var(--text)]">Curved Text (Bottom of Hero)</label>
-              <p className="text-xs text-[var(--faint)]">This text appears as a decorative curved element at the bottom of the hero section.</p>
-              <input
-                type="text"
-                value={normalizedContent.curved_text}
-                onChange={(e) => onChange({ ...normalizedContent, curved_text: e.target.value })}
-                className="studio-input"
-                placeholder="SHAH"
-              />
-              <p className="text-xs text-[var(--faint)]">Preview: {(normalizedContent.curved_text || 'SHAH').repeat(3)}</p>
-            </div>
+            <p className="studio-meta border-t border-[var(--line-soft)] pt-4 leading-relaxed">
+              The secondary button is replaced by a CV download whenever a resume file is set under
+              Design &amp; SEO.
+            </p>
           </div>
         );
       }}

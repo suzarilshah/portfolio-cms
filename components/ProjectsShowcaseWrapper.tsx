@@ -1,4 +1,4 @@
-import ProjectsCarousel from './ProjectsCarousel';
+import ProjectsGrid from './ProjectsGrid';
 import { secureDb } from '@/lib/security/database';
 
 // Fallback projects for when DB is empty
@@ -119,8 +119,9 @@ export default async function ProjectsShowcaseWrapper({ content }: { content?: a
   const projectsToUse = (projects && projects.length > 0) ? projects : FALLBACK_PROJECTS;
 
   return (
-    <ProjectsCarousel
+    <ProjectsGrid
       projects={projectsToUse}
+      eyebrow={content?.eyebrow}
       title={content?.title}
       description={content?.description}
     />

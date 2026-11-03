@@ -1,171 +1,200 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home, User, Briefcase, Award, BookOpen, Users, Mail } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 
-// No #blog entry: that section was removed, so the link scrolled nowhere.
-// The real blog lives at blog.suzarilshah.uk and will be surfaced from its
-// own feed rather than by an anchor to a section that does not exist.
-const navItems = [
-  { name: 'Home', href: '#home', icon: Home },
-  { name: 'About', href: '#about', icon: User },
-  { name: 'Experience', href: '#experience', icon: Briefcase },
-  { name: 'Awards', href: '#awards', icon: Award },
-  { name: 'Publications', href: '#publications', icon: BookOpen },
-  { name: 'Community', href: '#community', icon: Users },
-  { name: 'Contact', href: '#contact', icon: Mail },
+/**
+ * The site navigation.
+ *
+ * Two things changed here. The links now come from `site_settings.nav_items`,
+ * so the CMS owns them — a hardcoded list is how a link to a deleted #blog
+ * section survived on the live site. And the floating pill is opaque once you
+ * scroll: at 50% white with a light blur, page headings showed straight
+ * through it, and a screenshot caught the word "Recognition" cut in half.
+ */
+
+export interface NavItem {
+  label: string;
+  href: string;
+}
+
+const DEFAULT_NAV: NavItem[] = [
+  { label: 'Home', href: '#home' },
+  { label: 'About', href: '#about' },
+  { label: 'Work', href: '#projects' },
+  { label: 'Experience', href: '#experience' },
+  { label: 'Recognition', href: '#awards' },
+  { label: 'Writing', href: '#publications' },
+  { label: 'Contact', href: '#contact' },
 ];
+
+function usableItems(raw: unknown): NavItem[] {
+  if (!Array.isArray(raw)) return DEFAULT_NAV;
+  const items = raw
+    .filter(
+      (item): item is NavItem =>
+        !!item && typeof item.label === 'string' && typeof item.href === 'string'
+    )
+    .slice(0, 8);
+  return items.length > 0 ? items : DEFAULT_NAV;
+}
 
 export default function Navigation({ settings }: { settings?: any }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const reduce = useReducedMotion();
 
+  const items = useMemo(() => usableItems(settings?.nav_items), [settings?.nav_items]);
   const logoText = settings?.logo_text || 'SUZARIL';
   const logoHighlight = settings?.logo_highlight || 'SHAH';
   const logoUrl = settings?.logo_url;
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+    // Anchors only. An external link in the nav has no section to highlight.
+    const ids = items.filter((i) => i.href.startsWith('#')).map((i) => i.href.slice(1));
 
-      // Update active section based on scroll position
-      const sections = navItems.map(item => item.href.slice(1));
-      const current = sections.find(section => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          return rect.top <= 150 && rect.bottom >= 150;
-        }
-        return false;
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 24);
+      const current = ids.find((id) => {
+        const element = document.getElementById(id);
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        return rect.top <= 160 && rect.bottom >= 160;
       });
       if (current) setActiveSection(current);
     };
 
-    // Check if any project modal is open
-    const checkModalOpen = () => {
-      const modals = document.querySelectorAll('.project-modal');
-      const isModalOpen = Array.from(modals).some(modal => {
-        // Check if modal has :target pseudo-class by checking computed style
-        // or by checking if URL hash matches modal ID
-        const hash = window.location.hash;
-        return hash && modal.id === hash.slice(1);
-      });
-      return isModalOpen;
-    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [items]);
 
-    window.addEventListener('scroll', handleScroll);
-
-    // Listen for hash changes (when modal opens/closes)
-    const handleHashChange = () => {
-      const isOpen = checkModalOpen();
-      document.body.classList.toggle('modal-open', isOpen);
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    // Check on mount
-    handleHashChange();
-
+  // The drawer traps the page behind it; leaving the body scrollable lets the
+  // page move under the overlay, which reads as the menu being broken.
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('hashchange', handleHashChange);
+      document.body.style.overflow = '';
     };
-  }, []);
+  }, [isOpen]);
+
+  const isExternal = (href: string) => !href.startsWith('#');
 
   return (
     <>
-      {/* Desktop Navigation */}
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className={`fixed top-4 left-0 right-0 z-50 transition-all duration-300 px-4 sm:px-6`}
+        initial={reduce ? false : { y: -24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="fixed inset-x-0 top-3 z-50 px-4 sm:top-4 sm:px-6"
+        aria-label="Primary"
       >
-        <div className={`max-w-5xl mx-auto rounded-full transition-all duration-300 ${
-          scrolled 
-            ? 'bg-white/80 backdrop-blur-xl shadow-lg border border-slate-200/50 py-3 px-6' 
-            : 'bg-white/50 backdrop-blur-sm border border-transparent py-4 px-6'
-        }`}>
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <a href="#" className="relative z-50 group">
-              {logoUrl ? (
-                <img src={logoUrl} alt="Logo" className="h-8 w-auto object-contain" />
-              ) : (
-                <div className="font-display font-bold text-xl tracking-tight flex items-center gap-1">
-                  <span className="text-slate-900 group-hover:text-primary-600 transition-colors">{logoText}</span>
-                  <span className="text-primary-600 group-hover:text-slate-900 transition-colors">{logoHighlight}</span>
-                </div>
-              )}
-            </a>
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => (
+        <div
+          className={`mx-auto flex max-w-5xl items-center justify-between rounded-full px-5 transition-all duration-300 sm:px-6 ${
+            scrolled
+              ? 'border border-slate-200 bg-white py-2.5 shadow-[0_1px_2px_rgb(15_23_42/0.04),0_12px_32px_-12px_rgb(15_23_42/0.18)]'
+              : 'border border-transparent bg-transparent py-3.5'
+          }`}
+        >
+          <a href="#home" className="group relative z-50 shrink-0">
+            {logoUrl ? (
+              <img src={logoUrl} alt="" className="h-7 w-auto object-contain" />
+            ) : (
+              <span className="flex items-center gap-1 font-display text-[19px] font-bold tracking-tight">
+                <span className="text-slate-900">{logoText}</span>
+                <span className="text-primary-600">{logoHighlight}</span>
+              </span>
+            )}
+            <span className="sr-only">Back to top</span>
+          </a>
+
+          <div className="hidden items-center gap-0.5 md:flex">
+            {items.map((item) => {
+              const active = !isExternal(item.href) && activeSection === item.href.slice(1);
+              return (
                 <a
-                  key={item.name}
+                  key={item.href + item.label}
                   href={item.href}
-                  className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    activeSection === item.href.slice(1)
-                      ? 'text-primary-700 bg-primary-50'
-                      : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
+                  {...(isExternal(item.href) ? { target: '_blank', rel: 'noreferrer' } : {})}
+                  aria-current={active ? 'page' : undefined}
+                  className={`rounded-full px-3.5 py-2 text-[14px] font-medium transition-colors ${
+                    active
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  {item.name}
+                  {item.label}
                 </a>
-              ))}
-            </div>
-
-            {/* Mobile Menu Button */}
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-3 rounded-full hover:bg-slate-100 text-slate-900 transition-colors touch-target"
-              aria-label={isOpen ? 'Close menu' : 'Open menu'}
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </motion.button>
+              );
+            })}
           </div>
+
+          <button
+            onClick={() => setIsOpen(true)}
+            // 44px minimum target; the old one relied on a utility class that
+            // did not guarantee it.
+            className="-mr-2 grid h-11 w-11 place-items-center rounded-full text-slate-900 transition-colors hover:bg-slate-100 md:hidden"
+            aria-label="Open menu"
+            aria-expanded={isOpen}
+          >
+            <Menu size={22} />
+          </button>
         </div>
       </motion.nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 md:hidden bg-slate-900/20 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] bg-slate-900/30 backdrop-blur-sm md:hidden"
             onClick={() => setIsOpen(false)}
           >
             <motion.div
-              initial={{ x: '100%' }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu"
+              initial={reduce ? false : { x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-2xl border-l border-slate-200"
+              transition={{ type: 'spring', damping: 28, stiffness: 260 }}
+              className="absolute inset-y-0 right-0 flex w-[82%] max-w-xs flex-col bg-white shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col gap-2 p-4 mt-20">
-                {navItems.map((item, index) => (
-                  <motion.a
-                    key={item.name}
-                    href={item.href}
-                    initial={{ x: 50, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 p-4 rounded-xl font-medium transition-all duration-300 touch-target ${
-                      activeSection === item.href.slice(1)
-                        ? 'bg-primary-50 text-primary-700'
-                        : 'hover:bg-slate-50 text-slate-600'
-                    }`}
-                  >
-                    <item.icon size={20} />
-                    {item.name}
-                  </motion.a>
-                ))}
+              <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-slate-400">
+                  Menu
+                </span>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="-mr-2 grid h-11 w-11 place-items-center rounded-full text-slate-900 transition-colors hover:bg-slate-100"
+                  aria-label="Close menu"
+                >
+                  <X size={22} />
+                </button>
               </div>
+
+              <nav className="flex flex-col p-3">
+                {items.map((item) => {
+                  const active = !isExternal(item.href) && activeSection === item.href.slice(1);
+                  return (
+                    <a
+                      key={item.href + item.label}
+                      href={item.href}
+                      {...(isExternal(item.href) ? { target: '_blank', rel: 'noreferrer' } : {})}
+                      onClick={() => setIsOpen(false)}
+                      className={`rounded-xl px-4 py-3.5 text-[16px] font-medium transition-colors ${
+                        active ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  );
+                })}
+              </nav>
             </motion.div>
           </motion.div>
         )}

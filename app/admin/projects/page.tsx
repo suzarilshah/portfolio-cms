@@ -39,6 +39,7 @@ const DEFAULT_PROJECT: Project = {
 const ICONS = ['Code', 'Cloud', 'Zap', 'Server', 'Globe'];
 
 import SectionEditor from '../components/SectionEditor';
+import { Field, Input, Textarea } from '../components/ui';
 
 // ... existing interfaces ...
 
@@ -200,33 +201,40 @@ export default function ProjectsAdminPage() {
             </div>
 
             {activeTab === 'settings' ? (
-                <SectionEditor<{ title: string; description: string }>
+                <SectionEditor<{ eyebrow: string; title: string; description: string }>
                     sectionKey="projects"
-                    title="Projects Section Config"
-                    description="Manage the section header, title, and introductory text."
+                    title="Work"
+                    description="The header above the project grid."
                     defaultContent={{
-                        title: "Projects & Case Studies",
-                        description: "Real-world cloud architecture, DevOps transformations, and IoT solutions driving measurable business impact"
+                        eyebrow: "Selected work",
+                        title: "Systems I have shipped",
+                        description: "Production platforms with measurable outcomes, not side projects."
                     }}
                     renderForm={(content, onChange) => (
                         <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-[var(--text)]">Section Title</label>
-                                <input 
-                                    type="text" 
-                                    value={content.title} 
+                            <Field label="Eyebrow" hint="The small line above the heading.">
+                                <Input
+                                    value={content.eyebrow}
+                                    onChange={(e) => onChange({ ...content, eyebrow: e.target.value })}
+                                />
+                            </Field>
+                            <Field label="Heading">
+                                <Input
+                                    value={content.title}
                                     onChange={(e) => onChange({ ...content, title: e.target.value })}
-                                    className="studio-input"
                                 />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-[var(--text)]">Description</label>
-                                <textarea 
-                                    value={content.description} 
+                            </Field>
+                            <Field label="Intro" hint="One sentence. Leave empty to show nothing.">
+                                <Textarea
+                                    rows={3}
+                                    value={content.description}
                                     onChange={(e) => onChange({ ...content, description: e.target.value })}
-                                    className="studio-input"
                                 />
-                            </div>
+                            </Field>
+                            <p className="studio-meta border-t border-[var(--line-soft)] pt-4 leading-relaxed">
+                                Projects appear in a grid, every one visible without interaction. The
+                                first outcome you give a project is shown on its card.
+                            </p>
                         </div>
                     )}
                 />

@@ -1,158 +1,94 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+/**
+ * The page's background field.
+ *
+ * It replaced a 47KB SVG of randomly-filled squares that rendered at a
+ * hardcoded 0.7 opacity. Two problems with that: the filled cells read as a
+ * loading skeleton rather than a texture, and the one setting that looked
+ * like it controlled the grid (`background_overlay_opacity`) actually drove a
+ * separate white wash — so the CMS could not turn the noise down.
+ *
+ * This draws the grid in CSS instead. Intensity is a real setting, the lines
+ * fade toward the edges so the centre stays readable, and there is nothing to
+ * download.
+ */
 
 interface GridBackgroundProps {
   className?: string;
+  /** Accent name from site_settings; tints the grid to match the site. */
   svgColor?: string;
-  overlayOpacity?: number;
+  /** 0–100 from site_settings. Around 14 is a texture; 60 is a statement. */
+  intensity?: number;
 }
 
-// Color name to hue mapping
-const colorHues: Record<string, number> = {
-  blue: 210,
-  lime: 75,
-  cyan: 180,
+// Hue per accent name. The grid is drawn with the accent at very low alpha,
+// so it reads as tinted paper rather than as a coloured object.
+const ACCENT_HUES: Record<string, number> = {
+  blue: 214,
+  indigo: 239,
+  violet: 258,
   purple: 270,
+  cyan: 190,
+  teal: 174,
+  emerald: 152,
+  lime: 85,
+  amber: 38,
+  orange: 25,
   rose: 350,
-  emerald: 150,
-  orange: 30,
-  amber: 45,
-  indigo: 240,
-  teal: 170,
   pink: 330,
   slate: 215,
 };
 
-// Get hue rotation needed to shift lime (75) to target hue
-function getHueRotation(targetHue: number): number {
-  return targetHue - 75;
-}
-
 export default function GridBackground({
   className = '',
-  svgColor = 'blue',
-  overlayOpacity = 30
+  svgColor = 'indigo',
+  intensity = 14,
 }: GridBackgroundProps) {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isMobile, setIsMobile] = useState(false);
-  const { scrollY } = useScroll();
+  const hue = ACCENT_HUES[svgColor] ?? ACCENT_HUES.indigo;
 
-  // Parallax transforms
-  const y1 = useTransform(scrollY, [0, 3000], [0, -100]);
-  const y2 = useTransform(scrollY, [0, 3000], [0, -50]);
-  const scale = useTransform(scrollY, [0, 2000], [1, 1.05]);
-  const rotate = useTransform(scrollY, [0, 5000], [0, 2]);
-
-  // Check for mobile
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Mouse parallax effect - disabled on mobile for performance
-  useEffect(() => {
-    if (isMobile) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 15;
-      const y = (e.clientY / window.innerHeight - 0.5) * 15;
-      setMousePosition({ x, y });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isMobile]);
-
-  const targetHue = colorHues[svgColor] || 210;
-  const hueRotation = getHueRotation(targetHue);
-  const overlayOpacityDecimal = overlayOpacity / 100;
+  // Map 0–100 onto a deliberately narrow alpha range. The old background
+  // proved that giving this control a wide range just lets the page shout;
+  // even at 100 this stays a texture.
+  const clamped = Math.min(100, Math.max(0, intensity));
+  const line = (clamped / 100) * 0.3;
+  const minor = line * 0.45;
 
   return (
-    <div className={`fixed inset-0 overflow-hidden pointer-events-none -z-10 ${className}`}>
-      {/* Base background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-slate-50/20 to-white" />
+    <div
+      aria-hidden
+      className={`pointer-events-none fixed inset-0 -z-10 overflow-hidden ${className}`}
+    >
+      <div className="absolute inset-0 bg-white" />
 
-      {/* Main SVG Grid Pattern with parallax */}
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          y: isMobile ? 0 : y1,
-          scale: isMobile ? 1 : scale,
-          rotate: isMobile ? 0 : rotate,
-          x: isMobile ? 0 : mousePosition.x * 0.3,
-        }}
-      >
-        <div
-          className="absolute inset-0 w-full h-full"
-          style={{
-            backgroundImage: `url('/grid-pattern.svg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            opacity: 0.7,
-            filter: `hue-rotate(${hueRotation}deg) saturate(1.3)`,
-          }}
-        />
-      </motion.div>
-
-      {/* Secondary subtle grid overlay */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ y: isMobile ? 0 : y2, scale: isMobile ? 1 : scale }}
-      >
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgb(var(--p-300) / 0.06) 1px, transparent 1px),
-              linear-gradient(to bottom, rgb(var(--p-300) / 0.06) 1px, transparent 1px)
-            `,
-            backgroundSize: '80px 80px',
-          }}
-        />
-      </motion.div>
-
-      {/* Gradient fade for content readability - controlled by settings */}
+      {/* Major rules every 160px, minor every 40px. Two scales give the field
+          some depth without needing an image. */}
       <div
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(to bottom, rgba(255,255,255,${overlayOpacityDecimal * 0.8}) 0%, rgba(255,255,255,${overlayOpacityDecimal * 0.3}) 50%, rgba(255,255,255,${overlayOpacityDecimal}) 100%)`
+          backgroundImage: `
+            linear-gradient(to right, hsl(${hue} 60% 50% / ${line}) 1px, transparent 1px),
+            linear-gradient(to bottom, hsl(${hue} 60% 50% / ${line}) 1px, transparent 1px),
+            linear-gradient(to right, hsl(${hue} 60% 50% / ${minor}) 1px, transparent 1px),
+            linear-gradient(to bottom, hsl(${hue} 60% 50% / ${minor}) 1px, transparent 1px)
+          `,
+          backgroundSize: '160px 160px, 160px 160px, 40px 40px, 40px 40px',
+          // Fades the grid out behind the middle of the page, where the text
+          // is, and lets it persist at the edges.
+          maskImage:
+            'radial-gradient(ellipse 85% 60% at 50% 38%, transparent 15%, black 85%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 85% 60% at 50% 38%, transparent 15%, black 85%)',
         }}
       />
 
-      {/* Floating orbs with mouse parallax - hidden on mobile for performance */}
-      {!isMobile && (
-        <>
-          <motion.div
-            className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full blur-3xl"
-            style={{
-              x: mousePosition.x * 0.5,
-              y: mousePosition.y * 0.5,
-              backgroundColor: 'rgb(var(--p-200) / 0.2)',
-            }}
-          />
-          <motion.div
-            className="absolute top-1/3 -left-40 w-[500px] h-[500px] rounded-full blur-3xl"
-            style={{
-              x: mousePosition.x * -0.3,
-              y: mousePosition.y * -0.3,
-              backgroundColor: 'rgb(var(--p-100) / 0.25)',
-            }}
-          />
-          <motion.div
-            className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-3xl"
-            style={{
-              x: mousePosition.x * 0.2,
-              y: mousePosition.y * 0.2,
-              backgroundColor: 'rgba(168, 85, 247, 0.08)',
-            }}
-          />
-        </>
-      )}
+      {/* A single, very soft warm wash so the page is not clinical white. */}
+      <div
+        className="absolute inset-x-0 top-0 h-[70vh]"
+        style={{
+          background: `radial-gradient(ellipse 70% 100% at 50% 0%, hsl(${hue} 70% 60% / 0.05), transparent 70%)`,
+        }}
+      />
     </div>
   );
 }

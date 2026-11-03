@@ -23,6 +23,22 @@
     scroll-behavior: smooth;
   }
 
+  /* The nav floats over the page, so an anchor that scrolls a heading to
+   * y=0 parks it underneath the nav. Every section opts out of that here
+   * rather than each component remembering to. */
+  section[id],
+  [data-section-key] > section[id] {
+    scroll-margin-top: 6rem;
+  }
+
+  /* Smooth scrolling is a preference, not a given. Honouring this also stops
+   * the entrance animations from running for anyone who asked them not to. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   /* Indigo theme */
   html[data-accent="indigo"] {
     --p-50: 238 242 255;

@@ -1,3 +1,5 @@
+import { ABOUT_INTEREST_ICONS, DEFAULT_INTEREST_ICON } from '@/lib/content/about';
+
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
@@ -27,6 +29,24 @@ export class SecurityValidator {
   static validateIdentifier(input: string): boolean {
     // Only allow alphanumeric, underscores, and hyphens
     return /^[a-zA-Z0-9_-]+$/.test(input);
+  }
+
+  /**
+   * True only for an absolute http(s) URL.
+   *
+   * Anything the CMS stores can end up in an `href`, and `javascript:` in an
+   * href is script execution with the page's own origin. An allowlist of two
+   * protocols is the only safe shape here — a blocklist of "bad" schemes
+   * misses `data:`, `vbscript:`, and whatever comes next.
+   */
+  static isSafeHttpUrl(value: unknown): boolean {
+    if (typeof value !== 'string' || value.trim() === '') return false;
+    try {
+      const { protocol } = new URL(value.trim());
+      return protocol === 'http:' || protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 
   // Input validation for project data
@@ -358,6 +378,40 @@ export class SecurityValidator {
           .slice(0, 50); // Max 50 skills
       }
 
+      // The pull quote beside the About portrait.
+      if (content.quote && typeof content.quote === 'object') {
+        const quote: any = {};
+        if (content.quote.text) {
+          quote.text = this.sanitizeHtml(String(content.quote.text).trim().substring(0, 300));
+        }
+        if (content.quote.attribution) {
+          quote.attribution = this.sanitizeHtml(
+            String(content.quote.attribution).trim().substring(0, 200)
+          );
+        }
+        if (quote.text) sanitized.quote = quote;
+      }
+
+      // "Beyond tech" interests. `icon` is a closed set the renderer looks up,
+      // so an unknown name here would render nothing — it falls back instead.
+      if (content.interests && Array.isArray(content.interests)) {
+        sanitized.interests = content.interests
+          .slice(0, 6)
+          .map((item: any) => {
+            const out: any = {};
+            if (item?.label) {
+              out.label = this.sanitizeHtml(String(item.label).trim().substring(0, 40));
+            }
+            if (item?.icon && (ABOUT_INTEREST_ICONS as readonly string[]).includes(String(item.icon))) {
+              out.icon = String(item.icon);
+            } else if (item?.label) {
+              out.icon = DEFAULT_INTEREST_ICON;
+            }
+            return out;
+          })
+          .filter((item: any) => item.label);
+      }
+
       // Handle Community Section Arrays
       if (content.communityEvents && Array.isArray(content.communityEvents)) {
         sanitized.communityEvents = content.communityEvents.slice(0, 50).map((item: any) => {
@@ -470,6 +524,58 @@ export class SecurityValidator {
           .filter((item: any) => typeof item === 'string' && item.length <= 100)
           .map((item: string) => this.sanitizeHtml(item.trim()))
           .slice(0, 20); // Max 20 phrases
+      }
+
+      // One fixed line under the headline, which replaced the typewriter.
+      if (content.tagline) {
+        if (typeof content.tagline !== 'string' || content.tagline.length > 300) {
+          errors.push('Tagline must be a string with max 300 characters');
+        } else {
+          sanitized.tagline = this.sanitizeHtml(content.tagline.trim());
+        }
+      }
+
+      // Credentials are the hero's proof, so a bad URL here is worse than a
+      // missing one: a dead verification link undermines the claim it backs.
+      if (content.credentials && Array.isArray(content.credentials)) {
+        sanitized.credentials = content.credentials
+          .slice(0, 4)
+          .map((credential: any) => {
+            const out: any = {};
+            if (credential?.label) {
+              out.label = this.sanitizeHtml(String(credential.label).trim().substring(0, 60));
+            }
+            if (credential?.issuer) {
+              out.issuer = this.sanitizeHtml(String(credential.issuer).trim().substring(0, 60));
+            }
+            if (credential?.since) {
+              out.since = this.sanitizeHtml(String(credential.since).trim().substring(0, 20));
+            }
+            if (credential?.url && this.isSafeHttpUrl(credential.url)) {
+              out.url = String(credential.url).trim().substring(0, 500);
+            }
+            return out;
+          })
+          .filter((credential: any) => credential.label);
+      }
+
+      for (const key of ['primary_cta', 'secondary_cta'] as const) {
+        const cta = content[key];
+        if (cta && typeof cta === 'object') {
+          const out: any = {};
+          if (cta.label) {
+            out.label = this.sanitizeHtml(String(cta.label).trim().substring(0, 60));
+          }
+          // Same-page anchors and absolute http(s) only. A CTA is the most
+          // clicked thing on the page; it must not become a javascript: sink.
+          if (typeof cta.href === 'string') {
+            const href = cta.href.trim();
+            if (/^#[\w-]{1,60}$/.test(href) || this.isSafeHttpUrl(href)) {
+              out.href = href.substring(0, 500);
+            }
+          }
+          if (out.label || out.href) sanitized[key] = out;
+        }
       }
 
       if (content.curved_text) {

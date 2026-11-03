@@ -20,6 +20,13 @@ async function getData() {
     resume_url: null,
     background_svg_color: 'blue',
     background_overlay_opacity: 30,
+    // Chrome that used to be hardcoded in components. Null means "the
+    // component decides", which keeps the page rendering if the migration
+    // has not run against this database yet.
+    background_grid_intensity: 14,
+    nav_items: null,
+    footer: null,
+    identity: null,
   };
 
   const defaultOrder = ['hero', 'about', 'skills', 'projects', 'experience', 'education', 'awards', 'publications', 'community', 'contact'];
@@ -69,6 +76,11 @@ async function getData() {
       resume_url: s.resume_url || defaultSettings.resume_url,
       background_svg_color: s.background_svg_color || defaultSettings.background_svg_color,
       background_overlay_opacity: s.background_overlay_opacity ?? defaultSettings.background_overlay_opacity,
+      background_grid_intensity:
+        s.background_grid_intensity ?? defaultSettings.background_grid_intensity,
+      nav_items: s.nav_items ?? defaultSettings.nav_items,
+      footer: s.footer ?? defaultSettings.footer,
+      identity: s.identity ?? defaultSettings.identity,
     };
 
     return { 
@@ -96,7 +108,7 @@ export default async function Home() {
       {/* Global Grid Background with Parallax */}
       <GridBackground
         svgColor={settings.background_svg_color}
-        overlayOpacity={settings.background_overlay_opacity}
+        intensity={settings.background_grid_intensity}
       />
 
       {/* Navigation */}
