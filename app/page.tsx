@@ -3,7 +3,9 @@ import Navigation from './components/Navigation';
 import PageSections from './components/PageSections';
 import ProjectsShowcase from '@/components/ProjectsShowcaseWrapper';
 import Footer from './components/Footer';
-import GridBackground from '@/components/GridBackground';
+import Aurora from '@/components/motion/Aurora';
+import Grain from '@/components/motion/Grain';
+import SmoothScroll from '@/components/motion/SmoothScroll';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable caching completely
@@ -106,10 +108,14 @@ export default async function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden selection:bg-primary-100 selection:text-primary-900">
       {/* Global Grid Background with Parallax */}
-      <GridBackground
-        svgColor={settings.background_svg_color}
+      {/* The field the whole page sits on: drifting light, a grid that
+          responds to the cursor, and grain over the top for material. */}
+      <Aurora
+        accent={settings.background_svg_color}
         intensity={settings.background_grid_intensity}
       />
+      <Grain />
+      <SmoothScroll />
 
       {/* Navigation */}
       <Navigation settings={settings} />

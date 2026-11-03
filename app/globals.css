@@ -37,6 +37,79 @@
     html {
       scroll-behavior: auto;
     }
+
+    /* Belt and braces: any keyframe animation below is decorative. */
+    .aurora-drift-a,
+    .aurora-drift-b,
+    .aurora-drift-c,
+    .marquee-track {
+      animation: none !important;
+    }
+  }
+}
+
+/* Motion ------------------------------------------------------------------
+ * These run on the compositor rather than through React, so the background
+ * can move continuously without costing the main thread anything.
+ */
+@layer utilities {
+  @keyframes aurora-a {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(6%, 4%, 0) scale(1.12);
+    }
+  }
+  @keyframes aurora-b {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1.08);
+    }
+    50% {
+      transform: translate3d(-7%, 5%, 0) scale(1);
+    }
+  }
+  @keyframes aurora-c {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(4%, -6%, 0) scale(1.15);
+    }
+  }
+
+  /* Prime numbers of seconds, so the three never resynchronise and the
+     field never visibly loops. */
+  .aurora-drift-a {
+    animation: aurora-a 19s ease-in-out infinite;
+    will-change: transform;
+  }
+  .aurora-drift-b {
+    animation: aurora-b 23s ease-in-out infinite;
+    will-change: transform;
+  }
+  .aurora-drift-c {
+    animation: aurora-c 29s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes marquee-x {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  .marquee-track {
+    animation: marquee-x var(--marquee-duration, 40s) linear infinite;
+    will-change: transform;
+  }
+  .marquee-paused:hover .marquee-track {
+    animation-play-state: paused;
   }
 
   /* Indigo theme */

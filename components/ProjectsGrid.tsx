@@ -2,6 +2,9 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import SpotlightCard from './motion/SpotlightCard';
+import CountUp from './motion/CountUp';
+import KineticHeading from './motion/KineticHeading';
 import {
   ArrowUpRight,
   Cloud,
@@ -92,12 +95,13 @@ function ProjectCard({
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.45, delay: Math.min(index, 5) * 0.06 }}
     >
-      {/* One button wrapping the whole card: the entire surface is the target,
-          and there is exactly one tab stop per project. */}
-      <button
+      {/* One interactive surface per project: the whole card is the target,
+          and there is exactly one tab stop. */}
+      <SpotlightCard
+        as="button"
         onClick={onOpen}
-        className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_2px_4px_rgb(15_23_42/0.04),0_16px_40px_-16px_rgb(15_23_42/0.2)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-        aria-label={`${project.title} — open case study`}
+        ariaLabel={`${project.title} — open case study`}
+        className="flex h-full w-full flex-col text-left shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-shadow duration-300 hover:shadow-[0_2px_8px_rgb(15_23_42/0.06),0_24px_56px_-20px_rgb(15_23_42/0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
           {image ? (
@@ -105,13 +109,16 @@ function ProjectCard({
               src={image}
               alt=""
               loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              className="h-full w-full scale-[1.02] object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.08]"
             />
           ) : (
             <div className="grid h-full w-full place-items-center text-slate-300">
               <Icon size={28} />
             </div>
           )}
+          {/* A wash that lifts on hover, so the image gains contrast as you
+              consider it rather than sitting flat. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/15 to-transparent opacity-100 transition-opacity duration-500 group-hover:opacity-0" />
           {project.year && (
             <span className="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 font-mono text-[11px] font-semibold text-slate-700 shadow-sm">
               {project.year}
@@ -160,21 +167,21 @@ function ProjectCard({
           <div className="mt-auto flex items-end justify-between gap-3 border-t border-slate-100 pt-4">
             {headline ? (
               <div className="min-w-0">
-                <div className="text-[22px] font-bold leading-none tracking-[-0.02em] text-slate-900">
-                  {headline.value}
-                </div>
+                <CountUp
+                  value={headline.value}
+                  className="block text-[26px] font-bold leading-none tracking-[-0.025em] text-slate-900 tabular-nums"
+                />
                 <div className="mt-1.5 truncate text-[12px] text-slate-500">{headline.metric}</div>
               </div>
             ) : (
               <span className="text-[13px] text-slate-400">Case study</span>
             )}
-            <ArrowUpRight
-              size={18}
-              className="shrink-0 text-slate-400 transition-all group-hover:translate-x-0.5 group-hover:text-slate-900"
-            />
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-slate-200 text-slate-400 transition-all duration-300 group-hover:border-slate-900 group-hover:bg-slate-900 group-hover:text-white">
+              <ArrowUpRight size={16} />
+            </span>
           </div>
         </div>
-      </button>
+      </SpotlightCard>
     </motion.li>
   );
 }
@@ -344,9 +351,11 @@ export default function ProjectsGrid({
           <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary-600">
             {eyebrow || 'Selected work'}
           </span>
-          <h2 className="mt-3 text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-slate-900 sm:text-[40px]">
-            {title || 'Systems I have shipped'}
-          </h2>
+          <KineticHeading
+            as="h2"
+            text={title || 'Systems I have shipped'}
+            className="mt-3 text-[34px] font-bold leading-[1.08] tracking-[-0.035em] text-slate-900 sm:text-[46px]"
+          />
           {description && (
             <p className="mt-4 text-[16px] leading-relaxed text-slate-600 sm:text-[17px]">
               {description}
