@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Aurora from '@/components/motion/Aurora';
 import Grain from '@/components/motion/Grain';
 import SmoothScroll from '@/components/motion/SmoothScroll';
+import Spine from '@/components/layout/Spine';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable caching completely
@@ -106,7 +107,13 @@ export default async function Home() {
   const { sectionData, renderOrder, badges, settings } = await getData();
 
   return (
-    <main className="relative min-h-screen overflow-hidden selection:bg-primary-100 selection:text-primary-900">
+    // `overflow-x-clip`, not `overflow-hidden`. Both stop the full-bleed
+    // strips causing a horizontal scrollbar, but `hidden` on one axis forces
+    // the other to `auto`, which makes this element a scroll container — and
+    // a scroll container ancestor silently disables `position: sticky` in
+    // everything inside it. That killed both the spine and the pinned
+    // experience track while looking, in the markup, completely correct.
+    <main className="relative min-h-screen overflow-x-clip selection:bg-primary-100 selection:text-primary-900">
       {/* Global Grid Background with Parallax */}
       {/* The field the whole page sits on: drifting light, a grid that
           responds to the cursor, and grain over the top for material. */}
@@ -117,21 +124,33 @@ export default async function Home() {
       <Grain />
       <SmoothScroll />
 
-      {/* Navigation */}
-      <Navigation settings={settings} />
+      {/* The spine: a fixed index rail that replaces the nav on wide screens.
+          It reads the same renderOrder the page renders, so the CMS owns the
+          index exactly as it owns the page. */}
+      <Spine order={renderOrder} settings={settings} />
 
-      {/* Main content. The key → component map lives in PageSections so the
-          CMS can swap content in without a round trip; see lib/preview. */}
-      <PageSections
-        sectionData={sectionData}
-        renderOrder={renderOrder}
-        badges={badges}
-        settings={settings}
-        projectsSlot={<ProjectsShowcase content={sectionData.projects} />}
-      />
+      {/* Below xl there is no room for a rail, so the floating nav stands in.
+          Running both at once would be two navigations for one page. */}
+      <div className="xl:hidden">
+        <Navigation settings={settings} />
+      </div>
 
-      {/* Footer */}
-      <Footer content={settings.footer} settings={settings} />
+      {/* The river. Offset by the rail's width rather than centred, which is
+          what gives the page a left edge to read against. */}
+      <div className="xl:pl-[300px] 2xl:pl-[340px]">
+        {/* Main content. The key → component map lives in PageSections so the
+            CMS can swap content in without a round trip; see lib/preview. */}
+        <PageSections
+          sectionData={sectionData}
+          renderOrder={renderOrder}
+          badges={badges}
+          settings={settings}
+          projectsSlot={<ProjectsShowcase content={sectionData.projects} />}
+        />
+
+        {/* Footer */}
+        <Footer content={settings.footer} settings={settings} />
+      </div>
     </main>
   );
 }

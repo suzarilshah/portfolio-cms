@@ -48,6 +48,44 @@
   }
 }
 
+/* Layout ------------------------------------------------------------------
+ * The page is a spine and a river: a fixed index rail on the left, and the
+ * content running beside it. `.river` is the measure inside that river.
+ *
+ * It deliberately has no `margin-inline: auto`. Centring every section in the
+ * remaining width is what made the old page read as a template — content
+ * floating in the middle of the viewport with symmetric air on both sides.
+ * Hanging it off a left edge instead gives the eye a line to return to, and
+ * leaves asymmetric whitespace on the right that the layout can break into.
+ */
+@layer components {
+  :root {
+    --river-pad: 1.5rem;
+  }
+
+  .river {
+    width: 100%;
+    max-width: 76rem;
+    padding-left: var(--river-pad);
+    padding-right: var(--river-pad);
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --river-pad: 2rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    :root {
+      --river-pad: 3.5rem;
+    }
+    .river {
+      max-width: 78rem;
+    }
+  }
+}
+
 /* Motion ------------------------------------------------------------------
  * These run on the compositor rather than through React, so the background
  * can move continuously without costing the main thread anything.

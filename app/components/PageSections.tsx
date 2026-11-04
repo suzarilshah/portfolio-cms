@@ -108,12 +108,25 @@ export default function PageSections({
     [previewing, sectionData, drafts]
   );
 
+  // Section numbers shown in the margin and in the spine's index. They are
+  // positions in the *rendered* order, so hiding a section in the CMS
+  // renumbers the page rather than leaving a gap. The hero is the top of the
+  // document, not an entry in an index of it.
+  const numbered = renderOrder.filter((key) => key !== 'hero');
+  const numberOf = (key: string) => numbered.indexOf(key) + 1;
+
   const components: Record<string, React.ReactNode> = {
     hero: <HeroSection content={content.hero} settings={settings} />,
     about: <AboutSection content={content.about} settings={settings} />,
     skills: <SkillsMatrix content={content.skills} />,
     projects: projectsSlot,
-    experience: <ExperienceSection content={content.experience} settings={settings} />,
+    experience: (
+      <ExperienceSection
+        content={content.experience}
+        settings={settings}
+        index={numberOf('experience')}
+      />
+    ),
     education: <EducationSection content={content.education} />,
     awards: <AwardsSection badges={badges} content={content.awards} />,
     publications: <PublicationsSection content={content.publications} />,

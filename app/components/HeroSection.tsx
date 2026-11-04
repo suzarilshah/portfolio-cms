@@ -151,10 +151,7 @@ export default function HeroSection({
       id="home"
       className="relative flex min-h-[92svh] scroll-mt-24 flex-col justify-center overflow-hidden pb-16 pt-28 sm:pb-20 sm:pt-32"
     >
-      <motion.div
-        style={reduce ? undefined : { y, opacity }}
-        className="mx-auto w-full max-w-6xl px-5 sm:px-8"
-      >
+      <motion.div style={reduce ? undefined : { y, opacity }} className="river">
         <motion.div {...after(0.05)} className="mb-7 flex items-center gap-3">
           <span className="relative flex h-2 w-2">
             {/* A live indicator, not a decoration: it says the page is
@@ -174,12 +171,17 @@ export default function HeroSection({
           delay={0.15}
           stagger={0.06}
           highlight={highlight}
-          className="max-w-[17ch] text-balance font-display text-[42px] font-bold leading-[1.02] tracking-[-0.04em] text-slate-900 sm:text-[62px] md:text-[76px] lg:text-[88px]"
+          // Deliberately oversized, and deliberately only 15ch wide: the
+          // headline wraps to four tall lines and becomes the page's largest
+          // shape rather than a caption above the content.
+          className="max-w-[15ch] text-balance font-display text-[44px] font-bold leading-[0.98] tracking-[-0.045em] text-slate-900 sm:text-[66px] md:text-[82px] lg:text-[96px] xl:text-[108px]"
         />
 
+        {/* The tagline sits in the right half, across the gutter from the
+            headline's ragged edge, instead of stacking directly under it. */}
         <motion.p
           {...after(0.15 + headline.split(' ').length * 0.06)}
-          className="mt-6 max-w-[44ch] text-pretty text-[19px] leading-[1.42] text-slate-600 sm:text-[23px]"
+          className="mt-8 max-w-[40ch] text-pretty text-[19px] leading-[1.42] text-slate-600 sm:text-[22px] lg:ml-[38%] lg:mt-10"
         >
           {tagline}
         </motion.p>
@@ -202,14 +204,18 @@ export default function HeroSection({
 
       <motion.div
         {...after(0.75)}
-        className="mx-auto mt-11 w-full max-w-6xl px-5 sm:mt-14 sm:px-8"
+        className="river mt-11 sm:mt-14"
       >
-        <div className="flex flex-col gap-8 border-t border-slate-200/70 pt-8 md:flex-row md:items-start md:justify-between md:gap-12">
-          <p className="max-w-[56ch] text-[15px] leading-relaxed text-slate-500 sm:text-[16px]">
+        {/* A 12-column rule, not a flex row: the prose takes five columns and
+            the actions take four, with three left empty between them. The
+            hole is the point — symmetric justify-between is what everything
+            else on the internet does. */}
+        <div className="grid grid-cols-1 gap-8 border-t border-slate-900/10 pt-8 lg:grid-cols-12 lg:gap-6">
+          <p className="max-w-[56ch] text-[15px] leading-relaxed text-slate-500 sm:text-[16px] lg:col-span-5">
             {description}
           </p>
 
-          <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:col-span-4 lg:col-start-9 lg:justify-end">
             <MagneticButton
               href={primary.href}
               className="group inline-flex items-center justify-center rounded-full bg-slate-900 px-7 py-4 text-[15px] font-medium text-white transition-colors hover:bg-primary-600"
@@ -243,7 +249,9 @@ export default function HeroSection({
         <motion.a
           href="#about"
           {...after(1.1)}
-          className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-slate-400 transition-colors hover:text-slate-900 md:flex"
+          // Parked at the right edge rather than centred. A centred scroll cue
+          // re-imposes the axis of symmetry the rest of the hero just broke.
+          className="absolute bottom-7 right-[var(--river-pad)] hidden flex-col items-center gap-2 text-slate-400 transition-colors hover:text-slate-900 md:flex"
           aria-label="Scroll to About"
         >
           <span className="font-mono text-[10px] uppercase tracking-[0.18em]">Scroll</span>

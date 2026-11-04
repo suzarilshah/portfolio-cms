@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowUpRight, Calendar, MapPin, ChevronDown, ChevronUp,
-  Briefcase, Download, Users, Target, Layers, Code,
-  TrendingUp, Clock, Award
+  ArrowRight, ArrowUpRight, ChevronDown, ChevronUp, Download,
+  Users, Target, Layers, Code, TrendingUp, Award
 } from 'lucide-react';
 import EmailCaptureModal from '@/components/EmailCaptureModal';
-import TypingEffect from '@/components/TypingEffect';
+import SectionFrame from '@/components/layout/SectionFrame';
+import HorizontalScroll from '@/components/motion/HorizontalScroll';
+import SpotlightCard from '@/components/motion/SpotlightCard';
 
 // Default data structures
 const defaultWorkExperience = [
@@ -50,31 +51,6 @@ const defaultWorkExperience = [
   }
 ];
 
-const defaultPMExperience = [
-  {
-    company: 'Your PM Experience',
-    role: 'Project Manager',
-    period: '2024 – Present',
-    location: 'Remote',
-    description: 'Add your project management experience here. Describe your leadership, stakeholder management, and delivery achievements.',
-    tags: ['Agile', 'Scrum', 'Stakeholder Management'],
-    type: 'project_management',
-    team_size: '10-15',
-    budget: '$500K+',
-    methodologies: ['Agile', 'Scrum'],
-    tools: ['Jira', 'Confluence'],
-    key_achievements: ['On-time delivery', 'Budget adherence']
-  }
-];
-
-const defaultTypingPhrases = [
-  "Engineering Excellence",
-  "Project Leadership",
-  "System Architecture",
-  "Cloud Innovation",
-  "Digital Transformation"
-];
-
 interface ExperienceItem {
   company: string;
   role: string;
@@ -90,78 +66,71 @@ interface ExperienceItem {
   key_achievements?: string[];
 }
 
-// Experience Card Component for Work Experience
-function WorkExperienceCard({ exp, index, isLast }: { exp: ExperienceItem; index: number; isLast: boolean }) {
+/**
+ * One post, as a card on the horizontal track.
+ *
+ * The period is set as the card's largest element. On a vertical résumé the
+ * dates are a column you skim past; on a track that moves through time as you
+ * scroll, the date *is* the position, so it earns display size.
+ */
+function ExperienceCard({
+  exp,
+  index,
+  total,
+}: {
+  exp: ExperienceItem;
+  index: number;
+  total: number;
+}) {
+  const current = index === 0;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="group relative grid grid-cols-1 md:grid-cols-[180px_60px_1fr] gap-0 md:gap-4"
-    >
-      {/* Date/Period Column (Desktop) */}
-      <div className="hidden md:flex flex-col items-end pt-1 text-right px-2">
-        <span className={`font-display text-lg font-bold ${index === 0 ? 'text-primary-600' : 'text-slate-900'}`}>
-          {exp.period || 'Present'}
+    <SpotlightCard className="flex w-full shrink-0 flex-col p-7 lg:h-[440px] lg:w-[400px]">
+      <div className="flex items-center justify-between gap-4">
+        <span className="font-mono text-[10px] tabular-nums tracking-[0.18em] text-slate-400">
+          {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
         </span>
-        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider mt-1">
-          {exp.location ? exp.location.split(',')[0] : 'Remote'}
-        </span>
-      </div>
-
-      {/* Timeline Spine Column */}
-      <div className="hidden md:flex justify-center relative min-h-[100px]">
-        {!isLast && (
-          <div className="absolute top-4 bottom-0 w-px bg-gradient-to-b from-slate-200 via-slate-200 to-slate-200 group-hover:from-primary-200 group-hover:via-primary-200 group-hover:to-primary-100 transition-colors duration-500" />
+        {current && (
+          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-600">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Current
+          </span>
         )}
-        <div className={`relative z-10 mt-2 w-3 h-3 rounded-full border-2 transition-all duration-500 ${
-          index === 0
-            ? 'bg-primary-500 border-primary-200 scale-125 shadow-[0_0_0_4px_rgba(14,165,233,0.2)]'
-            : 'bg-white border-slate-400 group-hover:border-primary-500 group-hover:scale-125'
-        }`}>
-          {index === 0 && (
-            <span className="absolute inset-0 rounded-full bg-primary-400 animate-ping opacity-75" />
-          )}
-        </div>
       </div>
 
-      {/* Content Card Column */}
-      <div className="pb-8 pl-10 md:pl-0 pt-0 md:pt-0 relative">
-        {!isLast && (
-          <div className="md:hidden absolute left-[1.85rem] top-4 bottom-0 w-px bg-slate-200" />
+      <span className="mt-7 block font-display text-[30px] font-bold leading-none tracking-[-0.035em] text-slate-900">
+        {exp.period || 'Present'}
+      </span>
+
+      <h3 className="mt-4 text-balance font-display text-[21px] font-semibold leading-tight tracking-[-0.02em] text-slate-900">
+        {exp.role}
+      </h3>
+
+      <div className="mt-1.5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.1em] text-slate-500">
+        <span>{exp.company}</span>
+        {exp.location && (
+          <>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-400">{exp.location.split(',')[0]}</span>
+          </>
         )}
-        <div className="md:hidden absolute left-6 top-2 w-3 h-3 rounded-full bg-white border-2 border-slate-400 z-10" />
-
-        <div className="relative group-hover:-translate-y-1 transition-transform duration-300">
-          <div className="md:hidden inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold mb-3">
-            <Calendar size={12} />
-            {exp.period}
-          </div>
-
-          <h3 className="font-display text-2xl font-bold text-slate-900 mb-1 group-hover:text-primary-600 transition-colors">
-            {exp.role}
-          </h3>
-
-          <div className="flex items-center gap-2 text-slate-600 font-medium mb-4 text-base">
-            <Briefcase size={16} className="text-slate-400" />
-            {exp.company}
-          </div>
-
-          <p className="text-slate-600 leading-relaxed mb-5 text-[15px] max-w-2xl">
-            {exp.description}
-          </p>
-
-          <div className="flex flex-wrap gap-2">
-            {(exp.tags || []).map((tag: string) => (
-              <span key={tag} className="px-3 py-1 bg-white border border-slate-200 text-slate-600 text-xs font-semibold rounded-full group-hover:border-primary-200 group-hover:text-primary-700 transition-colors shadow-sm">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
       </div>
-    </motion.div>
+
+      <p className="mt-5 text-[14px] leading-relaxed text-slate-600 lg:line-clamp-5">
+        {exp.description}
+      </p>
+
+      <div className="mt-auto flex flex-wrap gap-1.5 pt-6">
+        {(exp.tags || []).slice(0, 3).map((tag: string) => (
+          <span
+            key={tag}
+            className="rounded-full border border-slate-200 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-slate-500"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    </SpotlightCard>
   );
 }
 
@@ -306,197 +275,136 @@ function PMExperienceCard({ exp, index }: { exp: ExperienceItem; index: number }
   );
 }
 
-// Tab Button Component - more compact
-function TabButton({
-  active,
-  onClick,
-  icon: Icon,
-  label,
-  count
+export default function ExperienceSection({
+  content,
+  settings,
+  index,
 }: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ElementType;
-  label: string;
-  count: number;
+  content?: any;
+  settings?: any;
+  /** Position in the page's render order, shown in the margin. */
+  index?: number;
 }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-        active
-          ? 'bg-slate-900 text-white shadow-md'
-          : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-      }`}
-    >
-      <Icon size={16} className={active ? 'text-primary-400' : 'text-slate-400'} />
-      <span>{label}</span>
-      <span className={`ml-1 px-1.5 py-0.5 rounded text-xs font-bold ${
-        active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-      }`}>
-        {count}
-      </span>
-    </button>
-  );
-}
-
-export default function ExperienceSection({ content, settings }: { content?: any; settings?: any }) {
-  const [activeTab, setActiveTab] = useState<'work' | 'pm'>('work');
-  const [showAll, setShowAll] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
 
-  // Parse content with fallbacks
-  const workExperience = content?.work_experience || content?.jobs || defaultWorkExperience;
-  const pmExperience = content?.project_management || defaultPMExperience;
-  const typingPhrases = content?.typing_phrases || defaultTypingPhrases;
-  const showTypingEffect = content?.show_typing_effect !== false;
+  const workExperience: ExperienceItem[] =
+    content?.work_experience || content?.jobs || defaultWorkExperience;
 
-  const displayedWork = showAll ? workExperience : workExperience.slice(0, 2);
+  // Only rendered when the CMS actually holds entries. The module default is
+  // placeholder copy ("Your PM Experience"), and placeholder copy on a live
+  // CV is worse than an absent section.
+  const pmExperience: ExperienceItem[] = Array.isArray(content?.project_management)
+    ? content.project_management
+    : [];
+
   const resumeUrl = settings?.resume_url;
 
   return (
-    <section id="experience" className="relative py-20 sm:py-24 overflow-hidden">
-      <div className="max-w-5xl mx-auto px-6 relative z-10">
-        {/* Section Header with Typing Effect - more compact */}
-        <div className="text-center mb-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary-600 rounded-full text-xs font-semibold mb-4">
-              <Clock size={12} />
-              Career Journey
-            </span>
-
-            <h2 className="font-display text-3xl md:text-5xl font-bold text-slate-900 mb-3 tracking-tight">
-              {content?.title || 'Experience'}
-            </h2>
-
-            {/* Typing Effect Subtitle */}
-            {showTypingEffect && (
-              <div className="h-8 flex items-center justify-center">
-                <span className="text-lg md:text-xl text-slate-500 font-medium">
-                  <TypingEffect phrases={typingPhrases} />
+    <SectionFrame
+      id="experience"
+      index={index}
+      title={content?.title || 'Experience'}
+      standfirst={
+        content?.subtitle ||
+        'Four posts across telecom, platform consulting and financial messaging — each one closer to systems that cannot go down.'
+      }
+      bleed={
+        <>
+          {/* The track. Scrolling down drives it left, so the section reads
+              along the axis time actually runs on. */}
+          <HorizontalScroll
+            className="mt-10"
+            header={
+              <div className="flex items-baseline gap-4 border-t border-slate-900/10 pt-4">
+                {typeof index === 'number' && (
+                  <span className="font-mono text-[11px] tabular-nums tracking-[0.18em] text-slate-400">
+                    {String(index).padStart(2, '0')}
+                  </span>
+                )}
+                <span className="font-display text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
+                  {content?.title || 'Experience'}
+                </span>
+                <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.14em] text-slate-400">
+                  {workExperience[0]?.period?.split('–')[0]?.trim() || ''} → now
                 </span>
               </div>
-            )}
-
-            <p className="text-base text-slate-600 max-w-xl mx-auto mt-3 leading-relaxed">
-              {content?.subtitle || "A track record of engineering excellence and leadership in high-stakes environments."}
-            </p>
-          </motion.div>
-
-          {/* Download Resume Button */}
-          {resumeUrl && <motion.button
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            onClick={() => setShowEmailModal(true)}
-            className="group inline-flex items-center gap-2 px-5 py-2.5 mt-4 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-primary-600 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+            }
           >
-            <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
-            Download Resume
-          </motion.button>}
-        </div>
+            {workExperience.map((exp, i) => (
+              <ExperienceCard key={i} exp={exp} index={i} total={workExperience.length} />
+            ))}
 
-        {/* Tab Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-col sm:flex-row gap-3 justify-center mb-8"
-        >
-          <TabButton
-            active={activeTab === 'work'}
-            onClick={() => setActiveTab('work')}
-            icon={Briefcase}
-            label="Work Experience"
-            count={workExperience.length}
-          />
-          <TabButton
-            active={activeTab === 'pm'}
-            onClick={() => setActiveTab('pm')}
-            icon={Target}
-            label="Project Management"
-            count={pmExperience.length}
-          />
-        </motion.div>
+            {/* Terminal card: the track should arrive somewhere rather than
+                simply stop. */}
+            <div className="flex w-full shrink-0 flex-col justify-end p-7 lg:h-[440px] lg:w-[320px]">
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">
+                End of record
+              </span>
+              <p className="mt-3 max-w-[24ch] font-display text-[22px] font-semibold leading-tight tracking-[-0.02em] text-slate-900">
+                The next post is the one we talk about.
+              </p>
+              <a
+                href="#contact"
+                className="group mt-5 inline-flex items-center gap-1.5 self-start text-[14px] font-medium text-slate-900"
+              >
+                <span className="relative">
+                  Start a conversation
+                  <span className="absolute -bottom-0.5 left-0 h-px w-full origin-right scale-x-100 bg-slate-900 transition-transform duration-500 group-hover:origin-left group-hover:scale-x-0" />
+                </span>
+                <ArrowUpRight
+                  size={14}
+                  className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </a>
+            </div>
+          </HorizontalScroll>
 
-        {/* Content Area */}
-        <AnimatePresence mode="wait">
-          {activeTab === 'work' ? (
-            <motion.div
-              key="work"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Work Experience Timeline */}
-              <div className="relative space-y-0">
-                {displayedWork.map((exp: ExperienceItem, index: number) => (
-                  <WorkExperienceCard
-                    key={index}
-                    exp={exp}
-                    index={index}
-                    isLast={index === displayedWork.length - 1}
-                  />
+          {pmExperience.length > 0 && (
+            <div className="river mt-16">
+              <h3 className="mb-6 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400">
+                Project management
+              </h3>
+              <div className="grid gap-5 lg:grid-cols-2">
+                {pmExperience.map((exp, i) => (
+                  <PMExperienceCard key={i} exp={exp} index={i} />
                 ))}
               </div>
-
-              {/* Show More Button */}
-              {workExperience.length > 2 && (
-                <div className="mt-8 flex justify-center relative z-20">
-                  {!showAll && (
-                    <div className="absolute bottom-full w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-                  )}
-                  <button
-                    onClick={() => setShowAll(!showAll)}
-                    className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
-                  >
-                    {showAll ? (
-                      <>Show Less <ChevronUp size={16} /></>
-                    ) : (
-                      <>View More Experience <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" /></>
-                    )}
-                  </button>
-                </div>
-              )}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="pm"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="grid gap-6"
-            >
-              {pmExperience.map((exp: ExperienceItem, index: number) => (
-                <PMExperienceCard key={index} exp={exp} index={index} />
-              ))}
-
-              {/* Empty State for PM */}
-              {pmExperience.length === 0 && (
-                <div className="text-center py-10 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                  <Target size={36} className="mx-auto text-slate-300 mb-3" />
-                  <h3 className="text-base font-bold text-slate-600 mb-1">No Project Management Experience Added</h3>
-                  <p className="text-sm text-slate-500">Add your PM roles in the admin panel</p>
-                </div>
-              )}
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </>
+      }
+    >
+      {/* A meta row under the header, in the margin register. It also tells
+          you the track is horizontal, which otherwise has to be discovered. */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400">
+        <span className="tabular-nums">{String(workExperience.length).padStart(2, '0')} posts</span>
+        <span className="hidden items-center gap-2 lg:inline-flex">
+          Scroll to advance
+          <motion.span
+            aria-hidden
+            animate={{ x: [0, 5, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            className="inline-block"
+          >
+            <ArrowRight size={13} />
+          </motion.span>
+        </span>
+        {resumeUrl && (
+          <button
+            onClick={() => setShowEmailModal(true)}
+            className="group inline-flex items-center gap-1.5 uppercase tracking-[0.14em] text-slate-600 transition-colors hover:text-slate-900"
+          >
+            <Download size={12} className="transition-transform group-hover:translate-y-0.5" />
+            Download CV
+          </button>
+        )}
       </div>
 
-      {/* Email Capture Modal */}
       <EmailCaptureModal
         isOpen={showEmailModal}
         onClose={() => setShowEmailModal(false)}
         resumeUrl={resumeUrl || ''}
       />
-    </section>
+    </SectionFrame>
   );
 }
