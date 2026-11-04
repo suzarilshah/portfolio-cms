@@ -38,6 +38,54 @@ export interface SectionFrameProps {
   className?: string;
 }
 
+/**
+ * The header on its own.
+ *
+ * Exported separately so sections with their own established layout can adopt
+ * the editorial opening without having their markup rebuilt around
+ * `SectionFrame`. Same typography, same numbering, same rule — the only
+ * difference is who owns the surrounding element.
+ */
+export function SectionHeading({
+  index,
+  title,
+  standfirst,
+  highlight,
+  className = '',
+}: Pick<SectionFrameProps, 'index' | 'title' | 'standfirst' | 'highlight'> & {
+  className?: string;
+}) {
+  return (
+    <header className={`mb-12 border-t border-slate-900/10 pt-6 sm:mb-14 ${className}`}>
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+        <div className="flex items-start gap-4 sm:gap-6">
+          {typeof index === 'number' && (
+            <span
+              aria-hidden
+              className="mt-[0.7em] shrink-0 font-mono text-[11px] tabular-nums tracking-[0.18em] text-slate-400"
+            >
+              {String(index).padStart(2, '0')}
+            </span>
+          )}
+          <KineticHeading
+            as="h2"
+            text={title}
+            highlight={highlight}
+            stagger={0.045}
+            className="max-w-[14ch] text-balance font-display text-[34px] font-bold leading-[1.02] tracking-[-0.035em] text-slate-900 sm:text-[44px] lg:text-[56px]"
+          />
+        </div>
+
+        {standfirst && (
+          <p className="max-w-[40ch] text-[15px] leading-relaxed text-slate-500 lg:mt-3 lg:text-right">
+            {standfirst}
+          </p>
+        )}
+      </div>
+    </header>
+  );
+}
+
 export default function SectionFrame({
   id,
   index,
@@ -55,34 +103,12 @@ export default function SectionFrame({
       className={`relative scroll-mt-28 ${flush ? '' : 'py-20 sm:py-24 xl:py-28'} ${className}`}
     >
       <div className="river">
-        <header className="mb-12 border-t border-slate-900/10 pt-6 sm:mb-14">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
-            <div className="flex items-start gap-4 sm:gap-6">
-              {typeof index === 'number' && (
-                <span
-                  aria-hidden
-                  className="mt-[0.7em] shrink-0 font-mono text-[11px] tabular-nums tracking-[0.18em] text-slate-400"
-                >
-                  {String(index).padStart(2, '0')}
-                </span>
-              )}
-              <KineticHeading
-                as="h2"
-                text={title}
-                highlight={highlight}
-                stagger={0.045}
-                className="max-w-[14ch] text-balance font-display text-[34px] font-bold leading-[1.02] tracking-[-0.035em] text-slate-900 sm:text-[44px] lg:text-[56px]"
-              />
-            </div>
-
-            {standfirst && (
-              <p className="max-w-[40ch] text-[15px] leading-relaxed text-slate-500 lg:mt-3 lg:text-right">
-                {standfirst}
-              </p>
-            )}
-          </div>
-        </header>
-
+        <SectionHeading
+          index={index}
+          title={title}
+          standfirst={standfirst}
+          highlight={highlight}
+        />
         {children}
       </div>
 

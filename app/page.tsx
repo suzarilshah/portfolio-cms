@@ -145,7 +145,12 @@ export default async function Home() {
           renderOrder={renderOrder}
           badges={badges}
           settings={settings}
-          projectsSlot={<ProjectsShowcase content={sectionData.projects} />}
+          projectsSlot={
+            <ProjectsShowcase
+              content={sectionData.projects}
+              index={renderOrder.filter((key) => key !== 'hero').indexOf('projects') + 1}
+            />
+          }
         />
 
         {/* Footer */}

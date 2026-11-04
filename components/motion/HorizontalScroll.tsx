@@ -51,9 +51,14 @@ export default function HorizontalScroll({
 
   useEffect(() => {
     const query = window.matchMedia('(min-width: 1024px)');
+    // Read the preference here rather than trusting the hook's value. It
+    // returns null until it has resolved, and `!null` is `true` — so a
+    // visitor who asked for reduced motion would have had the scroll
+    // hijacked anyway. A media query has no indeterminate state.
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const measure = () => {
-      const on = query.matches && !reduce;
+      const on = query.matches && !calm.matches;
       setEnabled(on);
       if (!on || !trackRef.current) {
         setDistance(0);
@@ -68,6 +73,7 @@ export default function HorizontalScroll({
 
     measure();
     query.addEventListener('change', measure);
+    calm.addEventListener('change', measure);
     window.addEventListener('resize', measure);
 
     // Card content can reflow after fonts load, which changes scrollWidth
@@ -77,6 +83,7 @@ export default function HorizontalScroll({
 
     return () => {
       query.removeEventListener('change', measure);
+      calm.removeEventListener('change', measure);
       window.removeEventListener('resize', measure);
       observer.disconnect();
     };

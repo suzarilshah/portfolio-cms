@@ -91,9 +91,13 @@ export default function Spine({ order, settings }: SpineProps) {
     // rather than when its last pixel leaves the bottom of the screen.
     const observer = new IntersectionObserver(
       (observed) => {
+        // Descending by top: when two sections overlap the detection band,
+        // the one with the *greater* top is the one being entered. Taking the
+        // smaller top instead keeps the index on the section you are leaving,
+        // which showed "Education" while Recognition filled the screen.
         const visible = observed
           .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          .sort((a, b) => b.boundingClientRect.top - a.boundingClientRect.top);
         if (visible[0]) setActive(visible[0].target.id);
       },
       { rootMargin: '-15% 0px -70% 0px', threshold: 0 }

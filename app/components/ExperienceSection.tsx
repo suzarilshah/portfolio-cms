@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight, ArrowUpRight, ChevronDown, ChevronUp, Download,
@@ -10,6 +10,15 @@ import EmailCaptureModal from '@/components/EmailCaptureModal';
 import SectionFrame from '@/components/layout/SectionFrame';
 import HorizontalScroll from '@/components/motion/HorizontalScroll';
 import SpotlightCard from '@/components/motion/SpotlightCard';
+import CareerChart from './experience/CareerChart';
+import { buildTimeline } from '@/lib/content/timeline';
+
+/**
+ * Fallback "now" for the server render, bumped on the client after mount.
+ * Only the right-hand edge of the axis depends on it, so a stale value shifts
+ * the last bar by a sliver for one frame rather than breaking the chart.
+ */
+const DEFAULT_NOW = 2026;
 
 // Default data structures
 const defaultWorkExperience = [
@@ -73,19 +82,22 @@ interface ExperienceItem {
  * dates are a column you skim past; on a track that moves through time as you
  * scroll, the date *is* the position, so it earns display size.
  */
-function ExperienceCard({
-  exp,
-  index,
-  total,
-}: {
-  exp: ExperienceItem;
-  index: number;
-  total: number;
-}) {
-  const current = index === 0;
+const ExperienceCard = forwardRef<
+  HTMLDivElement,
+  { exp: ExperienceItem; index: number; total: number; active: boolean }
+>(function ExperienceCard({ exp, index, total, active }, ref) {
+  // Read from the dates, not from position. Ordering the track
+  // chronologically moved the current role to the end, and a "Current" badge
+  // pinned to index 0 would then have labelled the oldest job.
+  const current = /present|now|current|ongoing/i.test(exp.period || '');
 
   return (
-    <SpotlightCard className="flex w-full shrink-0 flex-col p-7 lg:h-[440px] lg:w-[400px]">
+    <div ref={ref} className="flex w-full shrink-0 lg:w-[400px]">
+      <SpotlightCard
+        className={`flex w-full flex-col p-7 transition-[border-color,opacity] duration-500 lg:h-[440px] ${
+          active ? 'border-slate-300' : 'lg:opacity-60'
+        }`}
+      >
       <div className="flex items-center justify-between gap-4">
         <span className="font-mono text-[10px] tabular-nums tracking-[0.18em] text-slate-400">
           {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
@@ -130,9 +142,10 @@ function ExperienceCard({
           </span>
         ))}
       </div>
-    </SpotlightCard>
+      </SpotlightCard>
+    </div>
   );
-}
+});
 
 // PM Experience Card - More detailed with extra fields (expanded by default)
 function PMExperienceCard({ exp, index }: { exp: ExperienceItem; index: number }) {
@@ -299,6 +312,62 @@ export default function ExperienceSection({
 
   const resumeUrl = settings?.resume_url;
 
+  // The timeline is built once per content change. `now` is captured on the
+  // client after mount rather than during render: calling Date.now() while
+  // rendering makes the server and client markup disagree, and Next will
+  // throw a hydration error for it.
+  const [now, setNow] = useState(() => DEFAULT_NOW);
+  useEffect(() => {
+    const date = new Date();
+    setNow(date.getFullYear() + date.getMonth() / 12);
+  }, []);
+
+  const timeline = useMemo(
+    () => buildTimeline(workExperience, (job) => job.period, now),
+    [workExperience, now]
+  );
+
+  // Chronological, earliest first. A timeline that runs right as you scroll
+  // right has to run forwards in time, and arriving at the current role is a
+  // better ending than opening on it. Roles whose dates could not be parsed
+  // keep their place at the end rather than being dropped.
+  const ordered = useMemo(
+    () => [...timeline.entries.map((entry) => entry.item), ...timeline.unparsed],
+    [timeline]
+  );
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // Which card is in the middle of the screen. A small box at the viewport's
+  // centre works for both layouts — the horizontal track moves cards through
+  // it sideways, the mobile fallback moves them through it vertically.
+  useEffect(() => {
+    const nodes = cardRefs.current.filter((node): node is HTMLDivElement => node !== null);
+    if (nodes.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (observed) => {
+        const hit = observed.find((entry) => entry.isIntersecting);
+        if (!hit) return;
+        const index = nodes.indexOf(hit.target as HTMLDivElement);
+        if (index >= 0) setActiveIndex(index);
+      },
+      { rootMargin: '-42% -46% -42% -46%', threshold: 0 }
+    );
+
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, [ordered.length]);
+
+  const scrollToCard = (index: number) => {
+    cardRefs.current[index]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center',
+    });
+  };
+
   return (
     <SectionFrame
       id="experience"
@@ -306,7 +375,7 @@ export default function ExperienceSection({
       title={content?.title || 'Experience'}
       standfirst={
         content?.subtitle ||
-        'Four posts across telecom, platform consulting and financial messaging — each one closer to systems that cannot go down.'
+        'Six posts across networking, platform support and financial messaging — three of them running at once.'
       }
       bleed={
         <>
@@ -315,23 +384,28 @@ export default function ExperienceSection({
           <HorizontalScroll
             className="mt-10"
             header={
-              <div className="flex items-baseline gap-4 border-t border-slate-900/10 pt-4">
-                {typeof index === 'number' && (
-                  <span className="font-mono text-[11px] tabular-nums tracking-[0.18em] text-slate-400">
-                    {String(index).padStart(2, '0')}
-                  </span>
-                )}
-                <span className="font-display text-[18px] font-semibold tracking-[-0.02em] text-slate-900">
-                  {content?.title || 'Experience'}
-                </span>
-                <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.14em] text-slate-400">
-                  {workExperience[0]?.period?.split('–')[0]?.trim() || ''} → now
-                </span>
-              </div>
+              <CareerChart
+                entries={timeline.entries}
+                from={timeline.from}
+                to={timeline.to}
+                lanes={timeline.lanes}
+                now={now}
+                activeIndex={activeIndex}
+                onSelect={scrollToCard}
+              />
             }
           >
-            {workExperience.map((exp, i) => (
-              <ExperienceCard key={i} exp={exp} index={i} total={workExperience.length} />
+            {ordered.map((exp, i) => (
+              <ExperienceCard
+                key={`${exp.company}-${exp.period}-${i}`}
+                ref={(node) => {
+                  cardRefs.current[i] = node;
+                }}
+                exp={exp}
+                index={i}
+                total={ordered.length}
+                active={i === activeIndex}
+              />
             ))}
 
             {/* Terminal card: the track should arrive somewhere rather than

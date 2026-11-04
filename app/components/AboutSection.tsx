@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { DEFAULT_INTEREST_ICON, type AboutInterestIcon } from '@/lib/content/about';
+import { SectionHeading } from '@/components/layout/SectionFrame';
 
 /**
  * About.
@@ -83,9 +84,12 @@ export const DEFAULT_ABOUT = {
 export default function AboutSection({
   content,
   settings,
+  index,
 }: {
   content?: AboutContent;
   settings?: any;
+  /** Position in the page's render order, shown in the margin. */
+  index?: number;
 }) {
   const reduce = useReducedMotion();
 
@@ -118,8 +122,9 @@ export default function AboutSection({
       };
 
   return (
-    <section id="about" className="py-20 sm:py-24">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+    <section id="about" className="scroll-mt-28 py-20 sm:py-24">
+      <div className="river">
+        <SectionHeading index={index} title={heading} standfirst={eyebrow} />
         <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
           <motion.div {...fadeIn} className="lg:sticky lg:top-28 lg:self-start">
             {/* 3:2 on phones. At 4:5 the portrait was 472px tall on a 390px
@@ -154,16 +159,10 @@ export default function AboutSection({
           </motion.div>
 
           <motion.div {...fadeIn}>
-            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary-600">
-              {eyebrow}
-            </span>
-
-            <h2 className="mt-3 max-w-[20ch] text-balance text-[30px] font-bold leading-[1.12] tracking-[-0.03em] text-slate-900 sm:text-[38px]">
-              {heading}
-            </h2>
-
+            {/* The heading moved up into the section header, so the bio now
+                starts where the reader's eye already is. */}
             {paragraphs.length > 0 && (
-              <div className="mt-6 space-y-4">
+              <div className="space-y-4">
                 {paragraphs.map((paragraph, index) => (
                   <p
                     key={index}

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import SpotlightCard from './motion/SpotlightCard';
 import CountUp from './motion/CountUp';
-import KineticHeading from './motion/KineticHeading';
+import { SectionHeading } from './layout/SectionFrame';
 import {
   ArrowUpRight,
   Cloud,
@@ -59,6 +59,8 @@ interface ProjectsGridProps {
   eyebrow?: string;
   title?: string;
   description?: string;
+  /** Position in the page's render order, shown in the margin. */
+  index?: number;
 }
 
 const ICONS: Record<string, LucideIcon> = {
@@ -333,6 +335,7 @@ export default function ProjectsGrid({
   eyebrow,
   title,
   description,
+  index,
 }: ProjectsGridProps) {
   const [selected, setSelected] = useState<Project | null>(null);
   const close = useCallback(() => setSelected(null), []);
@@ -345,23 +348,13 @@ export default function ProjectsGrid({
     projects.length <= 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3';
 
   return (
-    <section id="projects" className="py-20 sm:py-24">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <header className="mb-10 max-w-2xl sm:mb-12">
-          <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary-600">
-            {eyebrow || 'Selected work'}
-          </span>
-          <KineticHeading
-            as="h2"
-            text={title || 'Systems I have shipped'}
-            className="mt-3 text-[34px] font-bold leading-[1.08] tracking-[-0.035em] text-slate-900 sm:text-[46px]"
-          />
-          {description && (
-            <p className="mt-4 text-[16px] leading-relaxed text-slate-600 sm:text-[17px]">
-              {description}
-            </p>
-          )}
-        </header>
+    <section id="projects" className="scroll-mt-28 py-20 sm:py-24">
+      <div className="river">
+        <SectionHeading
+          index={index}
+          title={title || 'Systems I have shipped'}
+          standfirst={description || eyebrow}
+        />
 
         <ul className={`grid grid-cols-1 gap-5 ${columns}`}>
           {projects.map((project, index) => (

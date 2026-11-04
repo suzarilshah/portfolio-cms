@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Calendar, ArrowRight, Linkedin, Github, Twitter, Globe, Send, CheckCircle, AlertCircle, User, MessageSquare } from 'lucide-react';
+import { SectionHeading } from '@/components/layout/SectionFrame';
 
 const defaultContact = {
   bookingUrl: 'https://suzarilshah.youcanbook.me',
@@ -15,7 +16,7 @@ const defaultContact = {
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
-export default function ContactSection({ content }: { content?: any }) {
+export default function ContactSection({ content, index }: { content?: any; index?: number }) {
   const bookingUrl = content?.bookingUrl || defaultContact.bookingUrl;
   const email = content?.email || defaultContact.email;
   const linkedin = content?.linkedin || defaultContact.linkedin;
@@ -54,20 +55,16 @@ export default function ContactSection({ content }: { content?: any }) {
   };
 
   return (
-    <section id="contact" className="py-20 sm:py-24 border-t border-slate-200/80">
-      <div className="max-w-5xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10"
-        >
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-3">Let&apos;s Collaborate</h2>
-          <p className="text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
-            Whether you&apos;re interested in discussing cloud architecture, AI solutions,
-            or community building, I&apos;m always open to connecting.
-          </p>
-        </motion.div>
+    <section id="contact" className="scroll-mt-28 py-20 sm:py-24">
+      <div className="river">
+        <SectionHeading
+          index={index}
+          title={content?.title || "Let's Collaborate"}
+          standfirst={
+            content?.subtitle ||
+            "Cloud architecture, AI, or community work — I'm always open to connecting."
+          }
+        />
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Contact Form */}

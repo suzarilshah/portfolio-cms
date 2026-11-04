@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Award, Medal, Star, ExternalLink, CheckCircle2, ChevronDown } from 'lucide-react';
 import Script from 'next/script';
+import { SectionHeading } from '@/components/layout/SectionFrame';
 
 const defaultAwards = [
   {
@@ -67,7 +68,16 @@ interface AwardsContent {
   items?: AwardItem[];
 }
 
-export default function AwardsSection({ badges, content }: { badges?: any[]; content?: AwardsContent }) {
+export default function AwardsSection({
+  badges,
+  content,
+  index,
+}: {
+  badges?: any[];
+  content?: AwardsContent;
+  /** Position in the page's render order, shown in the margin. */
+  index?: number;
+}) {
   const items = content?.items || defaultAwards;
   const title = content?.title || "Global Recognition";
   const subtitle = content?.subtitle || "Acknowledged by industry giants for technical innovation, community leadership, and engineering excellence.";
@@ -106,25 +116,18 @@ export default function AwardsSection({ badges, content }: { badges?: any[]; con
 
       <Script src="//cdn.credly.com/assets/utilities/embed.js" strategy="lazyOnload" />
       
-      <div className="max-w-[1400px] mx-auto px-6 relative z-10">
-        
+      <div className="river relative z-10">
+        <SectionHeading
+          index={index}
+          title={title || 'Global Recognition'}
+          standfirst={subtitle}
+          // Tint everything after the first word, which is how the old
+          // hand-split heading read before it became a shared component.
+          highlight={(title || 'Global Recognition').split(' ').slice(1)}
+        />
+
         {/* AWARDS SECTION */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-16">
-          {/* Header */}
-          <div className="lg:col-span-4 relative lg:sticky lg:top-32">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
-                {title?.split(' ')[0] || 'Global'} <br /> <span className="text-primary-600">{title?.split(' ').slice(1).join(' ') || 'Recognition'}</span>
-              </h2>
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                {subtitle}
-              </p>
-            </motion.div>
-          </div>
 
           {/* Awards Grid */}
           <div className="lg:col-span-8">

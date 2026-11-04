@@ -114,7 +114,13 @@ async function getProjects() {
   }
 }
 
-export default async function ProjectsShowcaseWrapper({ content }: { content?: any }) {
+export default async function ProjectsShowcaseWrapper({
+  content,
+  index,
+}: {
+  content?: any;
+  index?: number;
+}) {
   const projects = await getProjects();
   const projectsToUse = (projects && projects.length > 0) ? projects : FALLBACK_PROJECTS;
 
@@ -124,6 +130,7 @@ export default async function ProjectsShowcaseWrapper({ content }: { content?: a
       eyebrow={content?.eyebrow}
       title={content?.title}
       description={content?.description}
+      index={index}
     />
   );
 }

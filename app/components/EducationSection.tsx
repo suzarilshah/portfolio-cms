@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { GraduationCap, BookOpen, Award } from 'lucide-react';
+import { SectionHeading } from '@/components/layout/SectionFrame';
 
 const education = [
   {
@@ -30,13 +31,21 @@ const education = [
   }
 ];
 
-export default function EducationSection({ content }: { content?: any }) {
+export default function EducationSection({ content, index }: { content?: any; index?: number }) {
   const educationList = content?.items || education;
   const title = content?.title || "Academic Foundation";
 
   return (
-    <section id="education" className="py-20 sm:py-24">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="education" className="scroll-mt-28 py-20 sm:py-24">
+      <div className="river">
+        <SectionHeading
+          index={index}
+          title={title}
+          standfirst={
+            content?.subtitle ||
+            'Theoretical computer science and practical engineering, with research as a pillar rather than an afterthought.'
+          }
+        />
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Header Column */}
           <motion.div
@@ -44,15 +53,7 @@ export default function EducationSection({ content }: { content?: any }) {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-              {title}
-            </h2>
-            <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
-              My academic journey has been grounded in both theoretical computer science 
-              and practical engineering application. I believe in continuous learning 
-              and academic research as a pillar for technological innovation.
-            </p>
-            
+
             <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
               <h3 className="font-bold text-slate-900 mb-2">Research Focus</h3>
               <p className="text-slate-600 text-sm md:text-base">

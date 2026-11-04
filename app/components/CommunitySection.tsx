@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Mic, Users, Heart, Calendar, MapPin, ExternalLink, ChevronDown, ChevronUp, Award, Video, Globe } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { SectionHeading } from '@/components/layout/SectionFrame';
 
 // --- Data Definitions ---
 
@@ -143,7 +144,7 @@ type SessionizeSession = {
   link: string;
 };
 
-export default function CommunitySection({ content }: { content?: any }) {
+export default function CommunitySection({ content, index }: { content?: any; index?: number }) {
   const [sessions, setSessions] = useState<SessionizeSession[]>([]);
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [showAllPast, setShowAllPast] = useState(false);
@@ -182,21 +183,15 @@ export default function CommunitySection({ content }: { content?: any }) {
       <div className="absolute inset-0 bg-slate-50 -z-20"></div>
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-50/50 to-transparent -z-10"></div>
 
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-              Community & Speaking
-            </h2>
-            <p className="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">
-              Empowering the tech ecosystem through global mentorship, impactful speaking engagements, and community leadership.
-            </p>
-          </motion.div>
-        </div>
+      <div className="river">
+        <SectionHeading
+          index={index}
+          title={content?.title || 'Community & Speaking'}
+          standfirst={
+            content?.subtitle ||
+            'Mentorship, speaking and community leadership across the regional tech ecosystem.'
+          }
+        />
 
         <div className="grid lg:grid-cols-12 gap-12">
             {/* LEFT COLUMN: Events & Archive */}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, ExternalLink, BookOpen, ArrowUpRight, ChevronDown, Rss, Calendar, Tag, Loader2 } from 'lucide-react';
+import { SectionHeading } from '@/components/layout/SectionFrame';
 
 interface BlogPost {
   title: string;
@@ -98,7 +99,7 @@ const sortByYear = (items: any[]) => {
   });
 };
 
-export default function PublicationsSection({ content }: { content?: any }) {
+export default function PublicationsSection({ content, index }: { content?: any; index?: number }) {
   // Use content from database, or fall back to rich defaults
   // Sort by year (most recent first)
   const rawArticles = content?.articles?.length > 0 ? content.articles : defaultArticles;
@@ -210,8 +211,9 @@ export default function PublicationsSection({ content }: { content?: any }) {
   ];
 
   return (
-    <section id="publications" className="py-20 sm:py-24">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="publications" className="scroll-mt-28 py-20 sm:py-24">
+      <div className="river">
+        <SectionHeading index={index} title={title} standfirst={description} />
         <div className="grid lg:grid-cols-12 gap-12">
 
           {/* Header Column (Left) */}
@@ -222,12 +224,6 @@ export default function PublicationsSection({ content }: { content?: any }) {
             className="lg:col-span-4"
           >
             <div className="sticky top-32">
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-                {title}
-              </h2>
-              <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
-                {description}
-              </p>
 
               {/* Beautiful Vertical Tab Switcher */}
               <div className="space-y-3 mb-8">
