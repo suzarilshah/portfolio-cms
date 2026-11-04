@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, ExternalLink, BookOpen, ArrowUpRight, ChevronDown, Rss, Calendar, Tag, Loader2 } from 'lucide-react';
 import { SectionHeading } from '@/components/layout/SectionFrame';
+import IndexList from '@/components/motion/IndexList';
 
 interface BlogPost {
   title: string;
@@ -303,86 +304,39 @@ export default function PublicationsSection({ content, index }: { content?: any;
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="relative">
-                    <div className="grid md:grid-cols-2 gap-5">
-                      {displayItems.map((item: any, index: number) => {
-                        const isJournal = activeTab === 'journals';
-                        const hasValidLink = item.link && item.link.startsWith('http');
+                  {/* An index, not a two-column card grid. These are
+                      citations: a title, where it ran, and when. That is a
+                      bibliography, and a bibliography is a list. */}
+                  <IndexList
+                    items={displayItems.map((item: any, i: number) => ({
+                      id: `${activeTab}-${i}`,
+                      title: item.title,
+                      kicker: item.publisher || item.platform,
+                      meta: item.date || item.year,
+                      detail: item.doi ? `DOI: ${item.doi}` : undefined,
+                      href: item.link && item.link.startsWith('http') ? item.link : null,
+                    }))}
+                  />
 
-                        const cardContent = (
-                          <>
-                            {hasValidLink && (
-                              <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
-                                <ExternalLink className="text-primary-500" size={20} />
-                              </div>
-                            )}
-
-                            <div className="mb-6">
-                              <div className={`inline-flex p-3 rounded-xl mb-4 transition-colors ${isJournal ? 'bg-purple-50 text-purple-600 group-hover:bg-purple-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
-                                {isJournal ? <BookOpen size={24} /> : <FileText size={24} />}
-                              </div>
-                              <h3 className={`font-display font-bold text-slate-900 transition-colors text-lg leading-snug line-clamp-3 ${hasValidLink ? 'group-hover:text-primary-600' : ''}`}>
-                                {item.title}
-                              </h3>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 border-t border-slate-50 pt-4 mt-auto">
-                              <span className="text-slate-700 px-2 py-1 bg-slate-50 rounded-md">{item.publisher || item.platform}</span>
-                              <span>{item.date || item.year}</span>
-                              {isJournal && item.doi && (
-                                <span className="font-mono text-[10px] text-slate-400 truncate max-w-[120px]" title={item.doi}>DOI: {item.doi}</span>
-                              )}
-                            </div>
-                          </>
-                        );
-
-                        if (hasValidLink) {
-                          return (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: index * 0.05 }}
-                            >
-                              <a
-                                href={item.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 relative overflow-hidden cursor-pointer h-full"
-                              >
-                                {cardContent}
-                              </a>
-                            </motion.div>
-                          );
-                        }
-
-                        return (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl transition-all duration-300 relative overflow-hidden"
-                          >
-                            {cardContent}
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-
-                    {/* View More / Show Less Button */}
-                    {currentItems.length > 6 && (
-                      <div className="mt-8 flex justify-center relative z-20">
-                        <button
-                          onClick={() => setShowAllPublications(!showAllPublications)}
-                          className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
-                        >
-                          {showAllPublications ? 'Show Less' : 'View More Publications'}
-                          <ChevronDown size={16} className={`transition-transform ${showAllPublications ? 'rotate-180' : ''}`} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  {currentItems.length > 6 && (
+                    <button
+                      onClick={() => setShowAllPublications(!showAllPublications)}
+                      className="group mt-7 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-slate-500 transition-colors hover:text-slate-900"
+                    >
+                      <span className="relative">
+                        {showAllPublications
+                          ? 'Show fewer'
+                          : `All ${currentItems.length} ${activeTab}`}
+                        <span className="absolute -bottom-0.5 left-0 h-px w-full origin-right scale-x-100 bg-current transition-transform duration-500 group-hover:origin-left group-hover:scale-x-0" />
+                      </span>
+                      <ChevronDown
+                        size={13}
+                        className={`transition-transform duration-300 ${
+                          showAllPublications ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                  )}
                 </motion.div>
               )}
 

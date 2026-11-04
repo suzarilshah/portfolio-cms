@@ -327,14 +327,26 @@ export default function ExperienceSection({
     [workExperience, now]
   );
 
-  // Chronological, earliest first. A timeline that runs right as you scroll
-  // right has to run forwards in time, and arriving at the current role is a
-  // better ending than opening on it. Roles whose dates could not be parsed
-  // keep their place at the end rather than being dropped.
+  // Reverse chronological: the current role is the first card.
+  //
+  // I had this running earliest-first so the track moved forwards in time, and
+  // that was the wrong trade. A CV's job is to answer "what are you doing now"
+  // in the first second; making a recruiter scroll past 2022 to find it is a
+  // narrative flourish paid for with the only attention that matters.
+  //
+  // The chart underneath still runs left-to-right in real time — a time axis
+  // that ran backwards would be a lie. So as you scroll the track, the
+  // highlighted bar travels leftward across the chart: you are rewinding, and
+  // the map shows it.
   const ordered = useMemo(
-    () => [...timeline.entries.map((entry) => entry.item), ...timeline.unparsed],
+    () => [...timeline.entries.map((entry) => entry.item)].reverse().concat(timeline.unparsed),
     [timeline]
   );
+
+  // The chart is indexed chronologically; the cards are not. Map between them
+  // rather than assuming the two orders line up.
+  const chartIndexOf = (cardIndex: number) => timeline.entries.length - 1 - cardIndex;
+  const cardIndexOf = (chartIndex: number) => timeline.entries.length - 1 - chartIndex;
 
   const [activeIndex, setActiveIndex] = useState(0);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -390,8 +402,8 @@ export default function ExperienceSection({
                 to={timeline.to}
                 lanes={timeline.lanes}
                 now={now}
-                activeIndex={activeIndex}
-                onSelect={scrollToCard}
+                activeIndex={chartIndexOf(activeIndex)}
+                onSelect={(chartIndex) => scrollToCard(cardIndexOf(chartIndex))}
               />
             }
           >
@@ -408,14 +420,14 @@ export default function ExperienceSection({
               />
             ))}
 
-            {/* Terminal card: the track should arrive somewhere rather than
-                simply stop. */}
+            {/* The track now ends at the earliest role, so this is a
+                bookend rather than a destination. */}
             <div className="flex w-full shrink-0 flex-col justify-end p-7 lg:h-[440px] lg:w-[320px]">
               <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">
-                End of record
+                Start of record
               </span>
               <p className="mt-3 max-w-[24ch] font-display text-[22px] font-semibold leading-tight tracking-[-0.02em] text-slate-900">
-                The next post is the one we talk about.
+                Six posts from here to now. The next one is the conversation.
               </p>
               <a
                 href="#contact"

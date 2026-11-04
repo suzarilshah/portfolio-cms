@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Mic, Users, Heart, Calendar, MapPin, ExternalLink, ChevronDown, ChevronUp, Award, Video, Globe } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { SectionHeading } from '@/components/layout/SectionFrame';
+import IndexList from '@/components/motion/IndexList';
 
 // --- Data Definitions ---
 
@@ -206,66 +207,19 @@ export default function CommunitySection({ content, index }: { content?: any; in
                         </h3>
                     </div>
 
-                    <div className="space-y-6">
-                        {displayEvents.map((event: any, idx: number) => (
-                            <motion.div
-                                key={event.id || idx}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
-                                className="group bg-white rounded-2xl p-6 md:p-8 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden"
-                            >
-                                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                
-                                <div className="flex flex-col md:flex-row md:items-start gap-6">
-                                    <div className="flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 bg-primary-50 text-primary-700 rounded-2xl font-bold leading-none">
-                                        <span className="text-xs uppercase tracking-wider">{event.date ? event.date.split(' ')[0]?.substring(0, 3) : 'TBD'}</span>
-                                        <span className="text-xl">{event.date ? event.date.split(' ')[1] : ''}</span>
-                                    </div>
-                                    
-                                    <div className="flex-grow">
-                                        <div className="flex flex-wrap gap-3 mb-3">
-                                            {event.type === 'upcoming' && (
-                                                <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-wide rounded-full">
-                                                    Upcoming
-                                                </span>
-                                            )}
-                                            <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium uppercase tracking-wide rounded-full">
-                                                {event.role}
-                                            </span>
-                                        </div>
-
-                                        <h4 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
-                                            {event.title}
-                                        </h4>
-                                        
-                                        <p className="text-slate-600 mb-4 line-clamp-2">
-                                            {event.topic}
-                                        </p>
-
-                                        <div className="flex items-center justify-between mt-auto">
-                                            <div className="flex items-center text-sm text-slate-500">
-                                                <MapPin size={16} className="mr-2" />
-                                                {event.venue}
-                                            </div>
-                                            
-                                            {event.link && (
-                                                <a 
-                                                    href={event.link} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
-                                                >
-                                                    Event Details <ExternalLink size={14} className="ml-1.5" />
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                    {/* An index of appearances rather than a stack of event
+                        cards. The venue and topic move into the hover panel;
+                        what you scan is where and when. */}
+                    <IndexList
+                      items={displayEvents.map((event: any, idx: number) => ({
+                        id: String(event.id ?? idx),
+                        title: event.title,
+                        kicker: event.type === 'upcoming' ? `Upcoming · ${event.role}` : event.role,
+                        meta: event.date,
+                        detail: [event.topic, event.venue].filter(Boolean).join(' — '),
+                        href: event.link || null,
+                      }))}
+                    />
                     
                     {displayCommunityEvents.length > 4 && (
                         <div className="mt-8 text-center">
