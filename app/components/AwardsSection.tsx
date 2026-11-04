@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Award, Medal, Star, ExternalLink, CheckCircle2, ChevronDown } from 'lucide-react';
 import Script from 'next/script';
-import { SectionHeading } from '@/components/layout/SectionFrame';
-import IndexList from '@/components/motion/IndexList';
 
 const defaultAwards = [
   {
@@ -69,21 +67,13 @@ interface AwardsContent {
   items?: AwardItem[];
 }
 
-export default function AwardsSection({
-  badges,
-  content,
-  index,
-}: {
-  badges?: any[];
-  content?: AwardsContent;
-  /** Position in the page's render order, shown in the margin. */
-  index?: number;
-}) {
+export default function AwardsSection({ badges, content }: { badges?: any[]; content?: AwardsContent }) {
   const items = content?.items || defaultAwards;
   const title = content?.title || "Global Recognition";
   const subtitle = content?.subtitle || "Acknowledged by industry giants for technical innovation, community leadership, and engineering excellence.";
 
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
+  const [showAllAwards, setShowAllAwards] = useState(false);
 
   // Initialize selected badge
   useEffect(() => {
@@ -107,7 +97,7 @@ export default function AwardsSection({
   };
 
   return (
-    <section id="awards" className="py-20 sm:py-24 relative bg-slate-50/50 overflow-hidden">
+    <section id="awards" className="py-20 md:py-32 relative bg-slate-50/50 overflow-hidden">
       {/* Background Blobs */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-blue-100/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
@@ -116,57 +106,182 @@ export default function AwardsSection({
 
       <Script src="//cdn.credly.com/assets/utilities/embed.js" strategy="lazyOnload" />
       
-      <div className="river relative z-10">
-        <SectionHeading
-          index={index}
-          title={title || 'Global Recognition'}
-          standfirst={subtitle}
-          // Tint everything after the first word, which is how the old
-          // hand-split heading read before it became a shared component.
-          highlight={(title || 'Global Recognition').split(' ').slice(1)}
-        />
+      <div className="max-w-[1400px] mx-auto px-6 relative z-10">
+        
+        {/* AWARDS SECTION */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-32">
+          {/* Header */}
+          <div className="lg:col-span-4 relative lg:sticky lg:top-32">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
+                {title?.split(' ')[0] || 'Global'} <br /> <span className="text-primary-600">{title?.split(' ').slice(1).join(' ') || 'Recognition'}</span>
+              </h2>
+              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                {subtitle}
+              </p>
+            </motion.div>
+          </div>
 
-        {/* The awards read as an index, not a six-card grid. A grid gives
-            every award identical weight and spends most of its area on
-            borders; a list of recognitions is something you scan, and the
-            detail only matters for the one under the cursor. */}
-        <IndexList
-          items={items.map((award: AwardItem, i: number) => ({
-            id: `${award.title}-${i}`,
-            title: award.title,
-            kicker: award.issuer,
-            meta: award.year,
-            detail: award.description,
-            href: award.link || null,
-          }))}
-          renderPreview={(item) => {
-            const award = items.find(
-              (candidate: AwardItem, i: number) => `${candidate.title}-${i}` === item.id
-            );
-            const Icon = getIcon(award?.icon || 'trophy');
-            return (
-              <div className="p-5">
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary-50 text-primary-600">
-                    <Icon size={17} />
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-slate-400">
-                    {item.meta}
-                  </span>
+          {/* Awards Grid */}
+          <div className="lg:col-span-8">
+            {items.length > 6 && !showAllAwards ? (
+              <div className="relative">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {items.slice(0, 6).map((award: any, index: number) => {
+                    const Icon = getIcon(award.icon);
+                    const CardContent = (
+                      <>
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="p-3 bg-primary-50 rounded-xl group-hover:bg-primary-600 transition-colors duration-500">
+                              <Icon className="w-6 h-6 text-primary-600 group-hover:text-white transition-colors duration-500" />
+                          </div>
+                          <span className="font-mono text-sm text-slate-400 bg-slate-100 px-2 py-1 rounded-md group-hover:bg-slate-800 group-hover:text-slate-300 transition-colors duration-500">
+                            {award.year}
+                          </span>
+                        </div>
+
+                        <h3 className="font-display text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors duration-300">
+                          {award.title}
+                        </h3>
+                        <p className="text-sm font-bold text-slate-500 mb-4 uppercase tracking-wide group-hover:text-slate-400 transition-colors">
+                          {award.issuer}
+                        </p>
+                        <p className="text-slate-600 text-sm leading-relaxed group-hover:text-slate-500 transition-colors">
+                          {award.description}
+                        </p>
+
+                        {award.link && (
+                          <div className="mt-6 flex items-center text-sm font-medium text-primary-600 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                              View Recognition <ExternalLink className="ml-2 w-4 h-4" />
+                          </div>
+                        )}
+                      </>
+                    );
+
+                    const cardClasses = "group p-8 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-primary-200 transition-all duration-500 h-full flex flex-col relative overflow-hidden";
+
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                          {award.link ? (
+                              <a href={award.link} target="_blank" rel="noopener noreferrer" className={cardClasses}>
+                                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary-100/50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                  {CardContent}
+                              </a>
+                          ) : (
+                              <div className={cardClasses}>
+                                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary-100/50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                  {CardContent}
+                              </div>
+                          )}
+                      </motion.div>
+                    );
+                  })}
                 </div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-slate-500">
-                  {item.kicker}
-                </p>
-                <p className="mt-2 text-[13px] leading-relaxed text-slate-600">{item.detail}</p>
+
+                {/* Gradient overlay matching Experience section */}
+                {!showAllAwards && (
+                    <div className="absolute bottom-full w-full h-32 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent pointer-events-none" />
+                )}
+
+                {/* View More Button - matching Experience section */}
+                <div className="mt-8 flex justify-center relative z-20">
+                    <button
+                        onClick={() => setShowAllAwards(true)}
+                        className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
+                    >
+                        View More Recognition
+                        <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                    </button>
+                </div>
               </div>
-            );
-          }}
-          className="mb-16"
-        />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {items.map((award: any, index: number) => {
+                  const Icon = getIcon(award.icon);
+                  const CardContent = (
+                    <>
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="p-3 bg-primary-50 rounded-xl group-hover:bg-primary-600 transition-colors duration-500">
+                            <Icon className="w-6 h-6 text-primary-600 group-hover:text-white transition-colors duration-500" />
+                        </div>
+                        <span className="font-mono text-sm text-slate-400 bg-slate-100 px-2 py-1 rounded-md group-hover:bg-slate-800 group-hover:text-slate-300 transition-colors duration-500">
+                          {award.year}
+                        </span>
+                      </div>
+
+                      <h3 className="font-display text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors duration-300">
+                        {award.title}
+                      </h3>
+                      <p className="text-sm font-bold text-slate-500 mb-4 uppercase tracking-wide group-hover:text-slate-400 transition-colors">
+                        {award.issuer}
+                      </p>
+                      <p className="text-slate-600 text-sm leading-relaxed group-hover:text-slate-500 transition-colors">
+                        {award.description}
+                      </p>
+
+                      {award.link && (
+                        <div className="mt-6 flex items-center text-sm font-medium text-primary-600 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                            View Recognition <ExternalLink className="ml-2 w-4 h-4" />
+                        </div>
+                      )}
+                    </>
+                  );
+
+                  const cardClasses = "group p-8 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-primary-200 transition-all duration-500 h-full flex flex-col relative overflow-hidden";
+
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                        {award.link ? (
+                            <a href={award.link} target="_blank" rel="noopener noreferrer" className={cardClasses}>
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary-100/50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                {CardContent}
+                            </a>
+                        ) : (
+                            <div className={cardClasses}>
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary-100/50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                {CardContent}
+                            </div>
+                        )}
+                    </motion.div>
+                  );
+                })}
+
+                {/* Show Less Button - matching Experience section */}
+                {items.length > 6 && (
+                  <div className="col-span-1 md:col-span-2 mt-8 flex justify-center">
+                    <button
+                      onClick={() => setShowAllAwards(false)}
+                      className="group flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-full shadow-lg text-slate-900 font-medium hover:border-primary-500 hover:text-primary-600 transition-all duration-300 hover:-translate-y-1"
+                    >
+                      Show Less
+                      <ChevronDown size={16} className="rotate-180 group-hover:-translate-y-0.5 transition-transform" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* CREDLY BADGES GALLERY */}
         {badges && badges.length > 0 && (
-            <div className="border-t border-slate-200 pt-16">
+            <div className="border-t border-slate-200 pt-24">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h3 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-4">Verified Credentials</h3>
                     <p className="text-slate-600 text-lg">

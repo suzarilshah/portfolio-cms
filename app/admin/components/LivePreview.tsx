@@ -136,7 +136,7 @@ export default function LivePreview({ sectionKey, content, onSelect }: LivePrevi
         <div className="flex items-start gap-2.5 border-b border-[var(--line)] bg-[#a26a12]/8 px-3 py-2.5">
           <AlertTriangle size={14} className="mt-0.5 shrink-0 text-[var(--warn)]" />
           <p className="text-[13px] leading-relaxed text-[var(--muted)]">
-            The preview did not connect. Editing and publishing still work — only the live
+            The preview did not connect. Editing and publishing still work. Only the live
             rendering is unavailable.
           </p>
         </div>

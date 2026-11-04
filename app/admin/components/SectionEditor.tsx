@@ -270,7 +270,7 @@ export default function SectionEditor<T>({
         </div>
         <div className="flex items-center gap-2">
           <Label>Position</Label>
-          <Meta className="studio-meta">{row.sort_order ?? '—'}</Meta>
+          <Meta className="studio-meta">{row.sort_order ?? '-'}</Meta>
         </div>
       </div>
 

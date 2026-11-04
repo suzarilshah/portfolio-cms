@@ -117,20 +117,12 @@ export default function PageSections({
 
   const components: Record<string, React.ReactNode> = {
     hero: <HeroSection content={content.hero} settings={settings} />,
-    about: <AboutSection content={content.about} settings={settings} index={numberOf('about')} />,
+    about: <AboutSection content={content.about} settings={settings} />,
     skills: <SkillsMatrix content={content.skills} />,
     projects: projectsSlot,
-    experience: (
-      <ExperienceSection
-        content={content.experience}
-        settings={settings}
-        index={numberOf('experience')}
-      />
-    ),
+    experience: <ExperienceSection content={content.experience} settings={settings} />,
     education: <EducationSection content={content.education} index={numberOf('education')} />,
-    awards: (
-      <AwardsSection badges={badges} content={content.awards} index={numberOf('awards')} />
-    ),
+    awards: <AwardsSection badges={badges} content={content.awards} />,
     publications: (
       <PublicationsSection content={content.publications} index={numberOf('publications')} />
     ),

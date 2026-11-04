@@ -1,26 +1,12 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { ArrowDown, ArrowRight, Download, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Download } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import EmailCaptureModal from '@/components/EmailCaptureModal';
-import KineticHeading from '@/components/motion/KineticHeading';
-import MagneticButton from '@/components/motion/MagneticButton';
+import TypingEffect from '@/components/TypingEffect';
 import Marquee from '@/components/motion/Marquee';
-
-/**
- * The hero.
- *
- * Choreography, in order: the eyebrow fades, the headline is revealed word by
- * word behind masks, the tagline follows, the credential strip starts moving,
- * and the CTAs arrive last. Each step hands off to the next rather than
- * everything animating at once, which is the difference between a composed
- * entrance and a page that simply appears.
- *
- * On scroll the whole block drifts upward slightly faster than the page and
- * fades, so the hero recedes behind the content rather than being pushed off
- * the top of it.
- */
 
 export interface HeroCredential {
   label: string;
@@ -29,46 +15,54 @@ export interface HeroCredential {
   since?: string;
 }
 
-export interface HeroCta {
-  label?: string;
-  href?: string;
-}
-
 export interface HeroContent {
   headline?: string;
-  tagline?: string;
-  description?: string;
-  credentials?: HeroCredential[];
-  primary_cta?: HeroCta;
-  secondary_cta?: HeroCta;
-  /** Words in the headline to tint with the accent. */
-  highlight?: string[];
-  /** Retired; kept so old rows do not fail validation on save. */
-  typing_phrases?: string[];
   subheadline?: string;
+  description?: string;
+  typing_phrases?: string[];
   curved_text?: string;
+  /** The credential belt. Kept from the redesign at your request. */
+  credentials?: HeroCredential[];
+  /** Retired fields, declared so old rows do not fail validation on save. */
+  tagline?: string;
+  primary_cta?: { label?: string; href?: string };
+  secondary_cta?: { label?: string; href?: string };
+  highlight?: string[];
 }
 
-interface Settings {
-  resume_url?: string;
-  [key: string]: any;
-}
-
+/**
+ * Defaults, exported because the Hero editor in /admin seeds its form from
+ * them. The editor and this component must agree on field names or the CMS
+ * writes to keys nothing renders.
+ *
+ * `tagline`, `primary_cta` and `secondary_cta` are kept because the editor
+ * still offers them; this layout uses `subheadline` and its own buttons, so
+ * `tagline` is read as a fallback for `subheadline` rather than ignored.
+ */
 export const DEFAULT_HERO = {
-  headline: 'I build the cloud platforms that critical systems run on.',
-  tagline: 'Azure architecture, Kubernetes and DevOps at production scale.',
+  headline: 'Building the Future of',
+  subheadline: 'Microsoft MVP • Docker Captain • Platform Engineering Leader',
+  tagline: 'Microsoft MVP • Docker Captain • Platform Engineering Leader',
   description:
-    'Senior IT Systems & Customer Engineer at Swift in Kuala Lumpur. I design and operate the infrastructure behind financial systems that cannot go down.',
-  credentials: [
-    { label: 'Microsoft MVP', issuer: 'AI & Azure', url: 'https://mvp.microsoft.com/en-us/PublicProfile/5005264' },
-    { label: 'Docker Captain', issuer: 'Docker Inc.', url: 'https://www.docker.com/captains/' },
-    { label: 'AWS Community Builder', issuer: 'Amazon Web Services' },
-    { label: 'Professional Technologist', issuer: 'MBOT' },
-  ] as HeroCredential[],
-  primary_cta: { label: 'Start a conversation', href: '#contact' },
-  secondary_cta: { label: 'See the work', href: '#projects' },
-  highlight: ['critical'],
+    'Muhammad Suzaril Shah, Senior IT Systems Engineer at Swift specializing in Azure Cloud Architecture, Kubernetes orchestration, DevOps automation, and IoT cloud solutions. Microsoft MVP and Docker Captain driving digital transformation across Southeast Asia.',
+  typing_phrases: [
+    'Azure Cloud Architect',
+    'DevOps Advocate',
+    'Platform Engineering Leader',
+    'Microsoft MVP',
+    'Docker Captain',
+  ],
+  credentials: [] as HeroCredential[],
+  primary_cta: { label: 'Schedule Consultation', href: '#contact' },
+  secondary_cta: { label: 'View Expertise', href: '#experience' },
 };
+
+const DEFAULT_CREDENTIALS: HeroCredential[] = [
+  { label: 'Microsoft MVP', issuer: 'AI & Azure', url: 'https://mvp.microsoft.com/en-us/PublicProfile/5005264' },
+  { label: 'Docker Captain', issuer: 'Docker Inc.', url: 'https://www.docker.com/captains/' },
+  { label: 'AWS Community Builder', issuer: 'Amazon Web Services' },
+  { label: 'Professional Technologist', issuer: 'MBOT' },
+];
 
 function CredentialChip({ credential }: { credential: HeroCredential }) {
   const body = (
@@ -88,9 +82,7 @@ function CredentialChip({ credential }: { credential: HeroCredential }) {
   const shell =
     'mx-1.5 flex items-center gap-3 rounded-full border border-slate-200/90 bg-white/70 py-2.5 pl-5 pr-5 backdrop-blur-sm transition-colors';
 
-  if (!credential.url) {
-    return <div className={shell}>{body}</div>;
-  }
+  if (!credential.url) return <div className={shell}>{body}</div>;
 
   return (
     <a
@@ -108,93 +100,130 @@ function CredentialChip({ credential }: { credential: HeroCredential }) {
   );
 }
 
-export default function HeroSection({
-  content,
-  settings,
-}: {
-  content?: HeroContent;
-  settings?: Settings;
-}) {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
+interface Settings {
+  resume_url?: string;
+  [key: string]: any;
+}
+
+const defaultTypingPhrases = [
+  "Azure Cloud Architect",
+  "DevOps Advocate",
+  "Platform Engineering Leader",
+  "Microsoft MVP",
+  "Docker Captain"
+];
+
+export default function HeroSection({ content, settings }: { content?: HeroContent; settings?: Settings }) {
+  const headline = content?.headline || "Building the Future of";
+  // `tagline` is what the current Hero editor writes; `subheadline` is what
+  // this layout has always read. Accepting both means the CMS keeps driving
+  // the strapline whichever field the editor happens to save.
+  const subheadline = content?.subheadline || content?.tagline || DEFAULT_HERO.subheadline;
+  const description = content?.description || "Muhammad Suzaril Shah - Senior IT Systems Engineer at Swift specializing in Azure Cloud Architecture, Kubernetes orchestration, DevOps automation, and IoT cloud solutions. Microsoft MVP & Docker Captain driving digital transformation across Southeast Asia.";
+  const typingPhrases = content?.typing_phrases || defaultTypingPhrases;
+  const credentials = content?.credentials?.length ? content.credentials : DEFAULT_CREDENTIALS;
+  const resumeUrl = settings?.resume_url;
   const [showEmailModal, setShowEmailModal] = useState(false);
 
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
-  const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
-
-  const headline = content?.headline || DEFAULT_HERO.headline;
-  const tagline = content?.tagline || DEFAULT_HERO.tagline;
-  const description = content?.description || DEFAULT_HERO.description;
-  const highlight = content?.highlight?.length ? content.highlight : DEFAULT_HERO.highlight;
-  const credentials = content?.credentials?.length
-    ? content.credentials
-    : DEFAULT_HERO.credentials;
-
-  const primary = { ...DEFAULT_HERO.primary_cta, ...(content?.primary_cta || {}) };
-  const secondary = { ...DEFAULT_HERO.secondary_cta, ...(content?.secondary_cta || {}) };
-  const resumeUrl = settings?.resume_url;
-
-  // Timed against the headline so nothing overlaps its reveal.
-  const after = (seconds: number) =>
-    reduce
-      ? {}
-      : {
-          initial: { opacity: 0, y: 14 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.7, delay: seconds, ease: [0.16, 1, 0.3, 1] as const },
-        };
-
   return (
-    <section
-      ref={ref}
-      id="home"
-      className="relative flex min-h-[92svh] scroll-mt-24 flex-col justify-center overflow-hidden pb-16 pt-28 sm:pb-20 sm:pt-32"
-    >
-      <motion.div style={reduce ? undefined : { y, opacity }} className="river">
-        <motion.div {...after(0.05)} className="mb-7 flex items-center gap-3">
-          <span className="relative flex h-2 w-2">
-            {/* A live indicator, not a decoration: it says the page is
-                current and the person is reachable. */}
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-500">
-            Kuala Lumpur · Open to work
-          </span>
-        </motion.div>
+    <section id="home" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 pt-16 sm:pt-20">
+        <div className="flex flex-col max-w-5xl mx-auto">
+          
+          {/* Executive Status Line */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8"
+          >
+            <div className="h-[1px] w-8 sm:w-12 bg-primary-500" />
+            <span className="font-mono text-xs sm:text-sm font-bold tracking-widest text-primary-600 uppercase">
+              {subheadline}
+            </span>
+          </motion.div>
 
-        <KineticHeading
-          as="h1"
-          text={headline}
-          trigger="mount"
-          delay={0.15}
-          stagger={0.06}
-          highlight={highlight}
-          // Deliberately oversized, and deliberately only 15ch wide: the
-          // headline wraps to four tall lines and becomes the page's largest
-          // shape rather than a caption above the content.
-          className="max-w-[15ch] text-balance font-display text-[44px] font-bold leading-[0.98] tracking-[-0.045em] text-slate-900 sm:text-[66px] md:text-[82px] lg:text-[96px] xl:text-[108px]"
-        />
+          {/* Main Headline with Typing Effect */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-6 sm:mb-8"
+          >
+            <h1 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-slate-900 leading-[1.1]">
+              {headline}
+            </h1>
+            <div className="font-display text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-primary-600 leading-[1.1] mt-2 min-h-[1.2em]">
+              <TypingEffect
+                phrases={typingPhrases}
+                typingSpeed={80}
+                deletingSpeed={40}
+                pauseDuration={2500}
+              />
+            </div>
+          </motion.div>
 
-        {/* The tagline sits in the right half, across the gutter from the
-            headline's ragged edge, instead of stacking directly under it. */}
-        <motion.p
-          {...after(0.15 + headline.split(' ').length * 0.06)}
-          className="mt-8 max-w-[40ch] text-pretty text-[19px] leading-[1.42] text-slate-600 sm:text-[22px] lg:ml-[38%] lg:mt-10"
-        >
-          {tagline}
-        </motion.p>
-      </motion.div>
+          {/* Professional Summary */}
+          <div className="grid md:grid-cols-12 gap-6 md:gap-12 items-start border-t border-slate-100 pt-6 md:pt-12">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="md:col-span-7"
+            >
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-600 leading-relaxed font-light">
+                {description}
+              </p>
+            </motion.div>
 
-      {/* Full-bleed credential strip. Breaking the container is deliberate:
-          it signals the page is wider than its text column. */}
+            {/* Call to Action */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="md:col-span-5 flex flex-col gap-3 sm:gap-4 w-full"
+            >
+              <a
+                href="#contact"
+                className="group inline-flex items-center justify-between px-6 sm:px-8 py-3 sm:py-4 bg-slate-900 text-white rounded-full hover:bg-primary-600 transition-all duration-300 shadow-lg hover:shadow-primary-500/25 hover:scale-105"
+              >
+                <span className="font-medium text-base sm:text-lg">Schedule Consultation</span>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+              </a>
+
+              {resumeUrl ? (
+                <button
+                  onClick={() => setShowEmailModal(true)}
+                  className="group inline-flex items-center justify-between px-6 sm:px-8 py-3 sm:py-4 bg-white border border-slate-200 text-slate-900 rounded-full hover:border-primary-200 hover:bg-slate-50 transition-all duration-300 hover:scale-105 w-full"
+                >
+                  <span className="font-medium text-base sm:text-lg">Download Resume</span>
+                  <Download className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-y-1 transition-transform" />
+                </button>
+              ) : (
+                <a
+                  href="#experience"
+                  className="group inline-flex items-center justify-between px-6 sm:px-8 py-3 sm:py-4 bg-white border border-slate-200 text-slate-900 rounded-full hover:border-primary-200 hover:bg-slate-50 transition-all duration-300 hover:scale-105"
+                >
+                  <span className="font-medium text-base sm:text-lg">View Expertise</span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                </a>
+              )}
+            </motion.div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Credential belt. Deliberately outside the centred container so it
+          runs the full width of the viewport: a band you can see the end of
+          is not a band. Three copies per half keeps it continuous on a wide
+          screen, where four chips would otherwise leave a visible seam. */}
       <motion.div
-        {...after(0.6)}
-        className="relative mt-11 sm:mt-14"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7, duration: 0.6 }}
+        className="relative z-10 mt-12 sm:mt-16"
       >
-        {/* Three copies per half: four credentials is narrower than a desktop
-            viewport, and a band you can see the end of is not a band. */}
         <Marquee speed={46} repeat={3}>
           {credentials.map((credential) => (
             <CredentialChip key={credential.label} credential={credential} />
@@ -202,68 +231,24 @@ export default function HeroSection({
         </Marquee>
       </motion.div>
 
+      {/* Minimal Scroll Indicator */}
       <motion.div
-        {...after(0.75)}
-        className="river mt-11 sm:mt-14"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+        className="absolute bottom-32 right-12 hidden md:flex items-center gap-4 z-10"
       >
-        {/* A 12-column rule, not a flex row: the prose takes five columns and
-            the actions take four, with three left empty between them. The
-            hole is the point — symmetric justify-between is what everything
-            else on the internet does. */}
-        <div className="grid grid-cols-1 gap-8 border-t border-slate-900/10 pt-8 lg:grid-cols-12 lg:gap-6">
-          <p className="max-w-[56ch] text-[15px] leading-relaxed text-slate-500 sm:text-[16px] lg:col-span-5">
-            {description}
-          </p>
-
-          <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:col-span-4 lg:col-start-9 lg:justify-end">
-            <MagneticButton
-              href={primary.href}
-              className="group inline-flex items-center justify-center rounded-full bg-slate-900 px-7 py-4 text-[15px] font-medium text-white transition-colors hover:bg-primary-600"
-            >
-              {primary.label}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </MagneticButton>
-
-            {resumeUrl ? (
-              <MagneticButton
-                onClick={() => setShowEmailModal(true)}
-                className="group inline-flex items-center justify-center rounded-full border border-slate-300 px-7 py-4 text-[15px] font-medium text-slate-900 transition-colors hover:border-slate-900"
-              >
-                Download CV
-                <Download className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
-              </MagneticButton>
-            ) : (
-              <MagneticButton
-                href={secondary.href}
-                className="group inline-flex items-center justify-center rounded-full border border-slate-300 px-7 py-4 text-[15px] font-medium text-slate-900 transition-colors hover:border-slate-900"
-              >
-                {secondary.label}
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </MagneticButton>
-            )}
-          </div>
+        <span className="font-mono text-xs tracking-widest text-slate-400 uppercase rotate-90 origin-right translate-x-2">Scroll</span>
+        <div className="h-16 w-[1px] bg-slate-200 overflow-hidden">
+          <motion.div
+            className="h-full w-full bg-slate-900"
+            animate={{ y: [-64, 64] }}
+            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+          />
         </div>
       </motion.div>
 
-      {!reduce && (
-        <motion.a
-          href="#about"
-          {...after(1.1)}
-          // Parked at the right edge rather than centred. A centred scroll cue
-          // re-imposes the axis of symmetry the rest of the hero just broke.
-          className="absolute bottom-7 right-[var(--river-pad)] hidden flex-col items-center gap-2 text-slate-400 transition-colors hover:text-slate-900 md:flex"
-          aria-label="Scroll to About"
-        >
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em]">Scroll</span>
-          <motion.span
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <ArrowDown size={14} />
-          </motion.span>
-        </motion.a>
-      )}
-
+      {/* Email Capture Modal */}
       <EmailCaptureModal
         isOpen={showEmailModal}
         onClose={() => setShowEmailModal(false)}

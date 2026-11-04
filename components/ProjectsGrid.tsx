@@ -102,7 +102,7 @@ function ProjectCard({
       <SpotlightCard
         as="button"
         onClick={onOpen}
-        ariaLabel={`${project.title} — open case study`}
+        ariaLabel={`${project.title}: open case study`}
         className="flex h-full w-full flex-col text-left shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-shadow duration-300 hover:shadow-[0_2px_8px_rgb(15_23_42/0.06),0_24px_56px_-20px_rgb(15_23_42/0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">

@@ -216,7 +216,7 @@ export default function CommunitySection({ content, index }: { content?: any; in
                         title: event.title,
                         kicker: event.type === 'upcoming' ? `Upcoming · ${event.role}` : event.role,
                         meta: event.date,
-                        detail: [event.topic, event.venue].filter(Boolean).join(' — '),
+                        detail: [event.topic, event.venue].filter(Boolean).join(' · '),
                         href: event.link || null,
                       }))}
                     />

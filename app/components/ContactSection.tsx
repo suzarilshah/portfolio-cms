@@ -62,7 +62,7 @@ export default function ContactSection({ content, index }: { content?: any; inde
           title={content?.title || "Let's Collaborate"}
           standfirst={
             content?.subtitle ||
-            "Cloud architecture, AI, or community work — I'm always open to connecting."
+            "Cloud architecture, AI, or community work. I'm always open to connecting."
           }
         />
 

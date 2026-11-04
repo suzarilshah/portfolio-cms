@@ -526,7 +526,7 @@ export default function ProjectsAdminPage() {
                                             {project.category || 'Project'}
                                         </span>
                                         <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-mono font-semibold text-[var(--dim)]">
-                                            {project.year || '—'}
+                                            {project.year || '-'}
                                         </span>
                                     </div>
                                 </div>

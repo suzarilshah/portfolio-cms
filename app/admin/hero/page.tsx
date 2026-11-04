@@ -143,12 +143,30 @@ export default function HeroEditor() {
             </Field>
 
             <Field
-              label="Tagline"
-              hint="The single line under the headline. It replaced the typing animation, which was never fully readable."
+              label="Strapline"
+              hint="The small line above the headline, set in mono caps."
             >
               <Input
-                value={content.tagline || ''}
-                onChange={(e) => onChange({ ...content, tagline: e.target.value })}
+                value={content.subheadline ?? content.tagline ?? ''}
+                onChange={(e) => onChange({ ...content, subheadline: e.target.value })}
+              />
+            </Field>
+
+            <Field
+              label="Rotating phrases"
+              hint="One per line. These cycle under the headline in the typing animation."
+            >
+              <Textarea
+                rows={5}
+                value={(content.typing_phrases || []).join('\n')}
+                onChange={(e) =>
+                  onChange({
+                    ...content,
+                    // Split on save rather than on every keystroke would drop
+                    // the blank line you are mid-way through typing.
+                    typing_phrases: e.target.value.split('\n'),
+                  })
+                }
               />
             </Field>
 

@@ -48,7 +48,7 @@ const FALLBACK_PROJECTS = [
   {
     id: 3,
     title: 'Azure AI‑Powered Smart Aquaponics',
-    tagline: 'Imagine Cup 2022 — Top 4 Asia',
+    tagline: 'Imagine Cup 2022: Top 4 Asia',
     challenge: 'Sustainable agriculture needs intelligent automation and real‑time monitoring.',
     solution: 'Built an IoT + AI system with Azure IoT Hub, ML, and computer vision to automate monitoring.',
     impact: [
