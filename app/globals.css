@@ -39,9 +39,6 @@
     }
 
     /* Belt and braces: any keyframe animation below is decorative. */
-    .aurora-drift-a,
-    .aurora-drift-b,
-    .aurora-drift-c,
     .marquee-track {
       animation: none !important;
     }
@@ -49,16 +46,10 @@
 }
 
 /* Layout ------------------------------------------------------------------
- * The page is a spine and a river: a fixed index rail on the left, and the
- * content running beside it. `.river` is the measure inside that river.
+ * `.river` is the shared measure for the sections that use SectionHeading:
+ * Projects, Education, Publications, Community and Contact.
  *
- * It deliberately has no `margin-inline: auto`. Centring every section in the
- * remaining width is what made the old page read as a template — content
- * floating in the middle of the viewport with symmetric air on both sides.
- * Hanging it off a left edge instead gives the eye a line to return to, and
- * leaves asymmetric whitespace on the right that the layout can break into.
- */
-/* Deliberately outside `@layer components`.
+ * Deliberately outside `@layer components`.
  *
  * Tailwind only emits rules inside a layer when it decides they are used, and
  * it dropped this entire block — including the `:root` custom properties,
@@ -73,6 +64,10 @@
 .river {
   width: 100%;
   max-width: 76rem;
+  /* Centred again. It hung off the left edge to sit beside the fixed index
+     rail; with the rail gone, left-aligned content would leave a growing
+     band of dead space on the right of a wide screen. */
+  margin-inline: auto;
   padding-left: var(--river-pad);
   padding-right: var(--river-pad);
 }
@@ -98,48 +93,7 @@
  * can move continuously without costing the main thread anything.
  */
 @layer utilities {
-  @keyframes aurora-a {
-    0%,
-    100% {
-      transform: translate3d(0, 0, 0) scale(1);
-    }
-    50% {
-      transform: translate3d(6%, 4%, 0) scale(1.12);
-    }
-  }
-  @keyframes aurora-b {
-    0%,
-    100% {
-      transform: translate3d(0, 0, 0) scale(1.08);
-    }
-    50% {
-      transform: translate3d(-7%, 5%, 0) scale(1);
-    }
-  }
-  @keyframes aurora-c {
-    0%,
-    100% {
-      transform: translate3d(0, 0, 0) scale(1);
-    }
-    50% {
-      transform: translate3d(4%, -6%, 0) scale(1.15);
-    }
-  }
 
-  /* Prime numbers of seconds, so the three never resynchronise and the
-     field never visibly loops. */
-  .aurora-drift-a {
-    animation: aurora-a 19s ease-in-out infinite;
-    will-change: transform;
-  }
-  .aurora-drift-b {
-    animation: aurora-b 23s ease-in-out infinite;
-    will-change: transform;
-  }
-  .aurora-drift-c {
-    animation: aurora-c 29s ease-in-out infinite;
-    will-change: transform;
-  }
 
   @keyframes marquee-x {
     from {

@@ -3,10 +3,7 @@ import Navigation from './components/Navigation';
 import PageSections from './components/PageSections';
 import ProjectsShowcase from '@/components/ProjectsShowcaseWrapper';
 import Footer from './components/Footer';
-import Aurora from '@/components/motion/Aurora';
-import Grain from '@/components/motion/Grain';
-import SmoothScroll from '@/components/motion/SmoothScroll';
-import Spine from '@/components/layout/Spine';
+import GridBackground from '@/components/GridBackground';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable caching completely
@@ -107,55 +104,40 @@ export default async function Home() {
   const { sectionData, renderOrder, badges, settings } = await getData();
 
   return (
-    // `overflow-x-clip`, not `overflow-hidden`. Both stop the full-bleed
-    // strips causing a horizontal scrollbar, but `hidden` on one axis forces
-    // the other to `auto`, which makes this element a scroll container — and
-    // a scroll container ancestor silently disables `position: sticky` in
-    // everything inside it. That killed both the spine and the pinned
-    // experience track while looking, in the markup, completely correct.
+    // `overflow-x-clip` rather than `overflow-hidden`. Both stop the credential
+    // belt causing a horizontal scrollbar, but `hidden` on one axis forces the
+    // other to `auto`, which makes this element a scroll container, and a
+    // scroll container ancestor silently disables `position: sticky` in
+    // everything inside it. The sticky column in Awards depends on that.
     <main className="relative min-h-screen overflow-x-clip selection:bg-primary-100 selection:text-primary-900">
-      {/* Global Grid Background with Parallax */}
-      {/* The field the whole page sits on: drifting light, a grid that
-          responds to the cursor, and grain over the top for material. */}
-      <Aurora
-        accent={settings.background_svg_color}
-        intensity={settings.background_grid_intensity}
+      {/* Global Grid Background with Parallax. Both of its controls stay
+          database-driven, so the colour and the wash are still set from
+          Design & SEO in the CMS. */}
+      <GridBackground
+        svgColor={settings.background_svg_color}
+        overlayOpacity={settings.background_overlay_opacity}
       />
-      <Grain />
-      <SmoothScroll />
 
-      {/* The spine: a fixed index rail that replaces the nav on wide screens.
-          It reads the same renderOrder the page renders, so the CMS owns the
-          index exactly as it owns the page. */}
-      <Spine order={renderOrder} settings={settings} />
+      {/* Navigation */}
+      <Navigation settings={settings} />
 
-      {/* Below xl there is no room for a rail, so the floating nav stands in.
-          Running both at once would be two navigations for one page. */}
-      <div className="xl:hidden">
-        <Navigation settings={settings} />
-      </div>
+      {/* Main content. The key → component map lives in PageSections so the
+          CMS can swap content in without a round trip; see lib/preview. */}
+      <PageSections
+        sectionData={sectionData}
+        renderOrder={renderOrder}
+        badges={badges}
+        settings={settings}
+        projectsSlot={
+          <ProjectsShowcase
+            content={sectionData.projects}
+            index={renderOrder.filter((key) => key !== 'hero').indexOf('projects') + 1}
+          />
+        }
+      />
 
-      {/* The river. Offset by the rail's width rather than centred, which is
-          what gives the page a left edge to read against. */}
-      <div className="xl:pl-[300px] 2xl:pl-[340px]">
-        {/* Main content. The key → component map lives in PageSections so the
-            CMS can swap content in without a round trip; see lib/preview. */}
-        <PageSections
-          sectionData={sectionData}
-          renderOrder={renderOrder}
-          badges={badges}
-          settings={settings}
-          projectsSlot={
-            <ProjectsShowcase
-              content={sectionData.projects}
-              index={renderOrder.filter((key) => key !== 'hero').indexOf('projects') + 1}
-            />
-          }
-        />
-
-        {/* Footer */}
-        <Footer content={settings.footer} settings={settings} />
-      </div>
+      {/* Footer */}
+      <Footer content={settings.footer} settings={settings} />
     </main>
   );
 }
